@@ -33,8 +33,8 @@ export class App
 {
     constructor( div, opts )
     {
-        this.clientId = "fd81068a15354a300522";
-        this.host = "https://editor.verovio.org";
+        this.clientId = "d83b17a6e055dede5e76";
+        this.host = "https://editor-test.verovio.org";
         this.authHost = "https://verovio-editor-auth.lm.r.appspot.com/"
 
         this.githubManager = new GitHubManager( this );
