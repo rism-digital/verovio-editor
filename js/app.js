@@ -25,9 +25,8 @@ import { elt } from './utils/functions.js';
 
 let filter = '/svg/filter.xml';
 
-// Texts
-// import about from '../md/about.md';
-//const marked = require( 'marked' );
+const marked = window.marked;
+const about = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com).`
 
 export class App
 {
@@ -730,7 +729,7 @@ export class App
     async helpAbout( e )
     {
         const dlg = new Dialog( this.ui.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.type.Msg } );
-        dlg.setContent( "Prout");
+        dlg.setContent( marked.parse(about) );
         await dlg.show();
     }
 
