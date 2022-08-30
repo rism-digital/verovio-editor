@@ -1,0 +1,863 @@
+////////////////////////////////////////////////////////////////////////
+// To change dark / light theme - also rename icons directories
+////////////////////////////////////////////////////////////////////////
+$darktheme: true;
+
+$background: lightgrey;
+$background-light: lighten($background, 10%);
+$background-extra-light: lighten($background, 20%);
+$background-active: darken($background, 20%);
+$background-toggled: darken($background, 10%);
+$background-border: darken($background, 10%);
+$text-color: black;
+$dialog-color: lighten($background, 10%);
+$dialog-background: rgba(245,245,245,0.8);
+$doc-background: whitesmoke;
+$disabled-opacity: 0.2;
+$primary: #8B0000;
+
+$hover-filter: invert(100%);
+$filtered-primary: invert($primary);
+$filtered-background-grey-active: invert($background-active);
+
+@if $darktheme == true {
+    $background: rgb(60, 60, 60);
+    $background-light: lighten($background, 10%);
+    $background-extra-light: lighten($background, 20%);
+    $background-active: darken($background, 15%);
+    $background-toggled: darken($background, 10%);
+    $background-border: lighten($background, 10%);
+    $text-color: white;
+    $dialog-color: rgb(50, 50, 50);
+    $dialog-background: rgba(95,95,95,0.8);
+    $doc-background: grey;
+    $disabled-opacity: 0.5;
+
+    $hover-filter: invert(0%);
+    $filtered-primary: $primary;
+    $filtered-background-grey-active: $background-active;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Some dimensions
+////////////////////////////////////////////////////////////////////////
+
+$toolbar-height: 36px;
+$menu-height: 18px;
+$statusbar-height: 20px;
+$editor-toolpanel-width: 0px;
+$btn-height: 40px;
+$dialog-gh-list-height: 350px;
+
+$z-index-valid: 5;
+$z-index-menu: 6;
+$z-index-dialog: 7;
+$z-index-notification: 8;
+
+$font-family: Helvetica Neue, Helvetica,Arial, sans-serif; 
+
+////////////////////////////////////////////////////////////////////////
+// Hidden form / file maniupulation elements
+////////////////////////////////////////////////////////////////////////
+
+.vrv-filter, .vrv-file-input, .vrv-file-output, .vrv-file-copy {
+    position: absolute;
+    // make sure it is out of the way
+    left: -9999px;
+    z-index: -1;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Properties for button-like elements
+////////////////////////////////////////////////////////////////////////
+
+.vrv-clickable:hover:not(.inactivated) {
+    filter: $hover-filter;
+    background-color: $filtered-primary;
+    cursor: pointer;
+}
+.vrv-activable:active:not(.inactivated) {
+    background-color: $filtered-background-grey-active;
+    cursor: pointer;
+}
+.vrv-toggleable.toggled {
+    background-color: $background-toggled;
+}
+.vrv-disableable.disabled {
+    opacity: $disabled-opacity;
+    pointer-events: none;
+}
+.vrv-inactivable.inactivated {
+    pointer-events: none;
+}
+.vrv-selectable.selected {
+    background-color: $background;
+}
+
+// Disable text selection
+.vrv-text-no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome and Opera */
+}
+
+////////////////////////////////////////////////////////////////////////
+// Main wrapper
+////////////////////////////////////////////////////////////////////////
+
+.vrv-wrapper {
+    // reset potential previous values
+    border: 0 none;
+    display: 'block';
+    font-weight: normal;
+    font-family: $font-family;
+    font-style: normal;
+    font-size: initial;
+    line-height: initial;
+    margin: 0;
+    outline: 0;
+    overflow: initial;
+    padding: 0;
+    text-align: initial;
+    vertical-align: baseline;
+    *,
+    ::before,
+    ::after {
+      box-sizing: initial;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Properties for button-like elements
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-views {
+        position: absolute;
+        overflow: scroll;
+    
+        .vrv-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background-color: $doc-background;
+            color: $text-color;
+
+            .vrv-loading-text {
+                text-align: center;
+                height: 120px;
+                background: url(./loading.svg) no-repeat center;
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // View and SVG elements
+        ////////////////////////////////////////////////////////////////////////
+    
+        .vrv-view {
+            display: none;
+    
+            .vrv-svg-wrapper, .vrv-svg-overlay {
+                svg {
+                    float: left;
+                }
+                overflow: auto;
+                position: absolute;
+
+                text {
+                    @extend .vrv-text-no-select
+                }
+            }
+
+            ////////////////////////////////////////////////////////////////////////
+            // Editoror view cursor
+            ////////////////////////////////////////////////////////////////////////        
+
+            .vrv-editor-cursor {
+                display: none;
+                top: -1000px;
+                position: relative;
+                pointer-events: none;
+
+                .vrv-cursor-lines {
+                    position: absolute;
+                }
+
+                .vrv-cursor-lines.top {
+                    background-position: center bottom;
+                    background-image: url(../icons/ledgerline.png);
+                }
+
+                .vrv-cursor-lines.bottom {
+                    background-position: center top;
+                    background-image: url(../icons/ledgerline.png);
+                }
+
+                .vrv-cursor-pointer {
+                    position: absolute;
+                    background-image: url(../icons/cursor.png);
+                }
+
+            }
+
+            ////////////////////////////////////////////////////////////////////////
+            // Document view wrapper
+            ////////////////////////////////////////////////////////////////////////
+        
+            .vrv-doc-wrapper {
+                background: $doc-background;
+                margin: 0;
+            
+                .vrv-page-wrapper {
+                    margin: auto auto;
+                    background: white;
+                    box-shadow: 2px 2px 4px darken($doc-background, 30%);
+                }
+            }
+
+            ////////////////////////////////////////////////////////////////////////
+            // Editor panel and splitter
+            ////////////////////////////////////////////////////////////////////////
+
+            .vrv-editor-toolpanel {
+                min-width: $editor-toolpanel-width;
+                background-color: $background;
+                border-top: 1px solid $background-border;
+                border-bottom: 1px solid $background-border;
+            }
+
+            .vrv-hsplit {
+                display: flex;
+            }
+            
+            .vrv-split {
+                display: flex;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+
+            // commmon to vertical and horizontal
+            .vrv-split > :nth-child(2) {
+                position: relative;
+            }
+
+            .vrv-split > :nth-child(3) {
+                flex: auto;
+                min-height: 200px;
+                min-width: 400px;
+            }
+
+            // vertical only
+            .vrv-split.vertical {
+                flex-direction: column;
+            }
+    
+            .vrv-split.vertical > :nth-child(1) {
+                height: 200px;
+                min-height: 200px;
+            }
+    
+            .vrv-split.vertical > :nth-child(2) {
+                height: 10px;
+                cursor: row-resize;
+                background: url(../icons/toolbar/drag-h.png) no-repeat center;
+                background-color: $background-active;
+            }
+
+            // horizontal only
+            .vrv-split.horizontal {
+                flex-direction: row;
+            }
+            
+            .vrv-split.horizontal > :nth-child(1) {
+                width: 200px;
+                min-width: 200px;
+            }
+
+            .vrv-split.horizontal > :nth-child(2) {
+                width: 10px;
+                cursor: col-resize;
+                background: url(../icons/toolbar/drag-v.png) no-repeat center;
+                background-color: $background-active;
+            }
+
+            ////////////////////////////////////////////////////////////////////////
+            // XMLEditor view
+            ////////////////////////////////////////////////////////////////////////
+            
+            .vrv-split div {
+
+                .vrv-xml {
+                    position: absolute;
+                    background: lightgrey;
+                }
+            }
+
+            .vrv-xmlvalid {
+                z-index: $z-index-valid;
+                position: absolute;
+                min-height: 16px;
+                min-width: 16px;
+            }
+            .vrv-xmlvalid.ok {
+                background: url(../icons/xml/ok.png) no-repeat center;
+                background-color: green;
+            }
+            .vrv-xmlvalid.wait {
+                background: url(../icons/xml/wait.png) no-repeat center;
+                background-color: darkorange;
+            }
+            .vrv-xmlvalid.error {
+                background: url(../icons/xml/stop.png) no-repeat center;
+                background-color: #B00;
+            }
+        }
+    }
+
+    svg {
+        display: block;
+        margin: 0 auto;
+    }
+
+    $btn-padding: 9px;
+    $menu-padding: 5px;
+    $btn-small: 16px;
+    $btn-large: 32px;
+    $midibar-width: 200px;
+
+    ////////////////////////////////////////////////////////////////////////
+    // Toolbar
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-toolbar {
+        width: 100%;
+        overflow: auto;
+        background: $background;
+        min-height: $toolbar-height;
+        color: $text-color;
+    
+        .vrv-btn-group {
+            float: left;
+        }
+
+        .vrv-btn-group-right {
+            float: right;
+        }
+    
+        .vrv-h-separator {
+            float: left;
+            min-width: 1px;
+            height: $toolbar-height;
+            background-color: $background-border
+        }
+
+        .vrv-v-separator {
+            float: left;
+            min-height: 1px;
+            background-color: $background;
+        }
+
+        .vrv-btn {
+            @extend .vrv-clickable;
+            @extend .vrv-activable;
+            @extend .vrv-toggleable;
+            @extend .vrv-disableable;
+            @extend .vrv-inactivable;
+            float: left;
+            padding: $btn-padding 10px 0px 10px;
+            text-decoration: none;
+            height: $toolbar-height - $btn-padding;
+            font-size: 16px;
+        }
+
+        // Attribute for setting text programatically 
+        .vrv-btn-text {
+            @extend .vrv-btn;
+        }
+        .vrv-btn-text:before {
+            content: attr(data-before);
+        }
+    
+        .vrv-btn-icon-left {
+            @extend .vrv-btn-text;
+            padding-left: 30px;
+            background-repeat: no-repeat;
+            background-position: 8px center !important;
+        }
+    
+        .vrv-btn-icon {
+            @extend .vrv-btn-text;
+            padding-right: 30px;
+            background-repeat: no-repeat;
+            background-position: right 8px center !important;
+        }
+    
+        .vrv-btn-icon-large {
+            @extend .vrv-btn;
+            padding: 2px;
+            width: $btn-large;
+            height: $btn-large;
+            background-repeat: no-repeat;
+            background-position: center center !important;
+        }
+    
+        ////////////////////////////////////////////////////////////////////////
+        // Sub-menus and Sub-sub-menu
+        ////////////////////////////////////////////////////////////////////////
+
+        .vrv-menu-icon-left {
+            @extend .vrv-btn-icon-left;
+            @extend .vrv-btn-text;
+            height: $menu-height;
+            padding-top: $menu-padding;
+            padding-bottom: $menu-padding;
+        }
+
+        .vrv-menu {
+            float: left;
+            display: inline-flex;
+        }
+
+        .vrv-menu-content {
+            display: none;
+            position: absolute;
+            margin-top: $toolbar-height;
+            background-color: $background-light;
+            z-index: $z-index-menu;
+            flex-direction: column;
+
+            .vrv-menu-text {
+                @extend .vrv-btn-text;
+                @extend .vrv-menu;
+                height: $menu-height;
+                padding: $menu-padding 10px $menu-padding 10px;
+            }
+        
+            .vrv-menu-checked::after {
+                content: url(../icons/toolbar/checked.png);
+                margin-left: 8px;
+            }
+
+            .vrv-submenu {
+                float: none;   
+            }
+
+            .vrv-submenu-text {
+                @extend .vrv-menu-text;
+                background: url(../icons/toolbar/submenu.png) no-repeat;
+                background-position: center right; 
+                padding-right: 20px;
+                width: calc(100% - 30px); // padding left 10 / right 20
+            }
+
+            .vrv-submenu-content {
+                @extend .vrv-menu-content;
+                margin-top: 0px;
+                left: calc(100% + 1px);
+                white-space: nowrap;
+                display: none !important; // Because we inherit from submenu-content
+            }
+
+            // Activate sub-submenu - !important because we inherit from submenu-content
+            .vrv-submenu:hover .vrv-submenu-content {display: flex !important;} 
+        }
+        // When a menu entry is clicked, hide it
+        .vrv-menu-content.clicked {
+            display: none !important;
+        }
+
+        // Activate submenu
+        .vrv-menu:hover .vrv-menu-content {display: flex;}  
+
+        ////////////////////////////////////////////////////////////////////////
+        // Midi player
+        ////////////////////////////////////////////////////////////////////////
+
+        // midi player
+        .vrv-midi-progress {
+            height: $toolbar-height;
+            float: left;
+
+            .vrv-midi-current-time, .vrv-midi-total-time {
+                margin: 8px;
+                font-size: 16px;
+                display: inline-block;
+            }
+
+            .vrv-midi-bar {
+                height: 12px;
+                margin-top: 11px;
+                width: $midibar-width;
+                background: lighten(lightgrey, 10%);
+                cursor: pointer;
+                display: inline-block;
+
+                .vrv-midi-bar-percent {
+                    margin: 0;
+                    background: $primary;
+                    width: 0%;
+                    height: 100%;
+                }
+            }
+        }
+    }
+
+    .vrv-editor-toolbar {
+        @extend .vrv-toolbar;
+        border-top: 1px solid $background-border;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Status bar
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-statusbar {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        background: $background;
+        min-height: $statusbar-height;
+        color: $text-color;
+
+        .vrv-status-text {
+            padding: 3px 3px 0px 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Notifications
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-notification
+    {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 4px;
+        background-color: $primary;
+        color: white;
+        z-index: $z-index-notification;
+        opacity: 1;
+        transition:opacity 400ms;
+    }
+    .vrv-notification.disabled {
+        opacity: 0;
+        z-index: -1;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Dialog
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-dialog {
+        display: none;
+        position: absolute;
+        z-index: $z-index-dialog;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: $dialog-background;
+        color: $text-color; 
+    
+        .vrv-dialog-box {
+            background-color: $dialog-color;
+            margin-top: 50px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+            border-radius: 4px;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+
+            .vrv-dialog-btn {
+                @extend .vrv-clickable;
+                @extend .vrv-activable;
+                @extend .vrv-disableable;
+                background: $background;
+                height: $btn-height;
+                min-width: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                margin-left: 20px;
+                padding: 0px 12px;
+            }
+            .vrv-dialog-btn::before {
+                content: attr(data-before);
+            }
+
+            .vrv-dialog-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #888;
+
+                .vrv-dialog-icon {
+                    flex: 1;
+                    max-width: 24px;
+                    height: 24px;
+                    margin-right: 16px;
+                }
+                .vrv-dialog-icon.warning {
+                    background: url(../icons/warning.png) no-repeat center;
+                }
+                .vrv-dialog-icon.info {
+                    background: url(../icons/info.png) no-repeat center;
+                }
+                .vrv-dialog-icon.erro {
+                    background: url(../icons/error.png) no-repeat center;
+                }
+                .vrv-dialog-icon.question {
+                    background: url(../icons/question.png) no-repeat center;
+                }
+
+                .vrv-dialog-title {
+                    flex: 1;
+                }
+
+                .vrv-dialog-close {
+                    background: url(../icons/dialog/close.png) no-repeat center;
+                    flex: 1;
+                    height: 20px;
+                    max-width: 20px;
+                    margin-left: 16px;
+                    cursor: pointer;
+                }
+            }
+
+            .vrv-dialog-content {
+                padding-top: 10px;
+                padding-bottom: 10px;
+                line-height:22px;
+                br {
+                    display: block; 
+                    content: '';
+                    margin-top: 10px;
+                }
+
+                a, a:visited {
+                    color: $text-color
+                }
+            }
+    
+            .vrv-dialog-bottom 
+            {
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Dialog tabs
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-dialog-tabs {
+        display: flex;
+        align-items: center;
+        .vrv-dialog-tab {
+            @extend .vrv-text-no-select;
+            @extend .vrv-clickable;
+            @extend .vrv-activable;
+            @extend .vrv-selectable;
+            background-color: $background-toggled;
+            min-height: 40px;
+            min-width: 50px;
+            max-height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0px 10px;
+        }
+        .vrv-dialog-tab:not(:last-child) {
+            border-right: 1px solid $background-border;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Github loading and listing
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-dialog-gh-loading {
+        height: $dialog-gh-list-height;
+        width: 100%;
+        background: url(./loading.svg) no-repeat center;
+        background-color: $background;
+    }
+
+    .vrv-dialog-gh-list {
+        min-height: $dialog-gh-list-height;
+        max-height: $dialog-gh-list-height;
+        background-color: $background;
+        display: flex;
+        flex-direction: column;
+        overflow-y: scroll;
+
+        .vrv-dialog-gh-item {
+            @extend .vrv-clickable;
+            background-color: $background;
+            border-bottom: 1px solid $background-border;
+            min-height: 32px;
+            padding-left: 48px;
+            display: flex;
+            justify-content: left;
+            align-items: center;
+            background-repeat: no-repeat;
+            background-position: 12px center !important;
+        }
+        .vrv-dialog-gh-item:before {
+            content: attr(data-before);
+        }
+        .vrv-dialog-gh-item.checked::after {
+            content: url(../icons/toolbar/checked.png);
+            margin-left: 8px;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Github selection
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-dialog-gh-selection {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-top: 10px;
+
+        .vrv-dialog-gh-selection-item {
+            justify-content: center;
+            align-items: center;
+            min-height: 40px;
+            max-height: 40px;
+            display: flex;
+            padding-left: 48px;
+            background-repeat: no-repeat;
+            background-position: 12px center !important;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Path breadcrumbs
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-dialog-breadcrumbs {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-top: 10px;
+        background-color: $background;
+
+        .vrv-dialog-breadcrumb {
+            justify-content: center;
+            align-items: center;
+            min-height: 40px;
+            max-height: 40px;
+            display: flex;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+        .vrv-dialog-breadcrumb:first-child {
+            padding-left: 8px;
+            padding-right: 4px;
+        }
+        .vrv-dialog-breadcrumb:after {
+            padding-left: 8px;
+            content: "/\00a0";
+        }
+        .vrv-dialog-breadcrumb:hover {
+            filter: $hover-filter;
+            background-color: $filtered-primary;
+            cursor: pointer;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Dialog form
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-dialog-form {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        .vrv-dialog-label {
+            min-height: 36px;
+            padding-right: 12px;
+            padding-top: 12px;
+            display: flex;
+            justify-content: right;
+            align-items: top;
+        }
+        .vrv-dialog-input {
+            background-color: $background;
+            padding: 8px 12px;
+            margin: 4px 0px;
+            border: 1px solid $background-border;
+            border-radius: 2px;
+            box-sizing: border-box;
+            resize: vertical; 
+            color: $text-color;
+            font-size: 16px;         
+            font-family: $font-family;
+        }
+        .vrv-dialog-input:focus {
+            border: 1px solid $primary;
+        }
+
+    }
+}
+
+@media screen and (max-width: 600px) {
+    
+    .vrv-wrapper {
+        
+        .vrv-toolbar {
+        
+            // This does not work anymore with @data-before
+            .vrv-btn {
+                content: '';
+            }
+        }
+    }
+}
+
+.cm-s-vrv .CodeMirror-gutters { background: #3f3f3f !important; }
+.cm-s-vrv .CodeMirror-foldgutter-open, .CodeMirror-foldgutter-folded { color: #ccc; }
+.cm-s-vrv .CodeMirror-cursor { border-left: 1px solid white; }
+.cm-s-vrv { background-color: #3f3f3f; color: #ffffff; }
+.cm-s-vrv span.cm-builtin { color: #dcdccc; font-weight: bold; }
+.cm-s-vrv span.cm-comment { color: #ccb5e7; }
+.cm-s-vrv span.cm-keyword { color: #f0dfaf; font-weight: bold; }
+.cm-s-vrv span.cm-atom { color: #bfebbf; }
+.cm-s-vrv span.cm-def { color: #dcdccc; }
+.cm-s-vrv span.cm-variable { color: #dfaf8f; }
+.cm-s-vrv span.cm-variable-2 { color: #dcdccc; }
+.cm-s-vrv span.cm-string { color: #beffc9; }
+.cm-s-vrv span.cm-string-2 { color: #cc9393; }
+.cm-s-vrv span.cm-number { color: #dcdccc; }
+.cm-s-vrv span.cm-tag { color: #a6dcf1; }
+.cm-s-vrv span.cm-property { color: #dfaf8f; }
+.cm-s-vrv span.cm-attribute { color: #f0e190; }
+.cm-s-vrv span.cm-qualifier { color: #7cb8bb; }
+.cm-s-vrv span.cm-meta { color: #eec6c6; }
+.cm-s-vrv span.cm-header { color: #f0efd0; }
+.cm-s-vrv span.cm-operator { color: #f0efd0; }
+.cm-s-vrv span.CodeMirror-matchingbracket { box-sizing: border-box; background: transparent; border-bottom: 1px solid; }
+.cm-s-vrv span.CodeMirror-nonmatchingbracket { border-bottom: 1px solid; background: none; }
+.cm-s-vrv .CodeMirror-activeline { background: #000000; }
+.cm-s-vrv .CodeMirror-activeline-background { background: #000000; }
+.cm-s-vrv div.CodeMirror-selected { background: #545454; }
+.cm-s-vrv .CodeMirror-focused div.CodeMirror-selected { background: #4f4f4f; }
