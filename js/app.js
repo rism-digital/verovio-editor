@@ -64,6 +64,8 @@ export class App
             defaultView: 'responsive',
         }, opts );
 
+        if ( opts.reset ) window.localStorage.removeItem( "options" );
+
         const storedOptions = localStorage.getItem( "options" );
         if ( storedOptions )
         {
@@ -71,6 +73,7 @@ export class App
         }
 
         this.fileStack = new FileStack();
+        if ( opts.reset ) this.fileStack.reset();
 
         // Root element in which verovio-ui is created
         if ( !div || !( div instanceof HTMLDivElement ) ) 

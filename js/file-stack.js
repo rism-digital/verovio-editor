@@ -88,5 +88,6 @@ export class FileStack
             window.localStorage.removeItem( "file-" + list[i][0] );
         }
         window.localStorage.removeItem( "fileStack" );
+        this.stack.items = 0;
     }
 }

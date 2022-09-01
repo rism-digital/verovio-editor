@@ -1,5 +1,17 @@
 import { App } from "./js/app.js";
 
+let isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
+    
+if (isSafari) {
+    alert("It seems that you are using Safari, on which the Verovio Editor unfortunately does not work at this stage.\nPlease use another browser.");
+}
+
+function getParameterByName( name )
+{
+    var match = RegExp( '[?&]' + name + '=([^&]*)' ).exec( window.location.search );
+    return match && decodeURIComponent( match[1].replace( /\+/g, ' ' ) );
+}
+
 const options =
 {
     documentViewSVG: false,
@@ -8,29 +20,38 @@ const options =
     enableEditor: true,
     defaultZoom: 5,
     defaultView: 'editor',
-
-    //schema: 'http://localhost:31338/xml-validator-c/schema/4.0.1/mei-all.rng',
-    //schema: 'https://raw.githubusercontent.com/music-encoding/music-encoding/7ec2ba82b7aa1f8bc02aa7d233a0b57fd96ca18a/schemata/mei-basic.rng',
-    //schema: 'https://music-encoding.org/schema/4.0.1/mei-Mensural.rng',
     editorSplitterShow: true
 }
 
-// Create the App
-const verovioApp = new App(document.getElementById("app"), options);
+// Rescue option to reset to default before loading
+if ( getParameterByName( 'reset' ) != null ) options.reset = true;
 
-let filename;
-// Very simple AJAX request to handle a successful load of an included MEI file
-filename = 'examples/puccini.mei';
+// Create the app - here with an empty option object
+const app = new App( document.getElementById( "app" ), options );
 
-const xhr = new XMLHttpRequest();
-xhr.open( 'GET', '/' + filename );
-
-xhr.onreadystatechange = function()
+let file = 'examples/puccini.mei';
+let convert = false;
+let onlyIfEmpty = true;
+let urlFile = getParameterByName( 'file' );
+if ( urlFile != null )
 {
-    if (xhr.readyState === 4 && xhr.status === 200)
-    {
-        verovioApp.loadData( xhr.responseText, filename, false, true );
+    file = urlFile;
+    onlyIfEmpty = false;
+}
+if ( getParameterByName( 'musicxml' ) != null ) convert = false;
 
-    }
-};
-xhr.send( );
+// Load a file (MEI or MusicXML)
+fetch( file )
+    .then( function ( response )
+    {
+        if ( response.status !== 200 )
+        {
+            alert( 'File could not be fetched, loading default file');
+            throw new Error( "Not 200 response" );
+        }
+        return response.text();
+    } )
+    .then( function ( text )
+    {
+        app.loadData( text, file.substring(file.lastIndexOf("/") + 1), convert, onlyIfEmpty );
+    } );
