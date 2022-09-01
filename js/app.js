@@ -75,7 +75,7 @@ export class App
         if ( opts.reset ) this.fileStack.reset();
 
         // Root element in which verovio-ui is created
-        if ( !div || !( div instanceof HTMLDivElement ) ) 
+        if ( !div || !( div instanceof HTMLDivElement ) )
         {
             throw "All App objects must be initialized with a 'element' parameter that is a HTMLDivElement element.";
         }
@@ -91,7 +91,7 @@ export class App
         }
 
         document.head.appendChild( elt( 'link', { href: `/css/verovio.css`, rel: `stylesheet` } ) );
-            
+
         this.loadingCount = 0;
         this.eventManager = new EventManager( this );
         this.customEventManager = new CustomEventManager( {} );
@@ -584,7 +584,7 @@ export class App
 
     prevPage( e )
     {
-        if ( this.toolbarView.currentPage > 1 ) 
+        if ( this.toolbarView.currentPage > 1 )
         {
             this.toolbarView.currentPage -= 1;
             this.startLoading( "Loading content ...", true );
@@ -595,7 +595,7 @@ export class App
 
     nextPage( e )
     {
-        if ( this.toolbarView.currentPage < this.pageCount ) 
+        if ( this.toolbarView.currentPage < this.pageCount )
         {
             this.toolbarView.currentPage += 1;
             this.startLoading( "Loading content ...", true );
@@ -695,7 +695,7 @@ export class App
         const dlgRes = await dlg.show();
         if ( dlgRes === 1 )
         {
-            this.loadData( dlg.data, dlg.filename );   
+            this.loadData( dlg.data, dlg.filename );
         }
     }
 
@@ -704,7 +704,7 @@ export class App
         const dlg = new DialogGhExport( this.ui.dialog, this, "Export an MEI file to GitHub", {}, this.githubManager );
         const dlgRes = await dlg.show();
         if ( dlgRes === 1 )
-        {   
+        {
         }
     }
 
