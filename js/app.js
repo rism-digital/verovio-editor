@@ -33,8 +33,7 @@ export class App
     constructor( div, opts )
     {
         this.clientId = "d83b17a6e055dede5e76";
-        this.host = "https://editor-test.verovio.org";
-        this.authHost = "https://verovio-editor-auth.lm.r.appspot.com/"
+        this.host = "https://editor.verovio.org";
 
         this.githubManager = new GitHubManager( this );
 
@@ -749,12 +748,12 @@ export class App
 
     login( e )
     {
-        location.href = `https://github.com/login/oauth/authorize?client_id=${ this.clientId }&redirect_uri=${ this.authHost }/oauth/redirect&scope=public_repo%20read:org`;
+        location.href = `https://github.com/login/oauth/authorize?client_id=${ this.clientId }&redirect_uri=${ this.host }/oauth/redirect&scope=public_repo%20read:org`;
     }
 
     logout( e )
     {
-        location.href = `${ this.authHost }/oauth/logout`;
+        location.href = `${ this.host }/oauth/logout`;
     }
 
     async setView( e )
