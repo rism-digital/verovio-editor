@@ -2,7 +2,7 @@
  * The FileStack class for storing previously loading files in the window.localStorage.
  */
 
-//const pako = window.pako;
+const pako = window.pako;
 
 export class FileStack
 {
@@ -43,8 +43,8 @@ export class FileStack
 
         this.stack.filenames[this.stack.idx] = filename;
         //let compressedData = zlib.deflateSync( data ).toString( 'base64' );
-        // let compressedData = pako.deflate( data, { to: 'string' } );
-        window.localStorage.setItem( "file-" + this.stack.idx, data );
+        let compressedData = btoa( pako.deflate( data, { to: 'string' } ) );
+        window.localStorage.setItem( "file-" + this.stack.idx, compressedData );
 
         // Increase the stack items if not full
         if ( this.stack.items < this.stack.maxItems - 1 ) this.stack.items++;
@@ -56,10 +56,8 @@ export class FileStack
     {
         let data = window.localStorage.getItem( "file-" + idx );
         //let decompressedData = zlib.inflateSync( new Buffer( data, 'base64' ) ).toString();
-        // convert to binary
-        //const binData = new Uint8Array( data );
-        //let decompressedData = pako.inflate( binData, { to: 'string' } );
-        return { filename: this.stack.filenames[idx], data: data };
+        let decompressedData = pako.inflate( atob( data ), { to: 'string' });
+        return { filename: this.stack.filenames[idx], data: decompressedData };
     }
 
     getLast()
