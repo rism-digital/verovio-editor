@@ -6,19 +6,17 @@ import { Dialog } from './dialog.js';
 
 import { elt } from './utils/functions.js';
 
+const iconsBranch =  '/icons/dialog/branch.png';
+const iconsInstitution =  '/icons/dialog/institution.png';
+const iconsFile =  '/icons/dialog/file.png';
+const iconsFolder =  '/icons/dialog/folder.png';
+const iconsRepo =  '/icons/dialog/repo.png';
+const iconsUser =  '/icons/dialog/user.png';
+
 export class DialogGhImport extends Dialog
 {
     constructor( div, app, title, opts, githubManager )
     {
-
-        let iconsBranch =  '/icons/dialog/branch.png';
-        let iconsInstitution =  '/icons/dialog/institution.png';
-        let iconsFile =  '/icons/dialog/file.png';
-        let iconsFolder =  '/icons/dialog/folder.png';
-        let iconsRepo =  '/icons/dialog/repo.png';
-        let iconsUser =  '/icons/dialog/user.png';
-
-
         super( div, app, title, opts );
 
         // output members
