@@ -125,12 +125,21 @@ export class XMLEditorView extends GenericView
 
     async replaceSchema( schemaFile )
     {
-        const response = await fetch( schemaFile );
-        const data = await response.text();
-        const res = await this.validator.setRelaxNGSchema( data );
-        console.log( "New schema loaded", res );
-        this.rngLoader.setRelaxNGSchema( data );
-        this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags
+        try
+        {
+            const response = await fetch( schemaFile );
+            const data = await response.text();
+            const res = await this.validator.setRelaxNGSchema( data );
+            console.log( "New schema loaded", res );
+            this.rngLoader.setRelaxNGSchema( data );
+            this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags
+            return true;
+        }
+        catch ( error )
+        {
+            console.log( error );
+            return false;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////

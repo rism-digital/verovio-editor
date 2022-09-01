@@ -467,9 +467,17 @@ export class App
         const schemaMatch = schema.exec( this.mei );
         if ( schemaMatch && schemaMatch[1] !== this.currentSchema )
         {
-            this.currentSchema = schemaMatch[1];
-            console.log( this.currentSchema );
-            await this.viewEditor.xmlView.replaceSchema( this.currentSchema );
+            if ( await this.viewEditor.xmlView.replaceSchema( schemaMatch[1] ) )
+            {
+                this.currentSchema = schemaMatch[1];
+                this.showNotification( `Current MEI Schema changed to '${ this.currentSchema }'` );
+            }
+            else
+            {
+                const dlg = new Dialog( this.ui.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.type.Msg } );
+                dlg.setContent( `The Schema '${ schemaMatch[1] }' could not be loaded<br>The validation will be performed using '${ this.currentSchema }'` );
+                await dlg.show();
+            }
         }
     }
 
