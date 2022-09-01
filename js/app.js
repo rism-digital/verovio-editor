@@ -3,6 +3,8 @@
  * It requires a HTMLDivElement to be put on.
  */
 
+const version = "1.0.0";
+
 import { AppToolbar } from './app-toolbar.js';
 import { AppStatusbar } from './app-statusbar.js';
 import { Dialog } from './dialog.js'
@@ -26,7 +28,9 @@ import { elt } from './utils/functions.js';
 let filter = '/svg/filter.xml';
 
 const marked = window.marked;
-const about = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com).`
+
+const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${ version}`
+const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`
 
 export class App
 {
@@ -739,14 +743,14 @@ export class App
     async helpAbout( e )
     {
         const dlg = new Dialog( this.ui.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.type.Msg } );
-        dlg.setContent( marked.parse(about) );
+        dlg.setContent( marked.parse(aboutMsg) );
         await dlg.show();
     }
 
     async helpReset( e )
     {
         const dlg = new Dialog( this.ui.dialog, this, "Reset to default", { okLabel: "Yes", icon: "question" } );
-        dlg.setContent( "This will reset all default options, reset the default file, remove all previous files, and reload the application.<br>Do you want to proceed?" )
+        dlg.setContent( marked.parse( resetMsg ) );
         if ( await dlg.show() === 0 ) return;
         this.fileStack.reset();
         window.localStorage.removeItem( "options" );
