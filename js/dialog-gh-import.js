@@ -11,12 +11,12 @@ export class DialogGhImport extends Dialog
     constructor( div, app, title, opts, githubManager )
     {
 
-        let iconsBranch =  '../icons/dialog/branch.png';
-        let iconsInstitution =  '../icons/dialog/institution.png';
-        let iconsFile =  '../icons/dialog/file.png';
-        let iconsFolder =  '../icons/dialog/folder.png';
-        let iconsRepo =  '../icons/dialog/repo.png';
-        let iconsUser =  '../icons/dialog/user.png';
+        let iconsBranch =  '/icons/dialog/branch.png';
+        let iconsInstitution =  '/icons/dialog/institution.png';
+        let iconsFile =  '/icons/dialog/file.png';
+        let iconsFolder =  '/icons/dialog/folder.png';
+        let iconsRepo =  '/icons/dialog/repo.png';
+        let iconsUser =  '/icons/dialog/user.png';
 
 
         super( div, app, title, opts );
