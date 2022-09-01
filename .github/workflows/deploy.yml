@@ -1,0 +1,43 @@
+name: Editor deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:      
+      - name: "Checks-out the repository"
+        uses: actions/checkout@v2
+        
+      - name: Install packages
+        run: |
+          sudo apt install openresolv wireguard
+      
+      - name: Set up the configuration
+        working-directory: ${{ github.workspace }}
+        run: |
+          sudo echo "${{ secrets.VPN_CONFIGURATION }}" > ./wg0.conf
+
+      - name: Set up Wireguard VPN
+        working-directory: ${{ github.workspace }}
+        run: |
+         sudo wg-quick up ./wg0.conf
+
+      - name: Deploy with rsync
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avzr --delete --exclude="uploads" --exclude=".well-known" --exclude="wg0.conf"
+          path: ./
+          remote_path: ${{ secrets.DEPLOY_PRODUCTION_PATH }}
+          remote_host: ${{ secrets.DEPLOY_PRODUCTION_SERVER }}
+          remote_user: ${{ secrets.DEPLOY_USER }}
+          remote_key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Disconnect VPN
+        working-directory: ${{ github.workspace }}
+        run: |
+          sudo wg-quick down ./wg0.conf
