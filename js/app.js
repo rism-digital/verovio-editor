@@ -32,7 +32,7 @@ export class App
 {
     constructor( div, opts )
     {
-        this.clientId = "d83b17a6e055dede5e76";
+        this.clientId = "fd81068a15354a300522";
         this.host = "https://editor.verovio.org";
 
         this.githubManager = new GitHubManager( this );
