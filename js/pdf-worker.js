@@ -6,7 +6,7 @@
 importScripts( "https://www.verovio.org/javascript/pdfkit/pdfkit.js" );
 importScripts( "https://www.verovio.org/javascript/pdfkit/blobstream.js" );
 importScripts( "https://www.verovio.org/javascript/pdfkit/source.js" );
-importScripts( "https://www.verovio.org/javascript/pdfkit/vrv-ttf.js" );
+importScripts( "https://www.verovio.org/javascript/pdfkit/Leipzig-ttf.js" );
 
 class Deferred
 {
@@ -29,7 +29,7 @@ let pdfWidth = pdfSize[0];
 // Font callback and buffer
 let fontCallback = function ( family, bold, italic, fontOptions )
 {
-    if ( family == "VerovioText" )
+    if ( family == "Leipzig" )
     {
         return family;
     }
@@ -44,7 +44,7 @@ let fontCallback = function ( family, bold, italic, fontOptions )
 
 let options = {};
 options.fontCallback = fontCallback;
-let vrvFontBuffer = Uint8Array.from( atob( null ), c => c.charCodeAt( 0 ) );
+let vrvFontBuffer = Uint8Array.from( atob( LeipzigTTF ), c => c.charCodeAt( 0 ) );
 
 // Variables that will be instantiated through start()
 let doc = null;
@@ -68,7 +68,7 @@ addEventListener( 'message', function ( event )
         outString = "";
         const outStream = blobStream();
         doc.pipe(outStream);
-        doc.registerFont( 'VerovioText', vrvFontBuffer );
+        doc.registerFont( 'Leipzig', vrvFontBuffer );
 
         // The deferred promised that will be resolved through end() via on('finish')
         docEnd = new Deferred();
