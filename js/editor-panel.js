@@ -5,7 +5,7 @@
 import { GenericView } from './generic-view.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
-import { EventManager } from './event-manager.js';
+import { EventManager } from '../js-dist/event-manager.js';
 import { XMLEditorView } from './xml-editor-view.js';
 
 import { elt } from './utils/functions.js';

@@ -1,19 +1,34 @@
 /**
  * The ActionManager action class
  */
-
-import { EditorView } from './editor-view.js';
+import { Cursor } from '../js/cursor.js';
+import { EditorView } from '../js/editor-view.js';
 import { EventManager } from './event-manager.js';
+import { WorkerProxy } from '../js/worker-proxy.js'
+
+class Call {
+    method: Function;
+    args: IArguments;
+
+    constructor( method: Function, args: IArguments )
+    {   
+        this.method = method;
+        this.args = args; 
+    }
+}
 
 export class ActionManager
 {
-    constructor( view )
+    cursor: Cursor;
+    delayedCalls: Call[];
+    eventManager: EventManager;
+    inProgress: boolean;
+    verovio: WorkerProxy;
+    view: EditorView;
+
+    constructor( view: EditorView )
     {
         // EditorView object
-        if ( !view || !( view instanceof EditorView ) ) 
-        {
-            throw "All ActionManager objects must be initialized with a 'EditorView' parameter that is an instance of the EditorView class.";
-        }
         this.view = view;
         this.cursor = view.cursor;
         this.verovio = view.verovio;
@@ -35,10 +50,8 @@ export class ActionManager
         if ( this.delayedCalls.length > 0 )
         {
             const call = this.delayedCalls[0];
-            const method = call[0];
-            const args = call[1];
             this.delayedCalls.shift();
-            await method.apply( this, args );
+            await call.method.apply( this, call.args );
         }
         else
         {
@@ -101,7 +114,7 @@ export class ActionManager
         this.view.updateMEI();
     }
 
-    async drag( x, y )
+    async drag( x: number, y: number )
     {
         let chain = new Array();
         for ( const item of this.cursor.selectedItems )
@@ -130,12 +143,12 @@ export class ActionManager
         await this.view.renderPage( true, false );
     }
 
-    async keyDown( key, shiftKey, ctrlKey )
+    async keyDown( key: number, shiftKey: boolean, ctrlKey: boolean )
     {
         // keyDown events can 
         if ( this.inProgress )
         {
-            this.delayedCalls.push( [this.keyDown, arguments] );
+            this.delayedCalls.push( new Call( this.keyDown, arguments ) );
             return;
         }
         this.inProgress = true;
@@ -179,7 +192,7 @@ export class ActionManager
     // Element specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    async insertNote( x, y )
+    async insertNote( x: number, y: number )
     {
         if ( !this.cursor.inputMode ) return;
 
@@ -269,7 +282,7 @@ export class ActionManager
 
     // helper
 
-    async setAttrValue( attribute, value, elementTypes = [] )
+    async setAttrValue( attribute: string, value: string, elementTypes = [] )
     {
         let chain = new Array();
         for ( const item of this.cursor.selectedItems )
@@ -299,5 +312,4 @@ export class ActionManager
         await this.view.renderPage( true );
         this.view.updateMEI();
     }
-
 }

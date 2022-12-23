@@ -4,7 +4,7 @@
  * Events are attached to the App.eventManager
  */
 
-import { Toolbar } from './toolbar.js' ; 
+import { Toolbar } from '../js-dist/toolbar.js' ; 
 
 import { elt } from './utils/functions.js';
 

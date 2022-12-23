@@ -5,7 +5,7 @@
  */
 
 import { GenericView } from './generic-view.js';
-import { EventManager } from './event-manager.js';
+import { EventManager } from '../js-dist/event-manager.js';
 import { WorkerProxy } from './worker-proxy.js';
 
 export class VerovioView extends GenericView

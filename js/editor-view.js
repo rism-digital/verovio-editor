@@ -5,7 +5,7 @@
 
 import { ResponsiveView } from './responsive-view.js';
 import { Cursor } from './cursor.js';
-import { ActionManager } from './action-manager.js';
+import { ActionManager } from '../js-dist/action-manager.js';
 
 import { elt } from './utils/functions.js';
 

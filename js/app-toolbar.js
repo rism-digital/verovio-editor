@@ -7,7 +7,7 @@
 import { DocumentView } from './document-view.js';
 import { EditorPanel } from './editor-panel.js';
 import { ResponsiveView } from './responsive-view.js';
-import { Toolbar } from './toolbar.js';
+import { Toolbar } from '../js-dist/toolbar.js';
 
 import { elt } from './utils/functions.js';
 

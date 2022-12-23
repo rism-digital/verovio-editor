@@ -1,14 +1,17 @@
 /**
  * The Toolbar class is the based class for other toolbar implementations.
- * It should not be instanciated directly but only through inherited classes.
+ * It should not be instantiated directly but only through inherited classes.
  */
 
+import { App } from '../js/app.js';
 import { GenericView } from './generic-view.js';
 import { EventManager } from './event-manager.js';
 
 export class Toolbar extends GenericView
 {
-    constructor( div, app )
+    eventManager: EventManager;
+
+    constructor( div: HTMLDivElement, app: App )
     {
         super( div, app );
 
@@ -20,7 +23,7 @@ export class Toolbar extends GenericView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateToolbarGrp( grp, condition )
+    updateToolbarGrp( grp: HTMLElement, condition: boolean )
     {
         if ( grp === undefined )
         {
@@ -30,7 +33,7 @@ export class Toolbar extends GenericView
         else grp.style.display = 'none';
     }
 
-    updateToolbarBtn( btn, condition )
+    updateToolbarBtn( btn: HTMLElement, condition: boolean )
     {
         if ( btn === undefined )
         {
@@ -40,7 +43,7 @@ export class Toolbar extends GenericView
         else btn.classList.add( "disabled" );
     }
 
-    updateToolbarBtnHide( btn, condition )
+    updateToolbarBtnHide( btn: HTMLElement, condition: boolean )
     {
         if ( btn === undefined )
         {
@@ -50,7 +53,7 @@ export class Toolbar extends GenericView
         else btn.style.display = 'none';
     }
 
-    updateToolbarToggleBtn( btn, condition )
+    updateToolbarToggleBtn( btn: HTMLElement, condition: boolean )
     {
         if ( btn === undefined )
         {
@@ -60,7 +63,7 @@ export class Toolbar extends GenericView
         else btn.classList.remove( "toggled" );
     }
 
-    updateToolbarSubmenuBtn( btn, condition )
+    updateToolbarSubmenuBtn( btn: HTMLElement, condition: boolean )
     {
         if ( btn === undefined )
         {

@@ -2,20 +2,24 @@
 *  EventManager for binding events to a given parent object to avoid ES6 scope issues.
 */
 
-import { randomHex } from './utils/functions.js';
+import { randomHex } from '../js/utils/functions.js';
 
 export class EventManager
 {
-    constructor( parent )
+    parent: Object;
+    cache: Object;
+    appIDAttr: string;
+
+    constructor( parent: Object )
     {
-        if ( !parent ) return false;
+        if ( !parent ) return;
         this.parent = parent;
         this.cache = {};
         this.appIDAttr = 'data-app-el-id';
     }
 
-    // Binds function `funct` to element `el` on event `ev`
-    bind( el, ev, funct )
+    // Binds function `fct` to element `el` on event `ev`
+    bind( el: HTMLElement, ev: string, fct: Function )
     {
         // Assign the element a random ID for the EventManager to reference it by (or get it if we already have one)
         let appID = el.getAttribute( this.appIDAttr ) || el.getAttribute( 'id' );
@@ -36,15 +40,15 @@ export class EventManager
         const elEvObj = elObj[ev];
 
         // Bind the function to the parent
-        const boundFunct = funct.bind( this.parent );
-        elEvObj.push( boundFunct );
+        const boundFct = fct.bind( this.parent );
+        elEvObj.push( boundFct );
 
         // Add the listener
-        el.addEventListener( ev, boundFunct );
+        el.addEventListener( ev, boundFct );
     }
 
     // Unbinds all functions listening to event `ev` on element `el`
-    unbind( el, ev )
+    unbind( el: HTMLElement, ev: string )
     {
         // Get the appID from the object; if it doesn't exist, we haven't bound any events
         const appID = el.getAttribute( this.appIDAttr ) || el.getAttribute( 'id' );

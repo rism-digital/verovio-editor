@@ -4,7 +4,7 @@
  */
 
 import { Deferred } from './deferred.js';
-import { EventManager } from './event-manager.js';
+import { EventManager } from '../js-dist/event-manager.js';
 
 import { elt } from './utils/functions.js';
 
