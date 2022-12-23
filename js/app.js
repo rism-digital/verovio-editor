@@ -723,7 +723,7 @@ export class App
     async xmlOverwriteMEI( e )
     {
         let params = {}
-        if ( e.target.dataset.noIds ) params["removeIds"] = true
+        if ( e.target.dataset.noIds == 'true' ) params["removeIds"] = true
         const mei = await this.verovio.getMEI( params );
         this.mei = mei;
         let event = new CustomEvent( 'onUpdateData', {
