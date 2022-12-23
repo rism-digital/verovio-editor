@@ -31,7 +31,7 @@ export class MidiToolbar extends Toolbar
 
         // sub-toolbar in application 
         this.ui.midiControls = elt( 'div', { class: `vrv-btn-group` } );
-        this.app.toolbar.ui.midiPlayerSubToolbar.appendChild( this.ui.midiControls );
+        this.app.toolbar.midiPlayerSubToolbar.appendChild( this.ui.midiControls );
         //
         this.ui.midiControls.appendChild( elt( 'div', { class: `vrv-h-separator` } ) );
         this.ui.play = elt( 'div', { class: `vrv-btn-icon-large` } );

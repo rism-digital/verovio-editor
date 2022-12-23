@@ -5,7 +5,7 @@
 
 const version = "1.0.0";
 
-import { AppToolbar } from './app-toolbar.js';
+import { AppToolbar } from '../js-dist/app-toolbar.js';
 import { AppStatusbar } from '../js-dist/app-statusbar.js';
 import { Dialog } from './dialog.js'
 import { DialogGhExport } from './dialog-gh-export.js';
