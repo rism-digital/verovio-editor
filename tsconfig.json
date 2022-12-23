@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "target": "es2016",
+      "outDir": "js-dist"
+    },
+    "includes": [
+        "ts/*.ts"
+    ]
+}
