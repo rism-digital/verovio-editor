@@ -2,11 +2,11 @@
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
 
-import { GenericView } from './generic-view.js';
+import { GenericView } from '../js-dist/generic-view.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from '../js-dist/event-manager.js';
-import { XMLEditorView } from './xml-editor-view.js';
+import { XMLEditorView } from '../js-dist/xml-editor-view.js';
 
 import { elt } from './utils/functions.js';
 

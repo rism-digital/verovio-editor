@@ -1,9 +1,17 @@
 
 export function appendDivTo(parent: HTMLElement, options: object): HTMLDivElement {
-    const div = document.createElement('div');
-    setAttributes(div, options);
-    parent.appendChild(div);
-    return div;
+    return <HTMLDivElement> appendHTMLElementTo(parent, options, 'div');
+}
+
+export function appendTextAreaTo(parent: HTMLElement, options: object): HTMLTextAreaElement {
+    return <HTMLTextAreaElement> appendHTMLElementTo(parent, options, 'textarea');
+}
+
+function appendHTMLElementTo( parent: HTMLElement, options: object, tag: string ): HTMLElement {
+    const element = document.createElement(tag);
+    setAttributes(element, options);
+    parent.appendChild(element);
+    return element;
 }
 
 /**

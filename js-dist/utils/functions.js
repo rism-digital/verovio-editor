@@ -1,8 +1,14 @@
 export function appendDivTo(parent, options) {
-    const div = document.createElement('div');
-    setAttributes(div, options);
-    parent.appendChild(div);
-    return div;
+    return appendHTMLElementTo(parent, options, 'div');
+}
+export function appendTextAreaTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'textarea');
+}
+function appendHTMLElementTo(parent, options, tag) {
+    const element = document.createElement(tag);
+    setAttributes(element, options);
+    parent.appendChild(element);
+    return element;
 }
 /**
  * Set attributes of a DOM element. The `style` property is special-cased to

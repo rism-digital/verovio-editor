@@ -4,7 +4,7 @@
  * The VerovioView is attached to a VerovioMessenger.
  */
 
-import { GenericView } from './generic-view.js';
+import { GenericView } from '../js-dist/generic-view.js';
 import { EventManager } from '../js-dist/event-manager.js';
 import { WorkerProxy } from './worker-proxy.js';
 

@@ -4,7 +4,7 @@
  */
 
 import { App } from '../js/app.js';
-import { GenericView } from '../js/generic-view.js';
+import { GenericView } from './generic-view.js';
 
 import { elt } from '../js/utils/functions.js';
 

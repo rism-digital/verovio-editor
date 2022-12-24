@@ -3,41 +3,49 @@
  * It uses the CodeMirror editor package and a ValidatorMessenger
  */
 
+import { App } from '../js/app.js';
 import { GenericView } from './generic-view.js';
-import { WorkerProxy } from './worker-proxy.js';
+import { WorkerProxy } from '../js/worker-proxy.js';
 
-import { elt } from './utils/functions.js';
-
-import { RNGLoader } from './rng-loader.js';
+import { RNGLoader } from '../js/rng-loader.js';
+import { appendDivTo, appendTextAreaTo } from './utils/functions.js';
 
 const theme = "vrv"; // default for light theme
 
+declare global {
+    const CodeMirror;
+}
+
 export class XMLEditorView extends GenericView
 {
-    constructor( div, app, validator, rngLoader, options )
+    validator: WorkerProxy;
+    rngLoader: RNGLoader;
+    currentId: string;
+    element: HTMLDivElement;
+    xmlvalid: HTMLDivElement;
+    xmlEditorView: HTMLTextAreaElement;
+    updateLinting: Function;
+    loaded: boolean;
+    timestamp: number;
+    skipValidation: boolean;
+    formatting: boolean;
+    CMeditor: any;
+    app: App;
+
+    constructor( div: HTMLDivElement, app: App, validator: WorkerProxy, rngLoader: RNGLoader, options )
     {
-        super( div, app, options )
+        super( div, app )
 
         // Validator object
-        if ( !validator || !( validator instanceof WorkerProxy ) ) 
-        {
-            throw "All XMLEditorView objects must be initialized with a 'validator' parameter that is an instance of the WorkerProxy class.";
-        }
         this.validator = validator;
 
         // RNGLoader object
-        if ( !rngLoader || !( rngLoader instanceof RNGLoader ) ) 
-        {
-            throw "All XMLEditorView objects must be initialized with a 'rngLoader' parameter that is an instance of the RNGLoader class.";
-        }
         this.rngLoader = rngLoader;
 
         this.currentId = null;
 
-        this.ui.xmlvalid = elt( 'div', { class: `vrv-xmlvalid` } );
-        this.element.appendChild( this.ui.xmlvalid );
-        this.ui.xmlEditorView = elt( 'textarea', { class: ``, style: `` } );
-        this.element.appendChild( this.ui.xmlEditorView );
+        this.xmlvalid = appendDivTo( this.element, { class: `vrv-xmlvalid` } );
+        this.xmlEditorView = appendTextAreaTo( this.element, { } );
 
         this.updateLinting = null;
         this.currentId = "";
@@ -48,7 +56,7 @@ export class XMLEditorView extends GenericView
 
         const cmThis = this;
         
-        this.CMeditor = CodeMirror.fromTextArea( this.ui.xmlEditorView, {
+        this.CMeditor = CodeMirror.fromTextArea( this.xmlEditorView, {
             lineNumbers: true,
             readOnly: false,
             autoCloseTags: true,
@@ -92,23 +100,23 @@ export class XMLEditorView extends GenericView
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async validate( text, updateLinting, options )
+    async validate( text: string, updateLinting: Function, options)
     {
         //console.debug( "XMLEditorView::validate");
         if ( options && options.caller && text )
         {
-            const editor = options.caller;
+            const editor: XMLEditorView = options.caller;
             //console.debug( "XMLEditorView::validate", editor );
 
             if ( editor.formatting ) return;
             if ( editor.skipValidation ) return;
 
             // keep the callback
-            if ( editor.ui.xmlvalid )
+            if ( editor.xmlvalid )
             {
-                editor.ui.xmlvalid.classList.remove( "ok" );
-                editor.ui.xmlvalid.classList.remove( "error" );
-                editor.ui.xmlvalid.classList.add( "wait" );
+                editor.xmlvalid.classList.remove( "ok" );
+                editor.xmlvalid.classList.remove( "error" );
+                editor.xmlvalid.classList.add( "wait" );
             }
             editor.updateLinting = updateLinting;
             editor.app.startLoading( "Validating ...", true );
@@ -118,12 +126,12 @@ export class XMLEditorView extends GenericView
         }
     }
 
-    async suspendedValidate( text, updateLinting, options )
+    async suspendedValidate( text: string, updateLinting: Function, options )
     {
         // Do nothing...
     }
 
-    async replaceSchema( schemaFile )
+    async replaceSchema( schemaFile: string )
     {
         try
         {
@@ -146,7 +154,7 @@ export class XMLEditorView extends GenericView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    setCurrent( id )
+    setCurrent( id: string )
     {
         //console.debug( "XMLEditorView::setCurrent" );
         const cursor = this.CMeditor.getSearchCursor( `xml:id="${ id }"` );
@@ -159,12 +167,12 @@ export class XMLEditorView extends GenericView
         }
     }
 
-    highlightValidation( text, validation, timestamp )
+    highlightValidation( text: string, validation, timestamp: number )
     {
-        let lines;
+        let lines = [];
         let found = [];
         let i = 0;
-        let messages;
+        let messages = [];
 
         try
         {
@@ -208,15 +216,15 @@ export class XMLEditorView extends GenericView
             {
                 console.log( "Validated data is obsolete" );
             }
-            this.ui.xmlvalid.classList.remove( "wait" );
-            this.ui.xmlvalid.classList.remove( "error" );
-            this.ui.xmlvalid.classList.add( "ok" );
+            this.xmlvalid.classList.remove( "wait" );
+            this.xmlvalid.classList.remove( "error" );
+            this.xmlvalid.classList.add( "ok" );
         }
         else
         {
-            this.ui.xmlvalid.classList.remove( "wait" );
-            this.ui.xmlvalid.classList.remove( "ok" );
-            this.ui.xmlvalid.classList.add( "error" );
+            this.xmlvalid.classList.remove( "wait" );
+            this.xmlvalid.classList.remove( "ok" );
+            this.xmlvalid.classList.add( "error" );
         }
     }
 
@@ -301,7 +309,7 @@ export class XMLEditorView extends GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e )
+    onActivate( e: CustomEvent )
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("XMLEditorView::onActivate");
@@ -312,7 +320,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onLoadData( e )
+    onLoadData( e: CustomEvent )
     {
         if ( !super.onLoadData( e ) ) return false;
         //console.debug("XMLEditorView::onLoadData");
@@ -325,7 +333,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onSelect( e )
+    onSelect( e: CustomEvent )
     {
         if ( !super.onSelect( e ) ) return false;
         //console.debug("XMLEditorView::onSelect");
@@ -336,7 +344,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onUpdateData( e )
+    onUpdateData( e: CustomEvent )
     {
         if ( !super.onUpdateData( e ) ) return false;
         //console.debug("XMLEditorView::onUpdateData");
@@ -350,7 +358,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onResized( e )
+    onResized( e: CustomEvent )
     {
         if ( !super.onResized( e ) ) return false;
         //console.debug("XMLEditorView::onResized");
