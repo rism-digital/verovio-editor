@@ -4,8 +4,12 @@
 
 importScripts( "https://www.verovio.org/javascript/validator/xml-validator.js" );
 
-class Deferred
+class ValidatorDeferred
 {
+    promise: Promise<unknown>;
+    public reject: ((reason?: any) => void) | undefined;
+    public resolve: ((value: (PromiseLike<unknown> | unknown)) => void) | undefined;
+
     constructor()
     {
         this.promise = new Promise( ( resolve, reject ) =>
@@ -24,20 +28,25 @@ let methods = {
 };
 
 // Global deferred Promise that can be resolved when Module is initialized
-const moduleIsReady = new Deferred();
+const isValidatorModuleReady = new ValidatorDeferred();
 
+//@ts-ignore
 Module.onRuntimeInitialized = function ()
 {
-    methods.setSchema = Module.cwrap( 'set_schema', 'bool', ['string'] );
-    methods.validate = Module.cwrap( 'validate', 'string', ['string'] );
-    methods.setRelaxNGSchema = Module.cwrap( 'set_relaxNG_schema', 'bool', ['string'] );
-    methods.validateNG = Module.cwrap( 'validate_NG', 'string', ['string'] );
+    //@ts-ignore
+    methods.setSchema = Module.cwrap('set_schema', 'bool', ['string']);
+    //@ts-ignore
+    methods.validate = Module.cwrap('validate', 'string', ['string']);
+    //@ts-ignore
+    methods.setRelaxNGSchema = Module.cwrap('set_relaxNG_schema', 'bool', ['string']);
+    //@ts-ignore
+    methods.validateNG = Module.cwrap('validate_NG', 'string', ['string'] );
 
-    moduleIsReady.resolve();
+    isValidatorModuleReady.resolve(null);
 };
 
 // Listen to messages send to this worker
-addEventListener( 'message', function ( event )
+addEventListener( 'message', function ( event: MessageEvent<any> )
 {
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
@@ -46,14 +55,14 @@ addEventListener( 'message', function ( event )
     // Module is initialized
     if ( method === 'onRuntimeInitialized' )
     {
-        moduleIsReady.promise.then( () =>
+        isValidatorModuleReady.promise.then( () =>
         {
             postMessage( {
                 taskId,
                 method,
                 args,
                 result: null,
-            }, event );
+            } );
         } );
         return;
     }
@@ -68,7 +77,7 @@ addEventListener( 'message', function ( event )
     }
     else
     {
-        console.warn( "Unkown", method );
+        console.warn( "Unkown call ", method );
     }
 
     // Always respond to worker calls with postMessage
@@ -77,5 +86,5 @@ addEventListener( 'message', function ( event )
         method,
         args,
         result,
-    }, event );
+    } );
 }, false );

@@ -1,9 +1,8 @@
 /**
- * The Worker for Verovio
+ * The Worker for XML validation.
  */
-//importScripts( "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" );
-importScripts("http://localhost:8082/emscripten/build/verovio-toolkit-wasm.js");
-class VerovioDeferred {
+importScripts("https://www.verovio.org/javascript/validator/xml-validator.js");
+class ValidatorDeferred {
     constructor() {
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject;
@@ -11,17 +10,25 @@ class VerovioDeferred {
         });
     }
 }
-// Initializing an empty object to prevent if in onMessage listener the toolkit
-// is being accessed before Module.onRuntimeInitialized
-let verovioToolkit = {};
+let methods = {
+    setSchema: null,
+    validate: null,
+    setRelaxNGSchema: null,
+    validateNG: null
+};
 // Global deferred Promise that can be resolved when Module is initialized
-const isVerovioModuleReady = new VerovioDeferred();
-// Create a new toolkit instance when Module is ready
+const isValidatorModuleReady = new ValidatorDeferred();
 //@ts-ignore
-verovio.module.onRuntimeInitialized = function () {
+Module.onRuntimeInitialized = function () {
     //@ts-ignore
-    verovioToolkit = new verovio.toolkit();
-    isVerovioModuleReady.resolve(null);
+    methods.setSchema = Module.cwrap('set_schema', 'bool', ['string']);
+    //@ts-ignore
+    methods.validate = Module.cwrap('validate', 'string', ['string']);
+    //@ts-ignore
+    methods.setRelaxNGSchema = Module.cwrap('set_relaxNG_schema', 'bool', ['string']);
+    //@ts-ignore
+    methods.validateNG = Module.cwrap('validate_NG', 'string', ['string']);
+    isValidatorModuleReady.resolve(null);
 };
 // Listen to messages send to this worker
 addEventListener('message', function (event) {
@@ -30,7 +37,7 @@ addEventListener('message', function (event) {
     // postMessage on a `onRuntimeInitialized` method as soon as
     // Module is initialized
     if (method === 'onRuntimeInitialized') {
-        isVerovioModuleReady.promise.then(() => {
+        isValidatorModuleReady.promise.then(() => {
             postMessage({
                 taskId,
                 method,
@@ -41,15 +48,14 @@ addEventListener('message', function (event) {
         return;
     }
     // Check if verovio toolkit has passed method
-    const fn = verovioToolkit[method || null];
+    const fn = methods[method || null];
     let result;
     if (fn) {
-        // console.debug( "Calling", method );
-        // Call verovio toolkit method and pass arguments
-        result = fn.apply(verovioToolkit, args || []);
+        //console.debug( "Calling", method );
+        result = fn.apply(null, args || []);
     }
     else {
-        console.warn("Unknown", method);
+        console.warn("Unkown call ", method);
     }
     // Always respond to worker calls with postMessage
     postMessage({

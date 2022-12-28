@@ -194,7 +194,7 @@ export class App
         this.pageCount = 0;
         this.currentZoomIndex = 4;
 
-        const validatorWorker = new Worker( '/js/validator-worker.js' )
+        const validatorWorker = new Worker( '/js-dist/validator-worker.js' )
         this.validator = new WorkerProxy( validatorWorker );
 
         this.rngLoader = new RNGLoader();

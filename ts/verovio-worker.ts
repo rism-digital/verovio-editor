@@ -34,7 +34,7 @@ verovio.module.onRuntimeInitialized = function ()
 {
     //@ts-ignore
     verovioToolkit = new verovio.toolkit();
-    isVerovioModuleReady.resolve( undefined );
+    isVerovioModuleReady.resolve( null );
 };
 
 // Listen to messages send to this worker
