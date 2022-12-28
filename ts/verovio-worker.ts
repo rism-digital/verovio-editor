@@ -5,7 +5,7 @@
 //importScripts( "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" );
 importScripts( "http://localhost:8082/emscripten/build/verovio-toolkit-wasm.js" );
 
-class Deferred
+class VerovioDeferred
 {
     promise: Promise<unknown>;
     public reject: ((reason?: any) => void) | undefined;
@@ -22,11 +22,11 @@ class Deferred
 }
 
 // Initializing an empty object to prevent if in onMessage listener the toolkit
-// is beeing accessed before Module.onRuntimeInitialized
+// is being accessed before Module.onRuntimeInitialized
 let verovioToolkit = {};
 
 // Global deferred Promise that can be resolved when Module is initialized
-const moduleIsReady = new Deferred();
+const isVerovioModuleReady = new VerovioDeferred();
 
 // Create a new toolkit instance when Module is ready
 //@ts-ignore
@@ -34,7 +34,7 @@ verovio.module.onRuntimeInitialized = function ()
 {
     //@ts-ignore
     verovioToolkit = new verovio.toolkit();
-    moduleIsReady.resolve( undefined );
+    isVerovioModuleReady.resolve( undefined );
 };
 
 // Listen to messages send to this worker
@@ -47,7 +47,7 @@ addEventListener( 'message', function ( event: MessageEvent<any> )
     // Module is initialized
     if ( method === 'onRuntimeInitialized' )
     {
-        moduleIsReady.promise.then( () =>
+        isVerovioModuleReady.promise.then( () =>
         {
             postMessage( {
                 taskId,
