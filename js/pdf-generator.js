@@ -31,7 +31,6 @@ export class PDFGenerator
         const pdfOptions = {
             adjustPageHeight: false,
             footer: "auto",
-            justifyIncludeLastPage: true,
             justifyVertically: true,
             mmOutput: true,
             pageHeight: 2970,

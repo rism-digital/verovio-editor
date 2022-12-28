@@ -155,7 +155,7 @@ export class App
 
         // PDF object - will be created only if necessay
         this.pdf = null;
-        const pdfWorker =  new Worker( '/js/pdf-worker.js' );
+        const pdfWorker =  new Worker( '/js-dist/pdf-worker.js' );
         this.pdf = new WorkerProxy( pdfWorker );
         //this.generatePDF();
 

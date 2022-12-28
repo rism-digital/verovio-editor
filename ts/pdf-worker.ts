@@ -8,8 +8,12 @@ importScripts( "https://www.verovio.org/javascript/pdfkit/blobstream.js" );
 importScripts( "https://www.verovio.org/javascript/pdfkit/source.js" );
 importScripts( "https://www.verovio.org/javascript/pdfkit/Leipzig-ttf.js" );
 
-class Deferred
+class PDFDeferred
 {
+    promise: Promise<unknown>;
+    public reject: ((reason?: any) => void) | undefined;
+    public resolve: ((value: (PromiseLike<unknown> | unknown)) => void) | undefined;
+
     constructor()
     {
         this.promise = new Promise( ( resolve, reject ) =>
@@ -42,14 +46,14 @@ let fontCallback = function ( family, bold, italic, fontOptions )
     }
 };
 
-let options = {};
-options.fontCallback = fontCallback;
+const options: { fontCallback: Function } = { fontCallback: fontCallback };
+//@ts-ignore
 let vrvFontBuffer = Uint8Array.from( atob( LeipzigTTF ), c => c.charCodeAt( 0 ) );
 
 // Variables that will be instantiated through start()
+let outString: string | ArrayBuffer = "";
 let doc = null;
 let outStream = null;
-let outString = "";
 let docEnd = null;
 
 // Listen to messages send to this worker
@@ -64,21 +68,22 @@ addEventListener( 'message', function ( event )
 
     if ( method === 'start' )
     {
+        //@ts-ignore
         doc = new PDFDocument( { useCSS: true, compress: true, autoFirstPage: false, layout: pdfOrientation } );
         outString = "";
+        //@ts-ignore
         const outStream = blobStream();
         doc.pipe(outStream);
         doc.registerFont( 'Leipzig', vrvFontBuffer );
 
         // The deferred promised that will be resolved through end() via on('finish')
-        docEnd = new Deferred();
+        docEnd = new PDFDeferred();
 
         outStream.on( 'finish', function ()
         {
-            outString = outStream.toBlob( "application/pdf" );
-
+            let streamBlob = outStream.toBlob( "application/pdf" );
             var reader = new FileReader();
-            reader.readAsDataURL(outString); 
+            reader.readAsDataURL(streamBlob); 
             reader.onloadend = function() {
                 outString = reader.result;   
                 docEnd.resolve();
@@ -100,18 +105,19 @@ addEventListener( 'message', function ( event )
                 method,
                 args,
                 result: outString,
-            }, event );
+            } );
         } );
         return;
     }
     else if ( method === 'addPage' )
     {
-        doc.addPage( { size: pdfFormat, layout: pdfOrientation } );
+        doc.addPage({ size: pdfFormat, layout: pdfOrientation });
+        // @ts-ignore
         SVGtoPDF( doc, args[0], 0, 0, options );
     }
     else
     {
-        console.warn( "Unkown", method );
+        console.warn( "Unkown function", method );
     }
 
     // Always respond to worker calls with postMessage
@@ -120,5 +126,5 @@ addEventListener( 'message', function ( event )
         method,
         args,
         result,
-    }, event );
+    } );
 }, false );
