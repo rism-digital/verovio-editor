@@ -56,10 +56,34 @@ export class WorkerProxy
     }
 }
 
+export class PDFWorkerProxy extends WorkerProxy
+{
+    addPage: Function;
+    end: Function;
+    start: Function;
+
+    constructor(worker: Worker) {
+        super(worker);
+    }
+}
+
 export class ValidatorWorkerProxy extends WorkerProxy
 {
     validateNG: Function;
     setRelaxNGSchema: Function;
+
+    constructor(worker: Worker) {
+        super(worker);
+    }
+}
+
+export class VerovioWorkerProxy extends WorkerProxy
+{
+    getOptions: Function;
+    getPageCount: Function;
+    redoLayout: Function;
+    renderToSVG: Function;
+    setOptions: Function;
 
     constructor(worker: Worker) {
         super(worker);

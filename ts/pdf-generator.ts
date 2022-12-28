@@ -2,24 +2,18 @@
  * The PDFGenerator class handling the verovio and the pdf WorkerProxy instances.
  */
 
-import { WorkerProxy } from "../js-dist/worker-proxy.js";
+import { PDFWorkerProxy, VerovioWorkerProxy } from "./worker-proxy.js";
 
 export class PDFGenerator
 {
-    constructor( verovioProxy, pdfProxy, scale )
+    verovio: VerovioWorkerProxy;
+    pdf: PDFWorkerProxy;
+    currentScale: number;
+
+    constructor( verovioProxy: VerovioWorkerProxy, pdfProxy: PDFWorkerProxy, scale: number )
     {
-        if ( !verovioProxy || !( verovioProxy instanceof WorkerProxy ) ) 
-        {
-            throw "All PDFGenerator objects must be initialized with 'verovioProxy' parameter that is a WorkerProxy element.";
-        }
         this.verovio = verovioProxy;
-
-        if ( !pdfProxy || !( pdfProxy instanceof WorkerProxy ) ) 
-        {
-            throw "All PDFGenerator objects must be initialized with 'pdfProxy' parameter that is a WorkerProxy element.";
-        }
         this.pdf = pdfProxy;
-
         this.currentScale = scale;
     }
 

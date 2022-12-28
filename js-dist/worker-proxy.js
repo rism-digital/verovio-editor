@@ -39,7 +39,17 @@ export class WorkerProxy {
         });
     }
 }
+export class PDFWorkerProxy extends WorkerProxy {
+    constructor(worker) {
+        super(worker);
+    }
+}
 export class ValidatorWorkerProxy extends WorkerProxy {
+    constructor(worker) {
+        super(worker);
+    }
+}
+export class VerovioWorkerProxy extends WorkerProxy {
     constructor(worker) {
         super(worker);
     }
