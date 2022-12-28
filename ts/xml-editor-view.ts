@@ -5,7 +5,7 @@
 
 import { App } from '../js/app.js';
 import { GenericView } from './generic-view.js';
-import { WorkerProxy } from '../js/worker-proxy.js';
+import { ValidatorWorkerProxy } from './worker-proxy.js';
 
 import { RNGLoader } from '../js/rng-loader.js';
 import { appendDivTo, appendTextAreaTo } from './utils/functions.js';
@@ -18,7 +18,7 @@ declare global {
 
 export class XMLEditorView extends GenericView
 {
-    validator: WorkerProxy;
+    validator: ValidatorWorkerProxy;
     rngLoader: RNGLoader;
     currentId: string;
     element: HTMLDivElement;
@@ -32,7 +32,7 @@ export class XMLEditorView extends GenericView
     CMeditor: any;
     app: App;
 
-    constructor( div: HTMLDivElement, app: App, validator: WorkerProxy, rngLoader: RNGLoader, options )
+    constructor( div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader, options )
     {
         super( div, app )
 

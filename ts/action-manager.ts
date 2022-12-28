@@ -4,7 +4,7 @@
 import { Cursor } from '../js/cursor.js';
 import { EditorView } from '../js/editor-view.js';
 import { EventManager } from './event-manager.js';
-import { WorkerProxy } from '../js/worker-proxy.js'
+import { WorkerProxy } from './worker-proxy.js'
 
 class Call {
     method: Function;

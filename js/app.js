@@ -21,7 +21,7 @@ import { MidiToolbar } from './midi-toolbar.js';
 import { PDFGenerator } from './pdf-generator.js';
 import { ResponsiveView } from './responsive-view.js';
 import { RNGLoader } from './rng-loader.js';
-import { WorkerProxy } from './worker-proxy.js'
+import { WorkerProxy } from '../js-dist/worker-proxy.js'
 
 import { elt } from './utils/functions.js';
 

@@ -12,8 +12,8 @@ export class AppStatusbar extends GenericView
 {
     active: boolean;
     ui: Object;
-    statustext: HTMLElement;
-    element: HTMLElement;
+    statustext: HTMLDivElement;
+    element: HTMLDivElement;
 
     constructor( div: HTMLDivElement, app: App )
     {

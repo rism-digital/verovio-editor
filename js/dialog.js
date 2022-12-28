@@ -3,7 +3,7 @@
  * It should not be instanciated directly but only through inherited classes.
  */
 
-import { Deferred } from './deferred.js';
+import { Deferred } from '../js-dist/deferred.js';
 import { EventManager } from '../js-dist/event-manager.js';
 
 import { elt } from './utils/functions.js';

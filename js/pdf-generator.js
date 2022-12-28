@@ -2,7 +2,7 @@
  * The PDFGenerator class handling the verovio and the pdf WorkerProxy instances.
  */
 
-import { WorkerProxy } from "./worker-proxy.js";
+import { WorkerProxy } from "../js-dist/worker-proxy.js";
 
 export class PDFGenerator
 {
