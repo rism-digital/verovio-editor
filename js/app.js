@@ -176,7 +176,7 @@ export class App
         let event = new CustomEvent( 'onResized' );
         this.customEventManager.dispatch( event );
 
-        const verovioWorker = new Worker( '/js/verovio-worker.js' );
+        const verovioWorker = new Worker( '/js-dist/verovio-worker.js' );
         this.verovio = new WorkerProxy( verovioWorker );
 
         this.settings =
