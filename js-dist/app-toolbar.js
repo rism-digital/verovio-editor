@@ -5,7 +5,7 @@
  */
 import { DocumentView } from '../js/document-view.js';
 import { EditorPanel } from '../js/editor-panel.js';
-import { ResponsiveView } from '../js/responsive-view.js';
+import { ResponsiveView } from './responsive-view.js';
 import { Toolbar } from './toolbar.js';
 import { elt } from '../js/utils/functions.js';
 import { appendDivTo } from './utils/functions.js';

@@ -2,20 +2,25 @@
  * The ResponsiveView class implements a dynamic rendering view fitting and adjusting to the view port.
  */
 
-import { EditorView } from './editor-view.js';
-import { VerovioView, VerovioViewUpdate } from '../js-dist/verovio-view.js';
+import { App } from '../js/app.js'
+import { EditorView } from '../js/editor-view.js';
+import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
 
-import { elt } from './utils/functions.js';
+import { elt } from '../js/utils/functions.js';
+import { VerovioWorkerProxy } from './worker-proxy.js';
+import { appendDivTo } from './utils/functions.js';
 
 export class ResponsiveView extends VerovioView
 {
-    constructor( div, app, verovio, options )
+    svgWrapper: HTMLDivElement;
+    midiIds: Array<number>;
+
+    constructor( div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy )
     {
-        super( div, app, verovio, options )
+        super( div, app, verovio )
 
         // initializes ui underneath the parent element, as well as Verovio communication
-        this.ui.svgWrapper = elt( 'div', { class: `vrv-svg-wrapper` } );
-        this.element.appendChild( this.ui.svgWrapper );
+        this.svgWrapper = appendDivTo( this.element, { class: `vrv-svg-wrapper` } );
 
         this.midiIds = [];
     }
@@ -24,7 +29,7 @@ export class ResponsiveView extends VerovioView
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateView( update, lightEndLoading = true )
+    async updateView( update: VerovioViewUpdate, lightEndLoading = true )
     {
         switch ( update )
         {
@@ -37,7 +42,7 @@ export class ResponsiveView extends VerovioView
             case ( VerovioViewUpdate.Resized ):
                 await this.updateResized();
                 break;
-            case ( VerovioViewUpdate.UpdateData ):
+            case ( VerovioViewUpdate.Update ):
                 await this.updateUpdateData();
                 break;
             case ( VerovioViewUpdate.Zoom ):
@@ -47,14 +52,14 @@ export class ResponsiveView extends VerovioView
         this.app.endLoading( lightEndLoading );
     }
 
-    async updateActivate()
+    async updateActivate(): Promise<any>
     {
         this.app.settings.adjustPageHeight = true;
         this.app.settings.breaks = 'auto';
         this.app.settings.footer = 'none';
         this.app.settings.scale = this.currentScale;
-        this.app.settings.pageHeight = this.ui.svgWrapper.clientHeight * ( 100 / this.app.settings.scale );
-        this.app.settings.pageWidth = this.ui.svgWrapper.clientWidth * ( 100 / this.app.settings.scale );
+        this.app.settings.pageHeight = this.svgWrapper.clientHeight * ( 100 / this.app.settings.scale );
+        this.app.settings.pageWidth = this.svgWrapper.clientWidth * ( 100 / this.app.settings.scale );
         this.app.settings.justifyVertically = false;
 
         this.midiIds = [];
@@ -65,7 +70,7 @@ export class ResponsiveView extends VerovioView
         }
     }
 
-    async updateLoadData()
+    async updateLoadData(): Promise<any>
     {
         if ( !( this instanceof EditorView ) )
         {
@@ -73,13 +78,13 @@ export class ResponsiveView extends VerovioView
             this.element.style.width = this.element.parentElement.style.width;
         }
 
-        if ( this.ui && this.element && this.ui.svgWrapper )
+        if ( this.ui && this.element && this.svgWrapper )
         {
             this.updateSVGDimensions();
             // Reset pageHeight and pageWidth to match the effective scaled viewport width
             this.app.settings.scale = this.currentScale;
-            this.app.settings.pageHeight = this.ui.svgWrapper.clientHeight * ( 100 / this.app.settings.scale );
-            this.app.settings.pageWidth = this.ui.svgWrapper.clientWidth * ( 100 / this.app.settings.scale );
+            this.app.settings.pageHeight = this.svgWrapper.clientHeight * ( 100 / this.app.settings.scale );
+            this.app.settings.pageWidth = this.svgWrapper.clientWidth * ( 100 / this.app.settings.scale );
             // Not sure why we need to remove the top margin from the calculation... to be investigated
             this.app.settings.pageHeight -= ( this.app.settings.pageMarginTop ) * ( 100 / this.app.settings.scale );
 
@@ -101,32 +106,32 @@ export class ResponsiveView extends VerovioView
         }
     }
 
-    async updateResized() 
+    async updateResized(): Promise<any>
     {
         await this.updateLoadData();
     }
 
-    async updateUpdateData()
+    async updateUpdateData(): Promise<any>
     {
         await this.verovio.loadData( this.app.mei );
         this.app.pageCount = await this.verovio.getPageCount();
         await this.updateLoadData();
     }
 
-    async updateZoom()
+    async updateZoom(): Promise<any>
     {
         await this.updateLoadData();
     }
 
-    async renderPage( lightEndLoading = false )
+    async renderPage( lightEndLoading: boolean = false ): Promise<any>
     {
         const svg = await this.verovio.renderToSVG( this.currentPage );
-        this.ui.svgWrapper.innerHTML = svg;
+        this.svgWrapper.innerHTML = svg;
 
         if ( lightEndLoading ) this.app.endLoading( true );
     }
 
-    async midiUpdate( time )
+    async midiUpdate( time: number ): Promise<any>
     {
         //const animateStart = document.getElementById( "highlighting-start" );
 
@@ -152,25 +157,25 @@ export class ResponsiveView extends VerovioView
                 let noteid = this.midiIds[i];
                 if ( elementsAtTime.notes.indexOf( noteid ) === -1 )
                 {
-                    let note = this.ui.svgWrapper.querySelector( '#' + noteid );
+                    let note = <SVGElement>this.svgWrapper.querySelector( '#' + noteid );
                     if ( note ) note.style.filter = "";
                 }
             };
             this.midiIds = elementsAtTime.notes;
             for ( let i = 0, len = this.midiIds.length; i < len; i++ ) 
             {
-                let note = this.ui.svgWrapper.querySelector( '#' + this.midiIds[i] );
+                let note = <SVGElement>this.svgWrapper.querySelector( '#' + this.midiIds[i] );
                 if ( note ) note.style.filter = "url(#highlighting)";
                 //if ( note ) animateStart.beginElement();
             };
         }
     }
 
-    async midiStop()
+    async midiStop(): Promise<any>
     {
         for ( let i = 0, len = this.midiIds.length; i < len; i++ ) 
         {
-            let note = this.ui.svgWrapper.querySelector( '#' + this.midiIds[i] );
+            let note = <SVGElement>this.svgWrapper.querySelector( '#' + this.midiIds[i] );
             if ( note ) note.style.filter = "";
         };
         this.midiIds = [];
@@ -180,17 +185,17 @@ export class ResponsiveView extends VerovioView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateSVGDimensions()
+    updateSVGDimensions(): void
     {
-        this.ui.svgWrapper.style.height = this.element.style.height;
-        this.ui.svgWrapper.style.width = this.element.style.width;
+        this.svgWrapper.style.height = this.element.style.height;
+        this.svgWrapper.style.width = this.element.style.width;
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onPage( e )
+    onPage( e: CustomEvent ): boolean
     {
         if ( !super.onPage( e ) ) return false;
         //console.debug("ResponsiveView::onPage");
@@ -204,9 +209,11 @@ export class ResponsiveView extends VerovioView
     // Event listeners
     ////////////////////////////////////////////////////////////////////////
 
-    scrollListener( e )
+    scrollListener( e: UIEvent ): void
     {
-        this.ui.svgWrapper.scrollTop = e.target.scrollTop;
-        this.ui.svgWrapper.scrollLeft = e.target.scrollLeft;
+        let element = (e.target as HTMLElement);
+        console.log(element);
+        this.svgWrapper.scrollTop = element.scrollTop;
+        this.svgWrapper.scrollLeft = element.scrollLeft;
     }
 }

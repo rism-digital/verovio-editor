@@ -19,7 +19,7 @@ import { GitHubManager } from './github-manager.js';
 import { MidiPlayer } from './midi-player.js';
 import { MidiToolbar } from './midi-toolbar.js';
 import { PDFGenerator } from '../js-dist/pdf-generator.js';
-import { ResponsiveView } from './responsive-view.js';
+import { ResponsiveView } from '../js-dist/responsive-view.js';
 import { RNGLoader } from '../js-dist/rng-loader.js';
 import { WorkerProxy } from '../js-dist/worker-proxy.js'
 

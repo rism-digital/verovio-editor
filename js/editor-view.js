@@ -3,7 +3,7 @@
  * It uses a responsive layout. 
  */
 
-import { ResponsiveView } from './responsive-view.js';
+import { ResponsiveView } from '../js-dist/responsive-view.js';
 import { Cursor } from './cursor.js';
 import { ActionManager } from '../js-dist/action-manager.js';
 
@@ -55,14 +55,14 @@ export class EditorView extends ResponsiveView
 
         if ( this.ui && this.ui.svgOverlay )
         {
-            this.ui.svgOverlay.style.height = this.ui.svgWrapper.style.height;
-            this.ui.svgOverlay.style.width = this.ui.svgWrapper.style.width;
+            this.ui.svgOverlay.style.height = this.svgWrapper.style.height;
+            this.ui.svgOverlay.style.width = this.svgWrapper.style.width;
         }
     }
 
     initCursor()
     {
-        const svgRoot = this.ui.svgWrapper.querySelector( 'svg' );
+        const svgRoot = this.svgWrapper.querySelector( 'svg' );
         if ( !svgRoot ) return;
 
         const top = this.element.getBoundingClientRect().top;
@@ -77,7 +77,7 @@ export class EditorView extends ResponsiveView
     async renderPage( lightEndLoading = false, createOverlay = true )
     {
         const svg = await this.verovio.renderToSVG( this.currentPage );
-        this.ui.svgWrapper.innerHTML = svg;
+        this.svgWrapper.innerHTML = svg;
         this.initCursor();
 
         // create the overlay if necessary
@@ -159,10 +159,10 @@ export class EditorView extends ResponsiveView
     createOverlay()
     {
         // Copy wrapper HTML to overlay
-        this.ui.svgOverlay.innerHTML = this.ui.svgWrapper.innerHTML;
+        this.ui.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
 
         // Remove all the bounding boxes from the original wrapper because we do not want to highlight them
-        for ( const node of this.ui.svgWrapper.querySelectorAll( 'g.bounding-box' ) )
+        for ( const node of this.svgWrapper.querySelectorAll( 'g.bounding-box' ) )
         {
             node.parentNode.removeChild( node );
         }
@@ -222,7 +222,7 @@ export class EditorView extends ResponsiveView
         for ( const id of this.highlightedCache )
         {
             // Set the wrapper instance to be red
-            this.highlightWithColor( this.ui.svgWrapper.querySelector( '#' + id ), '#e60000' );
+            this.highlightWithColor( this.svgWrapper.querySelector( '#' + id ), '#e60000' );
         }
     }
 
@@ -231,7 +231,7 @@ export class EditorView extends ResponsiveView
         for ( const id of this.highlightedCache )
         {
             // Remove the color
-            this.highlightWithColor( this.ui.svgWrapper.querySelector( '#' + id ), '' );
+            this.highlightWithColor( this.svgWrapper.querySelector( '#' + id ), '' );
         }
         this.highlightedCache.length = 0;
     }
@@ -470,7 +470,7 @@ export class EditorView extends ResponsiveView
         {
             this.cursor.Update();
         }
-        this.ui.svgWrapper.scrollTop = e.target.scrollTop;
-        this.ui.svgWrapper.scrollLeft = e.target.scrollLeft;
+        this.svgWrapper.scrollTop = e.target.scrollTop;
+        this.svgWrapper.scrollLeft = e.target.scrollLeft;
     }
 }
