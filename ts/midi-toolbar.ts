@@ -2,7 +2,7 @@
  * The MidiToolbar class for controlling the MidiPlayer.
  */
 
-import { MidiPlayer } from '../js/midi-player.js';
+import { MidiPlayer } from './midi-player.js';
 import { Toolbar } from './toolbar.js';
 
 import { appendDivTo } from './utils/functions.js';
