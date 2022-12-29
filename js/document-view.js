@@ -1,11 +1,11 @@
 /**
- * The DocumentView class implements a continous document-like view of the MEI.
+ * The DocumentView class implements a continuous document-like view of the MEI.
  * Rendering can be either in SVG or Canvas
  * For browser supporting it an IntersectionObserver is used to lazy-load the rendering of the pages.
  * When SVG rendering is use, a limited number of pages it keep in the DOM.
  */
 
-import { VerovioView } from './verovio-view.js';
+import { VerovioView, VerovioViewUpdate } from '../js-dist/verovio-view.js';
 
 import { elt } from './utils/functions.js';
 
@@ -41,16 +41,16 @@ export class DocumentView extends VerovioView
     {
         switch ( update )
         {
-            case ( VerovioView.update.Activate ):
+            case ( VerovioViewUpdate.Activate ):
                 await this.updateActivate();
                 break;
-            case ( VerovioView.update.LoadData ):
+            case ( VerovioViewUpdate.LoadData ):
                 await this.updateLoadData();
                 break;
-            case ( VerovioView.update.Resized ):
+            case ( VerovioViewUpdate.Resized ):
                 await this.updateResized();
                 break;
-            case ( VerovioView.update.Zoom ):
+            case ( VerovioViewUpdate.Zoom ):
                 await this.updateZoom();
                 break;
         }

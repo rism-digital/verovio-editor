@@ -4,21 +4,36 @@
  * The VerovioView is attached to a VerovioMessenger.
  */
 
-import { GenericView } from '../js-dist/generic-view.js';
-import { EventManager } from '../js-dist/event-manager.js';
-import { WorkerProxy } from '../js-dist/worker-proxy.js';
+import { App } from '../js/app.js';
+import { GenericView } from './generic-view.js';
+import { EventManager } from './event-manager.js';
+import { VerovioWorkerProxy } from './worker-proxy.js';
 
 export class VerovioView extends GenericView
 {
-    constructor( div, app, verovio )
+    app: App;
+    verovio: VerovioWorkerProxy;
+    eventManager: EventManager;
+    currentId: number;
+    currentPage: number;
+    currentZoomIndex: number;
+    currentScale: number;
+
+    boundMouseMove: { (event: MouseEvent): void };
+    boundMouseUp: { (event: MouseEvent): void };
+    boundKeyDown: { (event: KeyboardEvent): void };
+    boundResize: { (event: Event): void };
+
+    mouseMoveListener: EventListener;
+    mouseUpListener: EventListener;
+    keyDownListener: EventListener;
+    resizeComponents: EventListener;
+
+    constructor( div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy )
     {
         super( div, app );
 
         // VerovioMessenger object
-        if ( !verovio || !( verovio instanceof WorkerProxy ) ) 
-        {
-            throw "All VerovioView objects must be initialized with a 'verovio' parameter that is an instance of the WorkerProxy class.";
-        }
         this.verovio = verovio;
 
         // One of the little quirks of writing in ES6, bind events
@@ -33,10 +48,10 @@ export class VerovioView extends GenericView
     }
 
     // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
-    destroy()
+    destroy(): void
     {
         this.eventManager.unbindAll();
-        this.events.unsubscribeAll();
+        //this.events.unsubscribeAll();
 
         document.removeEventListener( 'mousemove', this.boundMouseMove );
         document.removeEventListener( 'mouseup', this.boundMouseUp );
@@ -46,25 +61,25 @@ export class VerovioView extends GenericView
         super.destroy()
     }
 
-    parseAndScaleSVG( svgString, height, width )
+    parseAndScaleSVG( svgString: string, height: number, width: number )
     {
         const parser = new DOMParser();
-        const svg = parser.parseFromString( svgString, "text/xml" );
-        svg.firstChild.setAttribute( `height`, `${ height }px` );
-        svg.firstChild.setAttribute( `width`, `${ width }px` );
+        const svg: XMLDocument = parser.parseFromString( svgString, "text/xml" );
+        svg.firstElementChild.setAttribute( `height`, `${ height }px` );
+        svg.firstElementChild.setAttribute( `width`, `${ width }px` );
         return svg.firstChild;
     }
 
     // Necessary for how ES6 "this" works inside events
-    bindListeners()
+    bindListeners(): void
     {
-        this.boundKeyDown = ( evt ) => this.keyDownListener( evt );
-        this.boundMouseMove = ( evt ) => this.mouseMoveListener( evt );
-        this.boundMouseUp = ( evt ) => this.mouseUpListener( evt );
-        this.boundResize = ( evt ) => this.resizeComponents( evt );
+        this.boundKeyDown = ( e: KeyboardEvent )  => this.keyDownListener( e );
+        this.boundMouseMove = ( e: MouseEvent ) => this.mouseMoveListener( e );
+        this.boundMouseUp = ( e: MouseEvent ) => this.mouseUpListener( e );
+        this.boundResize = ( e: Event ) => this.resizeComponents( e );
     }
 
-    async updateView( update )
+    async updateView( update: VerovioViewUpdate, lightEndLoading: boolean = true )
     {
         console.debug( "View::updateView should be overwritten" );
         console.debug( update );
@@ -74,69 +89,69 @@ export class VerovioView extends GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e )
+    onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("VerovioView::onActivate");
 
-        this.updateView( VerovioView.update.Activate );
+        this.updateView( VerovioViewUpdate.Activate );
 
         // This occurs when switching views
         if ( e.detail && e.detail.loadData )
         {
-            this.updateView( VerovioView.update.LoadData, false );
+            this.updateView( VerovioViewUpdate.LoadData, false );
         }
 
         return true;
     }
 
-    onLoadData( e )
+    onLoadData( e: CustomEvent ): boolean
     {
         if ( !super.onLoadData( e ) ) return false;
         //console.debug("VerovioView::onLoadData");
 
-        this.updateView( VerovioView.update.LoadData, false );
+        this.updateView( VerovioViewUpdate.LoadData, false );
 
         return true;
     }
 
-    onResized( e )
+    onResized( e: CustomEvent ): boolean
     {
         if ( !super.onResized( e ) ) return false;
         //console.debug("VerovioView::onResized");
 
-        this.updateView( VerovioView.update.Resized );
+        this.updateView( VerovioViewUpdate.Resized );
 
         return true;
     }
 
-    onUpdateData( e )
+    onUpdateData( e: CustomEvent ): boolean
     {
         if ( !super.onUpdateData( e ) ) return false;
         //console.debug("VerovioView::onUpdateData");
 
-        this.updateView( VerovioView.update.UpdateData );
+        this.updateView( VerovioViewUpdate.Update );
 
         return true;
     }
 
-    onZoom( e )
+    onZoom( e: CustomEvent ): boolean
     {
         if ( !super.onZoom( e ) ) return false;
         //console.debug("VerovioView::onZoom");
 
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
 
-        this.updateView( VerovioView.update.Zoom );
+        this.updateView( VerovioViewUpdate.Zoom );
 
         return true;
     }
 }
 
-VerovioView.update = {
-    Activate: 1,
-    LoadData: 2,
-    Resized: 3,
-    Update: 4,
-    Zoom: 5
+export enum VerovioViewUpdate {
+    Activate,
+    LoadData,
+    Resized,
+    Update,
+    Zoom
 };

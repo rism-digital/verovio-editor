@@ -54,7 +54,7 @@ export class GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e: CustomEvent )
+    onActivate( e: CustomEvent ): boolean
     {
         //console.debug("GenericView::onActivate");
         this.element.style.display = 'block';
@@ -62,7 +62,7 @@ export class GenericView
         return true;
     }
 
-    onDeactivate( e: CustomEvent )
+    onDeactivate( e: CustomEvent ): boolean
     {
         //console.debug("GenericView::onDeactivate");
         this.element.style.display = 'none';
@@ -70,35 +70,35 @@ export class GenericView
         return true;
     }
 
-    onEndLoading( e: CustomEvent )
+    onEndLoading( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         //console.debug("GenericView::onEndLoading");
         return true;
     }
 
-    onLoadData( e: CustomEvent )
+    onLoadData( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         //console.debug("GenericView::onLoadData");
         return true;
     }
 
-    onPage( e: CustomEvent )
+    onPage( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         //console.debug("GenericView::onPage");
         return true;
     }
 
-    onResized( e: CustomEvent )
+    onResized( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         //console.debug("GenericView::onResized");
         return true;
     }
 
-    onSelect( e: CustomEvent )
+    onSelect( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         if ( this === e.detail.caller ) return false;
@@ -106,14 +106,14 @@ export class GenericView
         return true;
     }
 
-    onStartLoading( e: CustomEvent )
+    onStartLoading( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         //console.debug("GenericView::onStartLoading");
         return true;
     }
 
-    onUpdateData( e: CustomEvent )
+    onUpdateData( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         if ( this === e.detail.caller ) return false;
@@ -121,14 +121,14 @@ export class GenericView
         return true;
     }
 
-    onUpdateView( e: CustomEvent )
+    onUpdateView( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         //console.debug("GenericView::onUpdateView");
         return true;
     }
 
-    onZoom( e: CustomEvent )
+    onZoom( e: CustomEvent ): boolean
     {
         if ( !this.active ) return false;
         //console.debug("GenericView::onZoom");

@@ -3,7 +3,7 @@
  */
 
 import { EditorView } from './editor-view.js';
-import { VerovioView } from './verovio-view.js';
+import { VerovioView, VerovioViewUpdate } from '../js-dist/verovio-view.js';
 
 import { elt } from './utils/functions.js';
 
@@ -28,19 +28,19 @@ export class ResponsiveView extends VerovioView
     {
         switch ( update )
         {
-            case ( VerovioView.update.Activate ):
+            case ( VerovioViewUpdate.Activate ):
                 await this.updateActivate();
                 break;
-            case ( VerovioView.update.LoadData ):
+            case ( VerovioViewUpdate.LoadData ):
                 await this.updateLoadData();
                 break;
-            case ( VerovioView.update.Resized ):
+            case ( VerovioViewUpdate.Resized ):
                 await this.updateResized();
                 break;
-            case ( VerovioView.update.UpdateData ):
+            case ( VerovioViewUpdate.UpdateData ):
                 await this.updateUpdateData();
                 break;
-            case ( VerovioView.update.Zoom ):
+            case ( VerovioViewUpdate.Zoom ):
                 await this.updateZoom();
                 break;
         }
