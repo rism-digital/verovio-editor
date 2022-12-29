@@ -309,7 +309,7 @@ export class XMLEditorView extends GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e: CustomEvent )
+    onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("XMLEditorView::onActivate");
@@ -320,7 +320,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onLoadData( e: CustomEvent )
+    onLoadData( e: CustomEvent ): boolean
     {
         if ( !super.onLoadData( e ) ) return false;
         //console.debug("XMLEditorView::onLoadData");
@@ -333,7 +333,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onSelect( e: CustomEvent )
+    onSelect( e: CustomEvent ): boolean
     {
         if ( !super.onSelect( e ) ) return false;
         //console.debug("XMLEditorView::onSelect");
@@ -344,7 +344,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onUpdateData( e: CustomEvent )
+    onUpdateData( e: CustomEvent ): boolean
     {
         if ( !super.onUpdateData( e ) ) return false;
         //console.debug("XMLEditorView::onUpdateData");
@@ -358,7 +358,7 @@ export class XMLEditorView extends GenericView
         return true;
     }
 
-    onResized( e: CustomEvent )
+    onResized( e: CustomEvent ): boolean
     {
         if ( !super.onResized( e ) ) return false;
         //console.debug("XMLEditorView::onResized");
@@ -408,7 +408,6 @@ function completeIfInTag( cm )
 ////////////////////////////////////////////////////////////////////////
 // CodeMirror extension for autoFormatRange
 ////////////////////////////////////////////////////////////////////////
-
 
 CodeMirror.extendMode( "xml", {
     commentStart: "<!--",
