@@ -1,16 +1,18 @@
 /**
  * The RNGLoader class for parsing and storing an RNG Schema.
  */
-
 export class RNGLoader
 {
+    rngns: string;
+    tags: Object;
+
     constructor()
     {
         this.rngns = "http://relaxng.org/ns/structure/1.0";
         this.tags = {}
     }
 
-    setRelaxNGSchema( data ) 
+    setRelaxNGSchema( data: string ) 
     {
         const parser = new window.DOMParser();
         const doc = parser.parseFromString( data, "text/xml" );
@@ -18,11 +20,11 @@ export class RNGLoader
         "use strict";
         this.tags = {}
         const funcThis = this;
-        let definitions = this.collectDefinitions( doc ),
-            elements = {};
+        let definitions: Map<string, Element> = this.collectDefinitions(doc);
+        let elements: Map<string, Element> = new Map<string, Element>;
         Object.keys( definitions ).map( function ( key )
         {
-            definitions[key].map( function ( define )
+            definitions[key].map( function ( define: Element )
             {
                 funcThis.findElements( definitions, define, elements );
             } );
@@ -38,11 +40,11 @@ export class RNGLoader
     /**
      * Collect all <define/> elements.
      */
-    collectDefinitions( doc )
+    collectDefinitions( doc: Document ): Map<string, Element>
     {
         "use strict";
         let /**@type{!Object<!string,!Array.<!Element>>}*/
-            definitions = {},
+            definitions = new Map<string, Element>,
             defs = doc.getElementsByTagNameNS( this.rngns, "define" ),
             i,
             name,
@@ -61,7 +63,7 @@ export class RNGLoader
     /**
      * Continue recursion in the definition elements for the given reference.
      */
-    followReference( defs, stack, ref, handler ) 
+    followReference( defs: Map<string, Element>, stack: Array<string>, ref: Element, handler: Function ) 
     {
         "use strict";
         let name = ref.getAttribute( "name" ).trim();
@@ -76,7 +78,7 @@ export class RNGLoader
     /**
      * Recurse into the child elements. Follow references.
      */
-    recurseRng( defs, stack, rng, handler ) 
+    recurseRng( defs: Map<string, Element>, stack: Array<string>, rng, handler: Function ) 
     {
         "use strict";
         let child;
@@ -100,7 +102,7 @@ export class RNGLoader
     /**
      * Collect the text from all the <value/> elements.
      */
-    getAttributeValues( defs, stack, rng, values ) 
+    getAttributeValues( defs: Map<string, Element>, stack: Array<string>, rng: Element, values ) 
     {
         "use strict";
         let text;
@@ -124,7 +126,7 @@ export class RNGLoader
     /**
      * Get the possible names for an element or attribute.
      */
-    getNamesRecurse( e, names ) 
+    getNamesRecurse( e: Element, names: Array<string> )
     {
         "use strict";
         let child;
@@ -145,7 +147,7 @@ export class RNGLoader
     /**
      * Get the possible names for an element or attribute.
      */
-    getNames( e ) 
+    getNames( e: Element ): Array<string> 
     {
         "use strict";
         if ( e.hasAttribute( "name" ) )
@@ -165,11 +167,11 @@ export class RNGLoader
     /**
      * Find the allowed child elements and attributes for an element.
      */
-    defineElement( defs, stack, rng, def ) 
+    defineElement( defs: Map<string, Element>, stack: Array<string>, rng: Element, def ) 
     {
         "use strict";
-        let names,
-            values = [];
+        let names: Array<string>;
+        let values: Array<string>;
         if ( this.isRng( rng, "element" ) )
         {
             names = this.getNames( rng );
@@ -204,7 +206,7 @@ export class RNGLoader
         } else
         {
             const funcThis = this;
-            this.recurseRng( defs, stack, rng, function ( e )
+            this.recurseRng( defs, stack, rng, function ( e: Element )
             {
                 funcThis.defineElement( defs, stack, e, def );
             } );
@@ -224,7 +226,7 @@ export class RNGLoader
         return ordered;
     }
 
-    sortAttributeValues( attrs ) 
+    sortAttributeValues( attrs: Map<string, Array<string>> ) 
     {
         "use strict";
         let keys = Object.keys( attrs );
@@ -238,7 +240,7 @@ export class RNGLoader
         } );
     }
 
-    findElements( defs, rng, elements ) 
+    findElements( defs: Map<string, Element>, rng: Element, elements: Map<string, Element> ) 
     {
         "use strict";
         let child,
@@ -246,7 +248,7 @@ export class RNGLoader
             element;
         if ( this.isRng( rng, "element" ) )
         {
-            element = { attrs: {}, children: [] };
+            element = { attrs: Map<String, Array<string>>, children: [] };
             child = rng.firstElementChild;
             while ( child )
             {
@@ -273,7 +275,7 @@ export class RNGLoader
     }
 
 
-    findTopLevelElements( defs, stack, rng, top ) 
+    findTopLevelElements( defs: Map<string, Element>, stack: Array<any>, rng: Element, top: Array<any> ) 
     {
         "use strict";
         if ( rng.localName === "element" )
@@ -293,7 +295,7 @@ export class RNGLoader
     }
 
 
-    findAllTopLevelElements( defs, stack, doc ) 
+    findAllTopLevelElements( defs: Map<string, Element>, stack: Array<any>, doc: Document ) 
     {
         "use strict";
         let top = [],
@@ -308,7 +310,7 @@ export class RNGLoader
         return top;
     }
 
-    isRng( e, name ) 
+    isRng( e: Element, name: string ) 
     {
         "use strict";
         return e.namespaceURI === this.rngns && e.localName === name;

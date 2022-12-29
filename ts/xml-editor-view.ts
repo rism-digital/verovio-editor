@@ -7,7 +7,7 @@ import { App } from '../js/app.js';
 import { GenericView } from './generic-view.js';
 import { ValidatorWorkerProxy } from './worker-proxy.js';
 
-import { RNGLoader } from '../js/rng-loader.js';
+import { RNGLoader } from './rng-loader.js';
 import { appendDivTo, appendTextAreaTo } from './utils/functions.js';
 
 const theme = "vrv"; // default for light theme
@@ -135,7 +135,7 @@ export class XMLEditorView extends GenericView
     {
         try
         {
-            const response = await fetch( schemaFile );
+            const response = await fetch(schemaFile);
             const data = await response.text();
             const res = await this.validator.setRelaxNGSchema( data );
             console.log( "New schema loaded", res );
