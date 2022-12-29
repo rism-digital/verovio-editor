@@ -126,8 +126,8 @@ export class RNGLoader {
      */
     defineElement(defs, stack, rng, def) {
         "use strict";
-        let names;
-        let values;
+        let names = new Array;
+        let values = new Array;
         if (this.isRng(rng, "element")) {
             names = this.getNames(rng);
             names.map(function (name) {
@@ -184,7 +184,7 @@ export class RNGLoader {
         "use strict";
         let child, names, element;
         if (this.isRng(rng, "element")) {
-            element = { attrs: (Map), children: [] };
+            element = { attrs: {}, children: [] };
             child = rng.firstElementChild;
             while (child) {
                 this.defineElement(defs, [], child, element);

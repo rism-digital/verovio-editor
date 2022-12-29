@@ -1,11 +1,25 @@
 /**
  * The FileStack class for storing previously loading files in the window.localStorage.
  */
-
+//@ts-ignore
 const pako = window.pako;
+
+interface Stack {
+    idx: number;
+    items: number;
+    maxItems: number;
+    filenames: Array<string>;
+}
+
+export interface File {
+    filename: string;
+    data: string;
+}
 
 export class FileStack
 {
+    stack: Stack;
+
     constructor()
     {
         const cache = window.localStorage.getItem( "fileStack" );
@@ -21,15 +35,15 @@ export class FileStack
         //console.debug( this.stack );
     }
 
-    store( filename, data )
+    store( filename: string, data: string ): void
     {
-        let list = this.fileList();
+        let list: Array<{idx: number, filename: string}> = this.fileList();
         for ( let i = 0; i < list.length; i++ )
         {
             // Same filename, check the content
-            if ( filename === list[i][1] )
+            if ( filename === list[i].filename )
             {
-                let file = this.load( list[i][0] );
+                let file = this.load( list[i].idx );
                 if ( data === file.data )
                 {
                     console.debug( "File already in the list" );
@@ -52,7 +66,7 @@ export class FileStack
         window.localStorage.setItem( "fileStack", JSON.stringify( this.stack ) );
     }
 
-    load( idx )
+    load( idx: number ): File
     {
         let data = window.localStorage.getItem( "file-" + idx );
         //let decompressedData = zlib.inflateSync( new Buffer( data, 'base64' ) ).toString();
@@ -60,7 +74,7 @@ export class FileStack
         return { filename: this.stack.filenames[idx], data: decompressedData };
     }
 
-    getLast()
+    getLast(): File
     {
         if ( this.stack.items > 0 )
         {
@@ -68,21 +82,21 @@ export class FileStack
         }
     }
 
-    fileList()
+    fileList(): Array<{idx: number, filename: string}>
     {
-        let map = new Array();
+        let list = new Array<{idx: number, filename: string}>
         for ( let i = 0; i < this.stack.items; i++ )
         {
             let idx = ( this.stack.idx + i ) % this.stack.maxItems;
-            map.push( [idx, this.stack.filenames[idx]] );
+            list.push({ idx: idx, filename: this.stack.filenames[idx] } );
             //console.log(idx, this.stack.storage[idx]);
         }
-        return map;
+        return list;
     }
 
-    reset()
+    reset(): void
     {
-        let list = this.fileList();
+        let list: Array<{idx: number, filename: string}> = this.fileList();
         for ( let i = 0; i < list.length; i++ )
         {
             window.localStorage.removeItem( "file-" + list[i][0] );

@@ -186,8 +186,8 @@ export class AppToolbar extends Toolbar {
         this.subSubMenu.innerHTML = "";
         let fileList = this.app.fileStack.fileList();
         for (let i = 0; i < fileList.length; i++) {
-            const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i][1] });
-            entry.dataset.idx = fileList[i][0];
+            const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename });
+            entry.dataset.idx = fileList[i].idx.toString();
             this.app.eventManager.bind(entry, 'click', this.app.fileLoadRecent);
             this.eventManager.bind(entry, 'click', this.onClick);
         }

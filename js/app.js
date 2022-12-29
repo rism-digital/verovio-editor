@@ -14,7 +14,7 @@ import { DocumentView } from './document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from './editor-panel.js';
 import { EventManager } from '../js-dist/event-manager.js';
-import { FileStack } from './file-stack.js';
+import { FileStack } from '../js-dist/file-stack.js';
 import { GitHubManager } from './github-manager.js';
 import { MidiPlayer } from './midi-player.js';
 import { MidiToolbar } from './midi-toolbar.js';

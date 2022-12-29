@@ -170,8 +170,8 @@ export class RNGLoader
     defineElement( defs: Map<string, Element>, stack: Array<string>, rng: Element, def ) 
     {
         "use strict";
-        let names: Array<string>;
-        let values: Array<string>;
+        let names: Array<string> = new Array<string>;
+        let values: Array<string> = new Array<string>;
         if ( this.isRng( rng, "element" ) )
         {
             names = this.getNames( rng );
@@ -248,7 +248,7 @@ export class RNGLoader
             element;
         if ( this.isRng( rng, "element" ) )
         {
-            element = { attrs: Map<String, Array<string>>, children: [] };
+            element = { attrs: {}, children: [] };
             child = rng.firstElementChild;
             while ( child )
             {
