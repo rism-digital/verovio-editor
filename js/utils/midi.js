@@ -12,6 +12,7 @@ export const midiPlayerServer = 'https://www.verovio.org/javascript/midi-player-
 /************************************************************************/
 
 window.ULONG_MAX = 4294967295;
+export const ULONG_MAX = window.ULONG_MAX;
 window._EM_signalStop = 0;
 window._EM_seekSamples = ULONG_MAX;
 

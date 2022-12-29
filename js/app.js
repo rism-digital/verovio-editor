@@ -17,7 +17,7 @@ import { EventManager } from '../js-dist/event-manager.js';
 import { FileStack } from '../js-dist/file-stack.js';
 import { GitHubManager } from './github-manager.js';
 import { MidiPlayer } from './midi-player.js';
-import { MidiToolbar } from './midi-toolbar.js';
+import { MidiToolbar } from '../js-dist/midi-toolbar.js';
 import { PDFGenerator } from '../js-dist/pdf-generator.js';
 import { ResponsiveView } from '../js-dist/responsive-view.js';
 import { RNGLoader } from '../js-dist/rng-loader.js';
