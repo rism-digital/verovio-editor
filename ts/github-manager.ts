@@ -2,11 +2,28 @@
  * The GitHubManager class managing a connection to GitHub through the GitHub API.
  */
 
-const GitHub = window.GitHub;
+import { App } from '../js/app.js';
+
+declare global {
+    const GitHub;
+}
 
 export class GitHubManager
 {
-    constructor( app )
+    gh: any; // GitHub object
+    app: App;
+    name: string;
+    login: string;
+    user: any; // GitHub::User object
+    selectedUser: string;
+    selectedOrganization: any; // GitHub::Organization object
+    selectedAccountName: string;
+    selectedBranchName: string;
+    selectedRepo: any; // GitHub::Repository object
+    selectedRepoName: string;
+    selectedPath: Array<string>;
+
+    constructor( app: App )
     {
         this.app = app;
         this.name = 'GitHub';
@@ -33,18 +50,18 @@ export class GitHubManager
         }
     }
 
-    getSessionCookie( name )
+    getSessionCookie( name: string ): string
     {
-        var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        let v: Array<string> = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
         return v ? v[2] : null;
     }
 
-    isLoggedIn()
+    isLoggedIn(): boolean
     {
         return (this.gh !== null)
     }
 
-    storeSelection()
+    storeSelection(): void
     {
         this.app.options.github =
         {
@@ -56,29 +73,29 @@ export class GitHubManager
         }
     }
 
-    resetSelectedPath()
+    resetSelectedPath(): void
     {
         this.selectedPath = ["."];
     }
 
-    getPathString()
+    getPathString(): string
     {
         return this.selectedPath.join( '/' );
     }
 
-    appendToPath( dir )
+    appendToPath( dir: string ): void
     {
         this.selectedPath.push( dir );
         this.storeSelection();
     }
 
-    slicePathTo( value )
+    slicePathTo( value: number )
     {
         this.selectedPath = this.selectedPath.slice( 0, value );
         this.storeSelection();
     }
 
-    async initUser()
+    async initUser(): Promise<any>
     {
         this.user = this.gh.getUser(); 
         const profile = await this.user.getProfile();
@@ -98,7 +115,7 @@ export class GitHubManager
         }
     }
 
-    async selectAccount( login )
+    async selectAccount( login: string ): Promise<any>
     {
         if ( login === this.login )
         {
@@ -118,7 +135,7 @@ export class GitHubManager
         this.storeSelection();
     }
 
-    async selectBranch( name )
+    async selectBranch( name: string ): Promise<any>
     {
         if ( name === '' ) return;
 
@@ -128,7 +145,7 @@ export class GitHubManager
         this.storeSelection();
     }
 
-    async selectRepo( name )
+    async selectRepo( name: string ): Promise<any>
     {
         if ( name === '' ) return;
 
@@ -147,7 +164,7 @@ export class GitHubManager
         }
     }
 
-    async writeFile( filename, commitMsg )
+    async writeFile( filename: string, commitMsg: string ): Promise<any>
     {
         try
         {

@@ -15,7 +15,7 @@ import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from './editor-panel.js';
 import { EventManager } from '../js-dist/event-manager.js';
 import { FileStack } from '../js-dist/file-stack.js';
-import { GitHubManager } from './github-manager.js';
+import { GitHubManager } from '../js-dist/github-manager.js';
 import { MidiPlayer } from '../js-dist/midi-player.js';
 import { MidiToolbar } from '../js-dist/midi-toolbar.js';
 import { PDFGenerator } from '../js-dist/pdf-generator.js';
