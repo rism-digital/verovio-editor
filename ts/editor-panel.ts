@@ -2,17 +2,49 @@
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
 
-import { GenericView } from '../js-dist/generic-view.js';
-import { EditorToolbar } from '../js-dist/editor-toolbar.js';
-import { EditorView } from '../js-dist/editor-view.js';
-import { EventManager } from '../js-dist/event-manager.js';
-import { XMLEditorView } from '../js-dist/xml-editor-view.js';
+import { App } from '../js/app.js';
+import { EditorToolbar } from './editor-toolbar.js';
+import { EditorView } from './editor-view.js';
+import { EventManager } from './event-manager.js';
+import { GenericView } from './generic-view.js';
+import { RNGLoader } from './rng-loader.js';
+import { ValidatorWorkerProxy, VerovioWorkerProxy } from './worker-proxy.js';
+import { XMLEditorView } from './xml-editor-view.js';
 
-import { elt } from './utils/functions.js';
+import { elt } from '../js/utils/functions.js';
+import { appendDivTo } from './utils/functions.js';
 
 export class EditorPanel extends GenericView
 {
-    constructor( div, app, verovio, validator, rngLoader )
+    app: App;
+    verovio: VerovioWorkerProxy;
+    validator: ValidatorWorkerProxy;
+    rngLoader: RNGLoader;
+    eventManager: EventManager;
+    editorToolbar: EditorToolbar;
+
+    draggingSplitter: boolean;
+    draggingX: number;
+    draggingY: number;
+    splitterX: number;
+    splitterY: number;
+    splitterSize: number;
+    resizeTimer: number;
+
+    toolbar: HTMLDivElement;
+    hsplit: HTMLDivElement;
+    toolpanel: HTMLDivElement;
+    split: HTMLDivElement;
+    editor: HTMLDivElement;
+    splitter: HTMLDivElement;
+    xmlEditor: HTMLDivElement;
+
+    editorView: EditorView;
+    xmlEditorView: XMLEditorView;
+    boundMouseMove: { (event: MouseEvent): void };
+    boundMouseUp: { (event: MouseEvent): void };
+
+    constructor( div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy, validator: ValidatorWorkerProxy, rngLoader: RNGLoader )
     {
         super( div, app );
 
@@ -22,33 +54,26 @@ export class EditorPanel extends GenericView
 
         this.eventManager = new EventManager( this );
 
-        this.ui.toolbar = elt( 'div', { class: `vrv-editor-toolbar` } );
-        this.element.appendChild( this.ui.toolbar );
-        this.toolbar = new EditorToolbar( this.ui.toolbar, this.app, this );
-        this.customEventManager.addToPropagationList( this.toolbar.customEventManager );
+        this.toolbar = appendDivTo( this.element, { class: `vrv-editor-toolbar` } );
+        this.editorToolbar = new EditorToolbar( this.toolbar, this.app, this );
+        this.customEventManager.addToPropagationList( this.editorToolbar.customEventManager );
 
-        this.ui.hsplit = elt( 'div', { class: `vrv-hsplit` } );
-        this.element.appendChild( this.ui.hsplit );
+        this.hsplit = appendDivTo( this.element, { class: `vrv-hsplit` } );
+        this.toolpanel = appendDivTo( this.hsplit, { class: `vrv-editor-toolpanel` } );
 
-        this.ui.toolpanel = elt( 'div', { class: `vrv-editor-toolpanel` } );
-        this.ui.hsplit.appendChild( this.ui.toolpanel );
-
-        this.ui.split = elt( 'div', { class: `vrv-split` } );
+        this.split = appendDivTo( this.hsplit, { class: `vrv-split` } );
         let orientation = ( this.app.options.editorSplitterHorizontal ) ? "vertical" : "horizontal";
-        this.ui.split.classList.add( orientation );
-        this.ui.hsplit.appendChild( this.ui.split );
+        this.split.classList.add( orientation );
 
-        this.ui.editorView = elt( 'div', { class: `vrv-view`, style: `` } );
-        this.ui.split.appendChild( this.ui.editorView );
-        this.editorView = new EditorView( this.ui.editorView, this.app, this.verovio );
+        this.editor = appendDivTo( this.split, { class: `vrv-view`, style: `` } );
+        this.editorView = new EditorView( this.editor, this.app, this.verovio );
         this.customEventManager.addToPropagationList( this.editorView.customEventManager );
-        this.toolbar.bindEvents( this.editorView.actionManager );
+        this.editorToolbar.bindEvents( this.editorView.actionManager );
 
-        this.ui.splitter = elt( 'div', { class: `` } );
-        this.ui.split.appendChild( this.ui.splitter );
-        this.eventManager.bind( this.ui.splitter, 'mousedown', this.onDragInit );
-        this.boundMouseMove = ( e ) => this.onDragMove( e );
-        this.boundMouseUp = ( e ) => this.onDragUp( e );
+        this.splitter = appendDivTo( this.split, { class: `` } );
+        this.eventManager.bind( this.splitter, 'mousedown', this.onDragInit );
+        this.boundMouseMove = ( e: MouseEvent ) => this.onDragMove( e );
+        this.boundMouseUp = ( e: MouseEvent ) => this.onDragUp( e );
 
         this.draggingSplitter = false;
         this.draggingX = 0; // Stores x & y coordinates of the mouse pointer
@@ -56,12 +81,11 @@ export class EditorPanel extends GenericView
         this.splitterX = 0; // Stores top, left values (edge) of the element
         this.splitterY = 0;
 
-        this.ui.xmlView = elt( 'div', { class: `vrv-xml` } );
-        this.ui.split.appendChild( this.ui.xmlView );
+        this.xmlEditor = appendDivTo( this.split, { class: `vrv-xml` } );
 
-        this.xmlView = new XMLEditorView( this.ui.xmlView, this.app, this.validator, this.rngLoader );
-        this.xmlView.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
-        this.customEventManager.addToPropagationList( this.xmlView.customEventManager );
+        this.xmlEditorView = new XMLEditorView( this.xmlEditor, this.app, this.validator, this.rngLoader );
+        this.xmlEditorView.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
+        this.customEventManager.addToPropagationList( this.xmlEditorView.customEventManager );
 
         this.splitterSize = 60;
         this.resizeTimer;
@@ -75,14 +99,14 @@ export class EditorPanel extends GenericView
     {
         if ( this.app.options.editorSplitterHorizontal )
         {
-            const height = this.ui.split.clientHeight;
-            const editorHeight = this.ui.editorView.clientHeight;
+            const height = this.split.clientHeight;
+            const editorHeight = this.editor.clientHeight;
             this.splitterSize = Math.round( editorHeight * 100 / height );
         }
         else
         {
-            const width = this.ui.split.clientWidth;
-            const editorWidth = this.ui.editorView.clientWidth;
+            const width = this.split.clientWidth;
+            const editorWidth = this.editor.clientWidth;
             this.splitterSize = Math.round( editorWidth * 100 / width );
         }
     }
@@ -93,25 +117,25 @@ export class EditorPanel extends GenericView
         this.element.style.width = this.element.parentElement.style.width;
 
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
-        this.ui.toolbar.style.display = 'block';
-        let height = this.element.clientHeight - this.ui.toolbar.offsetHeight;
-        let width = this.element.clientWidth - this.ui.toolpanel.offsetWidth;
+        this.toolbar.style.display = 'block';
+        let height = this.element.clientHeight - this.toolbar.offsetHeight;
+        let width = this.element.clientWidth - this.toolpanel.offsetWidth;
 
-        this.ui.split.style.height = `${ height }px`;
-        this.ui.split.style.width = `${ width }px`;
+        this.split.style.height = `${ height }px`;
+        this.split.style.width = `${ width }px`;
 
-        this.ui.xmlView.style.display = 'block';
-        this.ui.splitter.style.display = 'block';
+        this.xmlEditor.style.display = 'block';
+        this.splitter.style.display = 'block';
 
         if ( !this.app.options.editorSplitterShow )
         {
             // Ideally we would send a onActive / onDeactiveate event
-            this.ui.xmlView.style.display = 'none';
-            this.ui.xmlView.style.height = `0px`;
-            this.ui.xmlView.style.width = `0px`;
-            this.ui.splitter.style.display = 'none';
-            this.ui.editorView.style.height = `${ height }px`;
-            this.ui.editorView.style.width = `${ width }px`;
+            this.xmlEditor.style.display = 'none';
+            this.xmlEditor.style.height = `0px`;
+            this.xmlEditor.style.width = `0px`;
+            this.splitter.style.display = 'none';
+            this.editor.style.height = `${ height }px`;
+            this.editor.style.width = `${ width }px`;
         }
         else if ( this.app.options.editorSplitterHorizontal )
         {
@@ -119,11 +143,11 @@ export class EditorPanel extends GenericView
             // 10 is the bottom border of the editor view
             let xmlHeight = Math.ceil( ( height * ( 100 - this.splitterSize ) / 100 ) - 10 );
 
-            this.ui.editorView.style.height = `${ editorHeight }px`;
-            this.ui.editorView.style.width = `${ width }px`;
+            this.editor.style.height = `${ editorHeight }px`;
+            this.editor.style.width = `${ width }px`;
 
-            this.ui.xmlView.style.height = `${ xmlHeight }px`;
-            this.ui.xmlView.style.width = `${ width }px`;
+            this.xmlEditor.style.height = `${ xmlHeight }px`;
+            this.xmlEditor.style.width = `${ width }px`;
 
             this.element.style.height = this.element.parentElement.style.height;
             this.element.style.width = this.element.parentElement.style.width;
@@ -134,11 +158,11 @@ export class EditorPanel extends GenericView
             // 10 is the bottom border of the editor view
             let xmlWidth = Math.ceil( ( width * ( 100 - this.splitterSize ) / 100 ) - 10 );
 
-            this.ui.editorView.style.height = `${ height }px`;
-            this.ui.editorView.style.width = `${ editorWidth }px`;
+            this.editor.style.height = `${ height }px`;
+            this.editor.style.width = `${ editorWidth }px`;
 
-            this.ui.xmlView.style.height = `${ height }px`;
-            this.ui.xmlView.style.width = `${ xmlWidth }px`;
+            this.xmlEditor.style.height = `${ height }px`;
+            this.xmlEditor.style.width = `${ xmlWidth }px`;
         }
 
         this.element.style.height = this.element.parentElement.style.height
@@ -151,7 +175,7 @@ export class EditorPanel extends GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e )
+    onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("EditorPanel::onActivate");
@@ -159,7 +183,7 @@ export class EditorPanel extends GenericView
         this.updateSize();
     }
 
-    onResized( e )
+    onResized( e: CustomEvent ): boolean
     {
         if ( !super.onResized( e ) ) return false;
         //console.debug("EditorPanel::onResized");
@@ -167,7 +191,7 @@ export class EditorPanel extends GenericView
         this.updateSize();
     }
 
-    onUpdateView( e )
+    onUpdateView( e: CustomEvent ): boolean
     {
         if ( !super.onUpdateView( e ) ) return false;
 
@@ -178,7 +202,7 @@ export class EditorPanel extends GenericView
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onDragInit( e )
+    onDragInit( e: MouseEvent ): void
     {
         document.addEventListener( 'mousemove', this.boundMouseMove );
         document.addEventListener( 'mouseup', this.boundMouseUp );
@@ -191,31 +215,31 @@ export class EditorPanel extends GenericView
         this.splitterX = e.clientX;
     }
 
-    onDragMove( e )
+    onDragMove( e: MouseEvent ): void
     {
         if ( this.draggingSplitter === true )
         {
             if ( this.app.options.editorSplitterHorizontal )
             {
                 const diffY = this.draggingY - e.clientY;
-                const editorHeight = this.ui.editorView.clientHeight;
-                const xmlHeight = this.ui.xmlView.clientHeight;
-                this.ui.editorView.style.height = `${ editorHeight - diffY }px`;
-                this.ui.xmlView.style.height = `${ xmlHeight + diffY }px`;
+                const editorHeight = this.editor.clientHeight;
+                const xmlHeight = this.xmlEditor.clientHeight;
+                this.editor.style.height = `${ editorHeight - diffY }px`;
+                this.xmlEditor.style.height = `${ xmlHeight + diffY }px`;
                 this.draggingY = e.clientY;
             }
             else
             {
                 const diffX = this.draggingX - e.clientX;
-                const editorWidth = this.ui.editorView.clientWidth;
-                const xmlWidth = this.ui.xmlView.clientWidth;
-                this.ui.editorView.style.width = `${ editorWidth - diffX }px`;
-                this.ui.xmlView.style.width = `${ xmlWidth + diffX }px`;
+                const editorWidth = this.editor.clientWidth;
+                const xmlWidth = this.xmlEditor.clientWidth;
+                this.editor.style.width = `${ editorWidth - diffX }px`;
+                this.xmlEditor.style.width = `${ xmlWidth + diffX }px`;
                 this.draggingX = e.clientX;
             }
             // We can already update the xmlView size
             let event = new CustomEvent( 'onResized' );
-            this.xmlView.customEventManager.dispatch( event );
+            this.xmlEditorView.customEventManager.dispatch( event );
 
             // To update Verovio 
             //this.app.startLoading( "Ajusting size ...", true );
@@ -225,7 +249,7 @@ export class EditorPanel extends GenericView
         }
     }
 
-    onDragUp( e )
+    onDragUp( e: MouseEvent ): void
     {
         this.draggingSplitter = false;
         // Remove listeners
@@ -238,17 +262,17 @@ export class EditorPanel extends GenericView
         this.customEventManager.dispatch( event );
     }
 
-    onToggleOrientation()
+    onToggleOrientation(): void
     {
         this.app.options.editorSplitterHorizontal = !this.app.options.editorSplitterHorizontal;
-        this.ui.split.classList.toggle( "vertical" );
-        this.ui.split.classList.toggle( "horizontal" );
+        this.split.classList.toggle( "vertical" );
+        this.split.classList.toggle( "horizontal" );
         this.app.startLoading( "Ajusting size ...", true );
         let event = new CustomEvent( 'onResized' );
         this.app.customEventManager.dispatch( event );
     }
 
-    onToggle()
+    onToggle(): void
     {
         this.app.options.editorSplitterShow = !this.app.options.editorSplitterShow;
         this.app.startLoading( "Ajusting size ...", true );

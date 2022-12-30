@@ -15,7 +15,7 @@ import { GenericView } from './generic-view.js';
 import { appendDivTo, appendTextAreaTo } from './utils/functions.js';
 const theme = "vrv"; // default for light theme
 export class XMLEditorView extends GenericView {
-    constructor(div, app, validator, rngLoader, options) {
+    constructor(div, app, validator, rngLoader) {
         super(div, app);
         // Validator object
         this.validator = validator;

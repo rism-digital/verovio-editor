@@ -32,7 +32,7 @@ export class XMLEditorView extends GenericView
     CMeditor: any;
     app: App;
 
-    constructor( div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader, options )
+    constructor( div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader )
     {
         super( div, app )
 

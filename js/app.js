@@ -12,7 +12,7 @@ import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DocumentView } from './document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
-import { EditorPanel } from './editor-panel.js';
+import { EditorPanel } from '../js-dist/editor-panel.js';
 import { EventManager } from '../js-dist/event-manager.js';
 import { FileStack } from '../js-dist/file-stack.js';
 import { GitHubManager } from '../js-dist/github-manager.js';
@@ -471,7 +471,7 @@ export class App
         const schemaMatch = schema.exec( this.mei );
         if ( schemaMatch && schemaMatch[1] !== this.currentSchema )
         {
-            if ( await this.viewEditor.xmlView.replaceSchema( schemaMatch[1] ) )
+            if ( await this.viewEditor.xmlEditorView.replaceSchema( schemaMatch[1] ) )
             {
                 this.currentSchema = schemaMatch[1];
                 this.showNotification( `Current MEI Schema changed to '${ this.currentSchema }'` );

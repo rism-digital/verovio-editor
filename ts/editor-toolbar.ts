@@ -6,7 +6,7 @@
 
 import { ActionManager } from './action-manager.js';
 import { App } from '../js/app.js';
-import { EditorPanel } from '../js/editor-panel.js';
+import { EditorPanel } from './editor-panel.js';
 import { Toolbar } from './toolbar.js' ; 
 
 import { elt } from '../js/utils/functions.js';
