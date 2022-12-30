@@ -3,34 +3,45 @@
  * It uses a responsive layout. 
  */
 
-import { ResponsiveView } from '../js-dist/responsive-view.js';
-import { Cursor } from './cursor.js';
-import { ActionManager } from '../js-dist/action-manager.js';
+import { App } from '../js/app.js';
+import { ResponsiveView } from './responsive-view.js';
+import { CursorPointer } from '../js/cursor-pointer.js';
+import { ActionManager } from './action-manager.js';
+import { VerovioWorkerProxy } from './worker-proxy.js';
 
-import { elt } from './utils/functions.js';
+import { appendDivTo } from './utils/functions.js';
 
-import * as soundsImport from './utils/sounds.js';
+import * as soundsImport from '../js/utils/sounds.js';
 
 export class EditorView extends ResponsiveView
 {
-    constructor( div, app, verovio )
+    sounds: soundsImport;
+    svgOverlay: HTMLDivElement;
+    cursor: HTMLDivElement;
+    cursorPointer: CursorPointer;
+    mouseMoveTimer: boolean;
+    draggingActive: boolean;
+    highlightedCache: Array<number>;
+    audio: any;
+    actionManager: ActionManager;
+    lastNote: { midiPitch: number, oct: string, pname: string };
+
+    constructor( div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy )
     {
         super( div, app, verovio )
 
         this.sounds = soundsImport;
 
         // add the svgOverlay for dragging
-        this.ui.svgOverlay = elt( 'div', { class: `vrv-svg-overlay`, style: `position: absolute` } );
-        this.element.appendChild( this.ui.svgOverlay );
+        this.svgOverlay = appendDivTo( this.element, { class: `vrv-svg-overlay`, style: `position: absolute` } );
 
-        this.ui.cursor = elt( 'div', { class: `vrv-editor-cursor` } );
-        this.element.appendChild( this.ui.cursor );
-        this.cursor = new Cursor( this.ui.cursor, this );
+        this.cursor = appendDivTo( this.element, { class: `vrv-editor-cursor` } );
+        this.cursorPointer = new CursorPointer( this.cursor, this );
 
         // synchronized scrolling between svg overlay and wrapper
-        this.eventManager.bind( this.ui.svgOverlay, 'scroll', this.scrollListener );
-        this.eventManager.bind( this.ui.svgOverlay, 'mouseleave', this.mouseLeaveListener );
-        this.eventManager.bind( this.ui.svgOverlay, 'mouseenter', this.mouseEnterListener );
+        this.eventManager.bind( this.svgOverlay, 'scroll', this.scrollListener );
+        this.eventManager.bind( this.svgOverlay, 'mouseleave', this.mouseLeaveListener );
+        this.eventManager.bind( this.svgOverlay, 'mouseenter', this.mouseEnterListener );
 
         // For dragging
         this.mouseMoveTimer = false;
@@ -38,7 +49,7 @@ export class EditorView extends ResponsiveView
         this.highlightedCache = [];
 
         // For note playback
-        this.lastNote = {};
+        this.lastNote = { midiPitch: 0, oct: "", pname: "" };
         this.audio = new Audio();
 
         // EditorAction
@@ -49,32 +60,32 @@ export class EditorView extends ResponsiveView
     // Overwriting methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateSVGDimensions()
+    updateSVGDimensions(): void
     {
         super.updateSVGDimensions();
 
-        if ( this.ui && this.ui.svgOverlay )
+        if ( this.ui && this.svgOverlay )
         {
-            this.ui.svgOverlay.style.height = this.svgWrapper.style.height;
-            this.ui.svgOverlay.style.width = this.svgWrapper.style.width;
+            this.svgOverlay.style.height = this.svgWrapper.style.height;
+            this.svgOverlay.style.width = this.svgWrapper.style.width;
         }
     }
 
-    initCursor()
+    initCursor(): void
     {
-        const svgRoot = this.svgWrapper.querySelector( 'svg' );
+        const svgRoot: SVGElement = this.svgWrapper.querySelector( 'svg' );
         if ( !svgRoot ) return;
 
         const top = this.element.getBoundingClientRect().top;
         const left = this.element.getBoundingClientRect().left;
-        this.cursor.init( svgRoot, top, left );
+        this.cursorPointer.init( svgRoot, top, left );
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async renderPage( lightEndLoading = false, createOverlay = true )
+    async renderPage( lightEndLoading: boolean = false, createOverlay: boolean = true ): Promise<any>
     {
         const svg = await this.verovio.renderToSVG( this.currentPage );
         this.svgWrapper.innerHTML = svg;
@@ -91,7 +102,7 @@ export class EditorView extends ResponsiveView
         if ( lightEndLoading ) this.app.endLoading( true );
     }
 
-    async updateMEI()
+    async updateMEI(): Promise<any>
     {
         const mei = await this.verovio.getMEI( {} );
         this.app.mei = mei;
@@ -104,7 +115,7 @@ export class EditorView extends ResponsiveView
         this.app.customEventManager.dispatch( event );
     }
 
-    async setCurrent( id )
+    async setCurrent( id: number ): Promise<any>
     {
         this.currentId = id;
         const pageWithElement = await this.verovio.getPageWithElement( id );
@@ -118,7 +129,7 @@ export class EditorView extends ResponsiveView
         this.activateHighlight( id )
     }
 
-    async playNoteSound()
+    async playNoteSound(): Promise<any>
     {
         const attr = await this.app.verovio.getElementAttr( this.highlightedCache[0] );
         if ( !attr.pname || !attr.oct ) return;
@@ -156,10 +167,10 @@ export class EditorView extends ResponsiveView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    createOverlay()
+    createOverlay(): void
     {
         // Copy wrapper HTML to overlay
-        this.ui.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
+        this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
 
         // Remove all the bounding boxes from the original wrapper because we do not want to highlight them
         for ( const node of this.svgWrapper.querySelectorAll( 'g.bounding-box' ) )
@@ -168,43 +179,43 @@ export class EditorView extends ResponsiveView
         }
 
         // Make all /g, /path and /text transparent
-        for ( const node of this.ui.svgOverlay.querySelectorAll( 'g, path, text' ) )
+        for ( const node of this.svgOverlay.querySelectorAll( 'g, path, text' ) )
         {
-            node.style.stroke = 'transparent';
-            node.style.fill = 'transparent';
+            (<SVGElement>node).style.stroke = 'transparent';
+            (<SVGElement>node).style.fill = 'transparent';
         }
 
         // Remove bouding boxes for /slur and /tie
-        for ( const node of this.ui.svgOverlay.querySelectorAll( '.slur.bounding-box, .tie.bounding-box' ) )
+        for ( const node of this.svgOverlay.querySelectorAll( '.slur.bounding-box, .tie.bounding-box' ) )
         {
             node.parentNode.removeChild( node );
         }
 
         // Increase border for facilitating selection of some elements
-        for ( const node of this.ui.svgOverlay.querySelectorAll( '.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path' ) )
+        for ( const node of this.svgOverlay.querySelectorAll( '.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path' ) )
         {
             //node.style.stroke = 'red';
-            node.style.strokeWidth = 90; // A default MEI unit
+            (<SVGElement>node).style.strokeWidth = "90"; // A default MEI unit
         }
 
         // Add event listeners for click on /g
-        for ( const node of this.ui.svgOverlay.querySelectorAll( 'g' ) ) 
+        for ( const node of this.svgOverlay.querySelectorAll( 'g' ) ) 
         {
             this.eventManager.bind( node, 'mousedown', this.mouseDownListener );
         }
 
-        for ( const node of this.ui.svgOverlay.querySelectorAll( 'g.staff' ) ) 
+        for ( const node of this.svgOverlay.querySelectorAll( 'g.staff' ) ) 
         {
             this.eventManager.bind( node, 'mouseenter', this.mouseEnterListener );
         }
 
         // Add an event listener to the overlay of note input
-        this.eventManager.bind( this.ui.svgOverlay, 'mousedown', this.mouseDownListener );
+        this.eventManager.bind( this.svgOverlay, 'mousedown', this.mouseDownListener );
 
         this.reapplyHighlights();
     }
 
-    activateHighlight( id )
+    activateHighlight( id: number ):void
     {
         if ( this.highlightedCache.indexOf( id ) === -1 )
         {
@@ -213,7 +224,7 @@ export class EditorView extends ResponsiveView
         this.reapplyHighlights();
     }
 
-    reapplyHighlights()
+    reapplyHighlights(): void
     {
         if ( this.highlightedCache.length === 1 )
         {
@@ -226,7 +237,7 @@ export class EditorView extends ResponsiveView
         }
     }
 
-    resetHighlights()
+    resetHighlights(): void
     {
         for ( const id of this.highlightedCache )
         {
@@ -236,20 +247,20 @@ export class EditorView extends ResponsiveView
         this.highlightedCache.length = 0;
     }
 
-    highlightWithColor( g, color )
+    highlightWithColor( g: SVGElement, color: string )
     {
         if ( !g ) return;
 
         for ( const node of g.querySelectorAll( '*:not(g)' ) )
         {
             // Do not highlight bounding boxes elements
-            if ( node.parentNode.classList.contains( 'bounding-box' ) ) continue;
-            node.style.fill = color;
-            node.style.stroke = color;
+            if ( (<SVGElement> node.parentNode).classList.contains( 'bounding-box' ) ) continue;
+            (<SVGElement> node).style.fill = color;
+            (<SVGElement> node).style.stroke = color;
         }
     }
 
-    getClosestMEIElement( node, elementType = null )
+    getClosestMEIElement( node: SVGElement, elementType: string = null )
     {
         if ( !node )
         {
@@ -257,11 +268,11 @@ export class EditorView extends ResponsiveView
         }
         else if ( node.nodeName != "g" || node.classList.contains( 'bounding-box' ) || node.classList.contains( 'notehead' ) )
         {
-            return this.getClosestMEIElement( node.parentNode, elementType );
+            return this.getClosestMEIElement( (<SVGElement> node.parentNode), elementType );
         }
         else if ( elementType && !node.classList.contains( elementType ) )
         {
-            return this.getClosestMEIElement( node.parentNode, elementType );
+            return this.getClosestMEIElement( (<SVGElement> node.parentNode), elementType );
         }
         else
         {
@@ -273,7 +284,7 @@ export class EditorView extends ResponsiveView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onEndLoading( e )
+    onEndLoading( e: CustomEvent ): boolean
     {
         if ( !super.onEndLoading( e ) ) return false;
         //console.debug("AppToolbar::onEndLoading");
@@ -283,7 +294,7 @@ export class EditorView extends ResponsiveView
         return true;
     }
 
-    onSelect( e )
+    onSelect( e: CustomEvent ): boolean
     {
         if ( !super.onSelect( e ) ) return false;
         //console.debug("VerovioView::onSelect");
@@ -297,7 +308,7 @@ export class EditorView extends ResponsiveView
     // Event listeners
     ////////////////////////////////////////////////////////////////////////
 
-    keyDownListener( e )
+    keyDownListener( e: KeyboardEvent ): void
     {
         //this.app.startLoading( "Editing...", true );
         //document.removeEventListener( 'keydown', this.boundKeyDown );
@@ -313,31 +324,31 @@ export class EditorView extends ResponsiveView
 
         //document.addEventListener( 'keydown', this.boundKeyDown );
         //this.app.endLoading( true );
-        event.preventDefault();
+        e.preventDefault();
     }
 
-    mouseDownListener( e )
+    mouseDownListener( e: MouseEvent ): void
     {
         this.draggingActive = false;
-        this.lastNote = {};
+        this.lastNote = { midiPitch: 0, oct: "", pname: "" };
         e.cancelBubble = true;
 
         // Note input
-        if ( this.cursor.inputMode )
+        if ( this.cursorPointer.inputMode )
         {
-            this.actionManager.insertNote( this.cursor.elementX, this.cursor.currentY );
-            this.cursor.hide();
+            this.actionManager.insertNote( this.cursorPointer.elementX, this.cursorPointer.currentY );
+            this.cursorPointer.hide();
             return;
         }
 
         // Clicking on the overlay - nothing to do
-        if ( e.target.parentNode === this.ui.svgOverlay )
+        if ( (<HTMLDivElement> (<HTMLElement> e.target).parentNode) === this.svgOverlay )
         {
             return;
         }
 
         // Get MEI element
-        let node = this.getClosestMEIElement( e.target );
+        let node = this.getClosestMEIElement( (<SVGElement> e.target) );
         if ( !node || !node.attributes.id ) 
         {
             console.log( node, "MEI element not found or with no id" );
@@ -350,13 +361,13 @@ export class EditorView extends ResponsiveView
         if ( e.shiftKey )
         {
             this.activateHighlight( id );
-            this.cursor.add( id, node );
+            this.cursorPointer.add( id, node );
             document.addEventListener( 'mousemove', this.boundMouseMove );
             document.addEventListener( 'mouseup', this.boundMouseUp );
             return;
         }
 
-        this.cursor.hide();
+        this.cursorPointer.hide();
         // More to reset here?
         document.removeEventListener( 'mousemove', this.boundMouseMove );
         document.removeEventListener( 'touchmove', this.boundMouseMove );
@@ -372,7 +383,7 @@ export class EditorView extends ResponsiveView
 
         this.resetHighlights();
         this.activateHighlight( id );
-        this.cursor.initEvent( e, id, node );
+        this.cursorPointer.initEvent( e, id, node );
 
         // we haven't started to drag yet, this might be just a selection
         document.addEventListener( 'mousemove', this.boundMouseMove );
@@ -381,20 +392,20 @@ export class EditorView extends ResponsiveView
         document.addEventListener( 'touchend', this.boundMouseUp );
     };
 
-    mouseEnterListener( e )
+    mouseEnterListener( e: MouseEvent ): void
     {
         document.addEventListener( 'keydown', this.boundKeyDown );
         //console.debug( "Hey!" );
-        let node = this.getClosestMEIElement( e.target );
+        let node = this.getClosestMEIElement( (<SVGElement> e.target) );
         if ( node && node.classList.contains( 'staff' ) )
         {
-            this.cursor.staffEnter( node );
+            this.cursorPointer.staffEnter( node );
         }
     }
 
-    mouseLeaveListener( e )
+    mouseLeaveListener( e: MouseEvent ): void
     {
-        this.cursor.hide();
+        this.cursorPointer.hide();
         document.removeEventListener( 'mouseup', this.boundMouseUp );
         document.removeEventListener( 'touchend', this.boundMouseUp );
         document.removeEventListener( 'mousemove', this.boundMouseMove );
@@ -402,29 +413,29 @@ export class EditorView extends ResponsiveView
         document.removeEventListener( 'keydown', this.boundKeyDown );
     }
 
-    mouseMoveListener( e )
+    mouseMoveListener( e: MouseEvent ): void
     {
         // Fire drag event only every 50ms
         if ( !this.mouseMoveTimer )
         {
             const timerThis = this;
-            this.cursor.lastEvent = e;
+            this.cursorPointer.lastEvent = e;
             this.mouseMoveTimer = true;
 
             setTimeout( function ()
             {
                 timerThis.mouseMoveTimer = false;
-                if ( timerThis.cursor.lastEvent.buttons == 1 )
+                if ( timerThis.cursorPointer.lastEvent.buttons == 1 )
                 {
-                    timerThis.cursor.hide();
-                    timerThis.cursor.moveToLastEvent( false );
+                    timerThis.cursorPointer.hide();
+                    timerThis.cursorPointer.moveToLastEvent( false );
                     timerThis.draggingActive = true; // we know we're dragging if this listener triggers
-                    let distY = timerThis.cursor.currentY - timerThis.cursor.elementY;
+                    let distY = timerThis.cursorPointer.currentY - timerThis.cursorPointer.elementY;
                     timerThis.actionManager.drag( 0, distY );
                 }
                 else
                 {
-                    timerThis.cursor.moveToLastEvent();
+                    timerThis.cursorPointer.moveToLastEvent();
                 }
 
             }, 50 );
@@ -433,7 +444,7 @@ export class EditorView extends ResponsiveView
         e.cancelBubble = true;
     };
 
-    mouseUpListener( e )
+    mouseUpListener( e: MouseEvent ): void
     {
         //console.debug( "EditorView::mouseUpListener" );
 
@@ -462,15 +473,16 @@ export class EditorView extends ResponsiveView
         }
     }
 
-    scrollListener( e )
+    scrollListener( e: Event ): void
     {
-        this.cursor.scrollTop = e.target.scrollTop;
-        this.cursor.scrollLeft = e.target.scrollLeft;
-        if ( this.cursor.lastEvent )
+        let element = (e.target as HTMLElement);
+        this.cursorPointer.scrollTop = element.scrollTop;
+        this.cursorPointer.scrollLeft = element.scrollLeft;
+        if ( this.cursorPointer.lastEvent )
         {
-            this.cursor.Update();
+            this.cursorPointer.Update();
         }
-        this.svgWrapper.scrollTop = e.target.scrollTop;
-        this.svgWrapper.scrollLeft = e.target.scrollLeft;
+        this.svgWrapper.scrollTop = element.scrollTop;
+        this.svgWrapper.scrollLeft = element.scrollLeft;
     }
 }

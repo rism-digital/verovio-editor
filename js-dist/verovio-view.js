@@ -101,6 +101,13 @@ export class VerovioView extends GenericView {
         this.updateView(VerovioViewUpdate.Zoom);
         return true;
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Event listeners
+    ////////////////////////////////////////////////////////////////////////
+    keyDownListener(e) { }
+    mouseMoveListener(e) { }
+    mouseUpListener(e) { }
+    resizeComponents(e) { }
 }
 export var VerovioViewUpdate;
 (function (VerovioViewUpdate) {

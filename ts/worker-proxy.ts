@@ -79,10 +79,14 @@ export class ValidatorWorkerProxy extends WorkerProxy
 
 export class VerovioWorkerProxy extends WorkerProxy
 {
+    edit: Function;
     getOptions: Function;
+    getMEI: Function;
     getPageCount: Function;
+    getPageWithElement: Function;
     loadData: Function;
     redoLayout: Function;
+    redoPagePitchPosLayout: Function;
     renderToSVG: Function;
     setOptions: Function;
 

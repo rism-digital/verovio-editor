@@ -18,7 +18,7 @@ export class ActionManager {
     constructor(view) {
         // EditorView object
         this.view = view;
-        this.cursor = view.cursor;
+        this.cursorPointer = view.cursorPointer;
         this.verovio = view.verovio;
         this.eventManager = new EventManager(this);
         this.inProgress = false;
@@ -65,7 +65,7 @@ export class ActionManager {
     delete() {
         return __awaiter(this, void 0, void 0, function* () {
             let chain = new Array();
-            for (const item of this.cursor.selectedItems) {
+            for (const item of this.cursorPointer.selectedItems) {
                 if (!["note"].includes(item.elementType))
                     continue;
                 chain.push({
@@ -91,7 +91,7 @@ export class ActionManager {
     drag(x, y) {
         return __awaiter(this, void 0, void 0, function* () {
             let chain = new Array();
-            for (const item of this.cursor.selectedItems) {
+            for (const item of this.cursorPointer.selectedItems) {
                 if (!["note"].includes(item.elementType))
                     continue;
                 const editorAction = {
@@ -124,7 +124,7 @@ export class ActionManager {
             }
             this.inProgress = true;
             let chain = new Array();
-            for (const item of this.cursor.selectedItems) {
+            for (const item of this.cursorPointer.selectedItems) {
                 if (!["note"].includes(item.elementType))
                     continue;
                 const editorAction = {
@@ -158,14 +158,14 @@ export class ActionManager {
     ////////////////////////////////////////////////////////////////////////
     insertNote(x, y) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.cursor.inputMode)
+            if (!this.cursorPointer.inputMode)
                 return;
             let chain = new Array();
             chain.push({
                 action: 'insert',
                 param: {
                     elementType: "note",
-                    startid: this.cursor.elementId
+                    startid: this.cursorPointer.elementId
                 }
             });
             chain.push({
@@ -242,7 +242,7 @@ export class ActionManager {
     setAttrValue(attribute, value, elementTypes = []) {
         return __awaiter(this, void 0, void 0, function* () {
             let chain = new Array();
-            for (const item of this.cursor.selectedItems) {
+            for (const item of this.cursorPointer.selectedItems) {
                 if (elementTypes.length > 0 && !elementTypes.includes(item.elementType))
                     continue;
                 const editorAction = {

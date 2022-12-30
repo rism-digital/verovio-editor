@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { EditorView } from '../js/editor-view.js';
+import { EditorView } from './editor-view.js';
 import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
 import { appendDivTo } from './utils/functions.js';
 export class ResponsiveView extends VerovioView {
@@ -184,7 +184,6 @@ export class ResponsiveView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     scrollListener(e) {
         let element = e.target;
-        console.log(element);
         this.svgWrapper.scrollTop = element.scrollTop;
         this.svgWrapper.scrollLeft = element.scrollLeft;
     }

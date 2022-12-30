@@ -24,11 +24,6 @@ export class VerovioView extends GenericView
     boundKeyDown: { (event: KeyboardEvent): void };
     boundResize: { (event: Event): void };
 
-    mouseMoveListener: EventListener;
-    mouseUpListener: EventListener;
-    keyDownListener: EventListener;
-    resizeComponents: EventListener;
-
     constructor( div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy )
     {
         super( div, app );
@@ -146,6 +141,18 @@ export class VerovioView extends GenericView
 
         return true;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Event listeners
+    ////////////////////////////////////////////////////////////////////////
+
+    keyDownListener(e: KeyboardEvent): void { }
+
+    mouseMoveListener(e: MouseEvent): void { }
+
+    mouseUpListener(e: MouseEvent): void { }
+
+    resizeComponents(e: Event): void { }
 }
 
 export enum VerovioViewUpdate {

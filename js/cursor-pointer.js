@@ -1,12 +1,12 @@
 /**
- * The Cursor class
+ * The CursorPointer class
  */
 
-import { EditorView } from './editor-view.js';
+import { EditorView } from '../js-dist/editor-view.js';
 
 import { elt } from './utils/functions.js';
 
-export class Cursor
+export class CursorPointer
 {
     constructor( div, editorView )
     {

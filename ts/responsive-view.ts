@@ -3,10 +3,9 @@
  */
 
 import { App } from '../js/app.js'
-import { EditorView } from '../js/editor-view.js';
+import { EditorView } from './editor-view.js';
 import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
 
-import { elt } from '../js/utils/functions.js';
 import { VerovioWorkerProxy } from './worker-proxy.js';
 import { appendDivTo } from './utils/functions.js';
 
@@ -212,7 +211,6 @@ export class ResponsiveView extends VerovioView
     scrollListener( e: UIEvent ): void
     {
         let element = (e.target as HTMLElement);
-        console.log(element);
         this.svgWrapper.scrollTop = element.scrollTop;
         this.svgWrapper.scrollLeft = element.scrollLeft;
     }
