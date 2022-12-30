@@ -21,7 +21,7 @@ export class EditorView extends ResponsiveView {
         super(div, app, verovio);
         this.sounds = soundsImport;
         // add the svgOverlay for dragging
-        this.svgOverlay = appendDivTo(this.element, { class: `vrv-svg-overlay`, style: `position: absolute` });
+        this.svgOverlay = appendDivTo(this.element, { class: `vrv-svg-overlay`, style: { position: `absolute` } });
         this.cursor = appendDivTo(this.element, { class: `vrv-editor-cursor` });
         this.cursorPointer = new CursorPointer(this.cursor, this);
         // synchronized scrolling between svg overlay and wrapper

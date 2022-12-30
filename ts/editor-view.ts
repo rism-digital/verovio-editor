@@ -33,7 +33,7 @@ export class EditorView extends ResponsiveView
         this.sounds = soundsImport;
 
         // add the svgOverlay for dragging
-        this.svgOverlay = appendDivTo( this.element, { class: `vrv-svg-overlay`, style: `position: absolute` } );
+        this.svgOverlay = appendDivTo(this.element, { class: `vrv-svg-overlay`, style: { position: `absolute` } } );
 
         this.cursor = appendDivTo( this.element, { class: `vrv-editor-cursor` } );
         this.cursorPointer = new CursorPointer( this.cursor, this );

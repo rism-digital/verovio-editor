@@ -3,7 +3,7 @@
  */
 
 import { GenericView } from '../js-dist/generic-view.js';
-import { EditorToolbar } from './editor-toolbar.js';
+import { EditorToolbar } from '../js-dist/editor-toolbar.js';
 import { EditorView } from '../js-dist/editor-view.js';
 import { EventManager } from '../js-dist/event-manager.js';
 import { XMLEditorView } from '../js-dist/xml-editor-view.js';
