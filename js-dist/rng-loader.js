@@ -222,7 +222,10 @@ export class RNGLoader {
     }
     findAllTopLevelElements(defs, stack, doc) {
         "use strict";
-        let top = [], starts = doc.getElementsByTagNameNS(this.rngns, "start"), e, i;
+        let top = [];
+        let starts = doc.getElementsByTagNameNS(this.rngns, "start");
+        let e;
+        let i;
         for (i = 0; i < starts.length; i += 1) {
             e = /**@type{!Element}*/ (starts.item(i));
             this.findTopLevelElements(defs, stack, e, top);

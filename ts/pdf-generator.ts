@@ -17,7 +17,7 @@ export class PDFGenerator
         this.currentScale = scale;
     }
 
-    async generateFile()
+    async generateFile(): Promise<any>
     {
         const currentOptions = await this.verovio.getOptions();
         currentOptions.scale = this.currentScale;

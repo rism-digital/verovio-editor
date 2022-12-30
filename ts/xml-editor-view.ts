@@ -100,7 +100,7 @@ export class XMLEditorView extends GenericView
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async validate( text: string, updateLinting: Function, options)
+    async validate( text: string, updateLinting: Function, options ): Promise<any>
     {
         //console.debug( "XMLEditorView::validate");
         if ( options && options.caller && text )
@@ -126,12 +126,12 @@ export class XMLEditorView extends GenericView
         }
     }
 
-    async suspendedValidate( text: string, updateLinting: Function, options )
+    async suspendedValidate( text: string, updateLinting: Function, options ): Promise<any>
     {
         // Do nothing...
     }
 
-    async replaceSchema( schemaFile: string )
+    async replaceSchema( schemaFile: string ): Promise<any>
     {
         try
         {
@@ -154,7 +154,7 @@ export class XMLEditorView extends GenericView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    setCurrent( id: string )
+    setCurrent( id: string ): void
     {
         //console.debug( "XMLEditorView::setCurrent" );
         const cursor = this.CMeditor.getSearchCursor( `xml:id="${ id }"` );
@@ -167,7 +167,7 @@ export class XMLEditorView extends GenericView
         }
     }
 
-    highlightValidation( text: string, validation, timestamp: number )
+    highlightValidation( text: string, validation, timestamp: number ): void
     {
         let lines = [];
         let found = [];
@@ -228,7 +228,7 @@ export class XMLEditorView extends GenericView
         }
     }
 
-    formatXML() 
+    formatXML(): void
     {
         console.debug( "XMLEditorView::FormatXML" );
         this.formatting = true;
@@ -250,7 +250,7 @@ export class XMLEditorView extends GenericView
     // Codemirror event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onCursorActivity( cm )
+    onCursorActivity( cm ): void
     {
         if ( this.formatting ) return;
 
@@ -277,7 +277,7 @@ export class XMLEditorView extends GenericView
         }
     }
 
-    keyHandled( cm, string, event )
+    keyHandled( cm, string, event ): void
     {
         if ( event.ctrlKey && event.shiftKey && event.key === "P" )
         {
@@ -299,7 +299,7 @@ export class XMLEditorView extends GenericView
         }
     }
 
-    onFocus( cm )
+    onFocus( cm ): void
     {
         //console.debug( "XMLEditorView::onFocus" );
         this.skipValidation = false;
@@ -374,7 +374,7 @@ export class XMLEditorView extends GenericView
 // Could be move to XMLEditorView:: keyHandled ?
 ////////////////////////////////////////////////////////////////////////
 
-function completeAfter( cm, pred ) 
+function completeAfter( cm, pred ): void
 {
     let cur = cm.getCursor();
     if ( !pred || pred() ) setTimeout( function ()
@@ -385,7 +385,7 @@ function completeAfter( cm, pred )
     return CodeMirror.Pass;
 }
 
-function completeIfAfterLt( cm ) 
+function completeIfAfterLt( cm ): void
 {
     return completeAfter( cm, function ()
     {
@@ -394,7 +394,7 @@ function completeIfAfterLt( cm )
     } );
 }
 
-function completeIfInTag( cm ) 
+function completeIfInTag( cm ): void
 {
     return completeAfter( cm, function ()
     {

@@ -95,7 +95,7 @@ export class EditorPanel extends GenericView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateSplitterSize()
+    updateSplitterSize(): void
     {
         if ( this.app.options.editorSplitterHorizontal )
         {
@@ -111,7 +111,7 @@ export class EditorPanel extends GenericView
         }
     }
 
-    updateSize()
+    updateSize(): boolean
     {
         this.element.style.height = this.element.parentElement.style.height;
         this.element.style.width = this.element.parentElement.style.width;
@@ -279,5 +279,4 @@ export class EditorPanel extends GenericView
         let event = new CustomEvent( 'onResized' );
         this.app.customEventManager.dispatch( event );
     }
-
 }

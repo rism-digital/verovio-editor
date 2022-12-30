@@ -31,7 +31,7 @@ let pdfHeight = pdfSize[1];
 let pdfWidth = pdfSize[0];
 
 // Font callback and buffer
-let fontCallback = function ( family, bold, italic, fontOptions )
+let fontCallback = function ( family, bold, italic, fontOptions? ): string
 {
     if ( family == "Leipzig" )
     {

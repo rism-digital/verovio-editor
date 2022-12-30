@@ -2,6 +2,7 @@
  * The MidiToolbar class for controlling the MidiPlayer.
  */
 
+import { App } from '../js/app.js';
 import { MidiPlayer } from './midi-player.js';
 import { Toolbar } from './toolbar.js';
 
@@ -26,7 +27,7 @@ export class MidiToolbar extends Toolbar
     midiBarPercent: HTMLDivElement;
     midiTotalTime: HTMLDivElement;
 
-    constructor( div, app, midiPlayer )
+    constructor( div: HTMLDivElement, app: App, midiPlayer: MidiPlayer )
     {
         let iconsPlay =  '/icons/toolbar/play.png';
         let iconsPause =  '/icons/toolbar/pause.png';
@@ -76,7 +77,7 @@ export class MidiToolbar extends Toolbar
         this.updateAll();
     }
 
-    updateAll()
+    updateAll(): void
     {
         this.updateProgressBar();
 
@@ -87,7 +88,7 @@ export class MidiToolbar extends Toolbar
         this.updateToolbarGrp( this.progressControl, this.playing || this.pausing );
     }
 
-    updateProgressBar()
+    updateProgressBar(): void
     {
         this.midiTotalTime.innerHTML = this.midiPlayer.totalTimeStr;
         this.midiCurrentTime.innerHTML = this.midiPlayer.currentTimeStr;
@@ -95,7 +96,7 @@ export class MidiToolbar extends Toolbar
         this.midiBarPercent.style.width = `${ percent }%`;
     }
 
-    updateDragging( pageX )
+    updateDragging( pageX: number ): void
     {
         let posX = this.barDragStart + ( pageX - this.pageDragStart );
         if ( posX >= 0 && posX <= this.barWidth )

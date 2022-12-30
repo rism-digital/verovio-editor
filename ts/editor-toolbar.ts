@@ -133,7 +133,7 @@ export class EditorToolbar extends Toolbar
         this.updateToolbarGrp( this.stemControls, ["NOTES", "note", "chord"].includes( this.selectedElementType ) );
     }
 
-    bindEvents( actionManager: ActionManager )
+    bindEvents( actionManager: ActionManager ): void
     {
         actionManager.eventManager.bind( this.formCres, 'click', actionManager.formCres );
         actionManager.eventManager.bind( this.formDim, 'click', actionManager.formDim );

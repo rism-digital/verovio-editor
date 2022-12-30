@@ -28,7 +28,7 @@ export class ResponsiveView extends VerovioView
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateView( update: VerovioViewUpdate, lightEndLoading = true )
+    async updateView( update: VerovioViewUpdate, lightEndLoading = true ): Promise<any>
     {
         switch ( update )
         {

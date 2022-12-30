@@ -56,7 +56,7 @@ export class VerovioView extends GenericView
         super.destroy()
     }
 
-    parseAndScaleSVG( svgString: string, height: number, width: number )
+    parseAndScaleSVG( svgString: string, height: number, width: number ): Node
     {
         const parser = new DOMParser();
         const svg: XMLDocument = parser.parseFromString( svgString, "text/xml" );
@@ -74,7 +74,7 @@ export class VerovioView extends GenericView
         this.boundResize = ( e: Event ) => this.resizeComponents( e );
     }
 
-    async updateView( update: VerovioViewUpdate, lightEndLoading: boolean = true )
+    async updateView( update: VerovioViewUpdate, lightEndLoading: boolean = true ): Promise<any>
     {
         console.debug( "View::updateView should be overwritten" );
         console.debug( update );

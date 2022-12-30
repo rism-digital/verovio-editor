@@ -252,7 +252,7 @@ export class AppToolbar extends Toolbar
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateAll()
+    updateAll(): void
     {
         this.updateToolbarBtn( this.prevPage, ( this.app.toolbarView.currentPage > 1 ) );
         this.updateToolbarBtn( this.nextPage, ( this.app.toolbarView.currentPage < this.app.pageCount ) );
@@ -285,7 +285,7 @@ export class AppToolbar extends Toolbar
         this.updateRecent();
     }
 
-    updateRecent()
+    updateRecent(): void
     {
         this.subSubMenu.innerHTML = "";
 
@@ -303,7 +303,7 @@ export class AppToolbar extends Toolbar
     // Mouse methods
     ////////////////////////////////////////////////////////////////////////
 
-    onMouseOver( e: CustomEvent )
+    onMouseOver( e: CustomEvent ): void
     {
         for ( const node of this.element.querySelectorAll( 'div.vrv-menu-content' ) ) 
         {
@@ -312,7 +312,7 @@ export class AppToolbar extends Toolbar
         }
     }
 
-    onClick( e: CustomEvent )
+    onClick( e: CustomEvent ): void
     {
         for ( const node of this.element.querySelectorAll( 'div.vrv-menu-content' ) ) 
         {
@@ -325,7 +325,7 @@ export class AppToolbar extends Toolbar
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e: CustomEvent )
+    onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("AppToolbar::onActivate");
@@ -335,7 +335,7 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    onEndLoading( e: CustomEvent )
+    onEndLoading( e: CustomEvent ): boolean
     {
         if ( !super.onEndLoading( e ) ) return false;
         //console.debug("AppToolbar::onEndLoading");
@@ -345,7 +345,7 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    onStartLoading( e: CustomEvent )
+    onStartLoading( e: CustomEvent ): boolean
     {
         if ( !super.onStartLoading( e ) ) return false;
         //console.debug("AppToolbar:onStartLoading");
@@ -358,7 +358,7 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    onUpdateView( e: CustomEvent )
+    onUpdateView( e: CustomEvent ): boolean
     {
         if ( !super.onUpdateView( e ) ) return false;
         //console.debug("AppToolbar::onUpdate");

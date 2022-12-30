@@ -44,7 +44,7 @@ export class ActionManager
     // Delayed calls
     ////////////////////////////////////////////////////////////////////////
 
-    async callDelayedCalls()
+    async callDelayedCalls(): Promise<any>
     {
         //console.debug( this.delayedCalls.length );
         if ( this.delayedCalls.length > 0 )
@@ -63,7 +63,7 @@ export class ActionManager
     // Generic methods
     ////////////////////////////////////////////////////////////////////////
 
-    async commit()
+    async commit(): Promise<any>
     {
         this.inProgress = true;
         const editorAction = { action: 'commit' };
@@ -85,7 +85,7 @@ export class ActionManager
         }
     }
 
-    async delete()
+    async delete(): Promise<any>
     {
         let chain = new Array();
         for ( const item of this.cursorPointer.selectedItems )
@@ -114,7 +114,7 @@ export class ActionManager
         this.view.updateMEI();
     }
 
-    async drag( x: number, y: number )
+    async drag( x: number, y: number ): Promise<any>
     {
         let chain = new Array();
         for ( const item of this.cursorPointer.selectedItems )
@@ -143,7 +143,7 @@ export class ActionManager
         await this.view.renderPage( true, false );
     }
 
-    async keyDown( key: number, shiftKey: boolean, ctrlKey: boolean )
+    async keyDown( key: number, shiftKey: boolean, ctrlKey: boolean ): Promise<any>
     {
         // keyDown events can 
         if ( this.inProgress )
@@ -192,7 +192,7 @@ export class ActionManager
     // Element specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    async insertNote( x: number, y: number )
+    async insertNote( x: number, y: number ): Promise<any>
     {
         if ( !this.cursorPointer.inputMode ) return;
 
@@ -229,47 +229,47 @@ export class ActionManager
         this.view.updateMEI();
     }
 
-    async formCres()
+    async formCres(): Promise<any>
     {
         await this.setAttrValue( "form", "cres", ["hairpin"] );
     }
 
-    async formDim()
+    async formDim(): Promise<any>
     {
         await this.setAttrValue( "form", "dim", ["hairpin"] );
     }
 
-    async placeAbove()
+    async placeAbove(): Promise<any>
     {
         await this.setAttrValue( "place", "above", ["dir", "dynam", "hairpin", "tempo", "pedal"] );
     }
 
-    async placeBelow()
+    async placeBelow(): Promise<any>
     {
         await this.setAttrValue( "place", "below", ["dir", "dynam", "hairpin", "tempo", "pedal"] );
     }
 
-    async placeAuto()
+    async placeAuto(): Promise<any>
     {
         await this.setAttrValue( "place", "", ["dir", "dynam", "hairpin", "tempo", "pedal"] );
     }
 
-    async stemDirUp()
+    async stemDirUp(): Promise<any>
     {
         await this.setAttrValue( "stem.dir", "up", ["note", "chord"] );
     }
 
-    async stemDirDown()
+    async stemDirDown(): Promise<any>
     {
         await this.setAttrValue( "stem.dir", "down", ["note", "chord"] );
     }
 
-    async stemDirAuto()
+    async stemDirAuto(): Promise<any>
     {
         await this.setAttrValue( "stem.dir", "", ["note", "chord"] );
     }
 
-    async update()
+    async update(): Promise<any>
     {
         const editorAction = {
             action: 'commit'
@@ -282,7 +282,7 @@ export class ActionManager
 
     // helper
 
-    async setAttrValue( attribute: string, value: string, elementTypes = [] )
+    async setAttrValue( attribute: string, value: string, elementTypes: Array<string> = [] ): Promise<any>
     {
         let chain = new Array();
         for ( const item of this.cursorPointer.selectedItems )

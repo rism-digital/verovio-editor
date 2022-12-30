@@ -33,7 +33,7 @@ export class AppStatusbar extends GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onEndLoading( e: CustomEvent )
+    onEndLoading( e: CustomEvent ): boolean
     {
         if ( !super.onEndLoading( e ) ) return false;
         //console.debug("AppStatusbar::onEndLoading");
@@ -43,7 +43,7 @@ export class AppStatusbar extends GenericView
         return true;
     }
 
-    onStartLoading( e: CustomEvent )
+    onStartLoading( e: CustomEvent ): boolean
     {
         if ( !super.onStartLoading( e ) ) return false;
         //console.debug("AppStatusbar:onStartLoading");

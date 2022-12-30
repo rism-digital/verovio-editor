@@ -19,7 +19,7 @@ export class EventManager
     }
 
     // Binds function `fct` to element `el` on event `ev`
-    bind( el: Element, ev: string, fct: Function )
+    bind( el: Element, ev: string, fct: Function ): void
     {
         // Assign the element a random ID for the EventManager to reference it by (or get it if we already have one)
         let appID = el.getAttribute( this.appIDAttr ) || el.getAttribute( 'id' );
@@ -48,7 +48,7 @@ export class EventManager
     }
 
     // Unbinds all functions listening to event `ev` on element `el`
-    unbind( el: Element, ev: string )
+    unbind( el: Element, ev: string ): void
     {
         // Get the appID from the object; if it doesn't exist, we haven't bound any events
         const appID = el.getAttribute( this.appIDAttr ) || el.getAttribute( 'id' );
@@ -67,7 +67,7 @@ export class EventManager
     }
 
     // Unbinds everything managed by this
-    unbindAll()
+    unbindAll(): void
     {
         for ( let appID in this.cache )
         {

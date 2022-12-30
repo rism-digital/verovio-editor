@@ -45,7 +45,7 @@ export class GenericView
         this.ui = {};
     }
 
-    destroy()
+    destroy(): void
     {
         // Nothing at this level
     }

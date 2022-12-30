@@ -23,7 +23,7 @@ export class Toolbar extends GenericView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateToolbarGrp( grp: HTMLElement, condition: boolean )
+    updateToolbarGrp( grp: HTMLElement, condition: boolean ): void
     {
         if ( grp === undefined )
         {
@@ -33,7 +33,7 @@ export class Toolbar extends GenericView
         else grp.style.display = 'none';
     }
 
-    updateToolbarBtn( btn: HTMLElement, condition: boolean )
+    updateToolbarBtn( btn: HTMLElement, condition: boolean ): void
     {
         if ( btn === undefined )
         {
@@ -43,7 +43,7 @@ export class Toolbar extends GenericView
         else btn.classList.add( "disabled" );
     }
 
-    updateToolbarBtnHide( btn: HTMLElement, condition: boolean )
+    updateToolbarBtnHide( btn: HTMLElement, condition: boolean ): void
     {
         if ( btn === undefined )
         {
@@ -53,7 +53,7 @@ export class Toolbar extends GenericView
         else btn.style.display = 'none';
     }
 
-    updateToolbarToggleBtn( btn: HTMLElement, condition: boolean )
+    updateToolbarToggleBtn( btn: HTMLElement, condition: boolean ): void
     {
         if ( btn === undefined )
         {
@@ -63,7 +63,7 @@ export class Toolbar extends GenericView
         else btn.classList.remove( "toggled" );
     }
 
-    updateToolbarSubmenuBtn( btn: HTMLElement, condition: boolean )
+    updateToolbarSubmenuBtn( btn: HTMLElement, condition: boolean ): void
     {
         if ( btn === undefined )
         {
