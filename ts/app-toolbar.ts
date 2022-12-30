@@ -5,7 +5,7 @@
  */
 
 import { App } from '../js/app.js';
-import { DocumentView } from '../js/document-view.js';
+import { DocumentView } from './document-view.js';
 import { EditorPanel } from './editor-panel.js';
 import { ResponsiveView } from './responsive-view.js';
 import { Toolbar } from './toolbar.js';

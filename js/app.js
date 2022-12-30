@@ -10,7 +10,7 @@ import { AppStatusbar } from '../js-dist/app-statusbar.js';
 import { Dialog } from './dialog.js'
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
-import { DocumentView } from './document-view.js';
+import { DocumentView } from '../js-dist/document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from '../js-dist/editor-panel.js';
 import { EventManager } from '../js-dist/event-manager.js';

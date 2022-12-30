@@ -5,27 +5,50 @@
  * When SVG rendering is use, a limited number of pages it keep in the DOM.
  */
 
-import { VerovioView, VerovioViewUpdate } from '../js-dist/verovio-view.js';
+import { App } from '../js/app.js';
+import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
+import { VerovioWorkerProxy } from './worker-proxy.js';
 
-import { elt } from './utils/functions.js';
+import { elt } from '../js/utils/functions.js';
+import { appendDivTo } from './utils/functions.js';
+
+class DocumentViewObserver extends IntersectionObserver
+{
+    public pruningMargin: number;
+    public lastPageIn: number;
+    public view: DocumentView;
+
+    constructor(callback: any, view: DocumentView, options?: object) {
+        super(callback, options);
+        this.pruningMargin = 10;
+        this.lastPageIn = 0;
+        this.view = view;
+    }
+}
 
 export class DocumentView extends VerovioView
 {
-    constructor( div, app, verovio )
+    observer: DocumentViewObserver;
+    pruning: number;
+    currentPageHeight: number;
+    currentPageWidth: number;
+    currentDocHeight: number;
+    currentDocWidth: number;
+    currentDocMargin: number;
+
+    docWrapper: HTMLDivElement;
+
+    constructor( div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy )
     {
         super( div, app, verovio );
 
-        this.ui.docWrapper = elt( 'div', { class: `vrv-doc-wrapper`, style: `position: absolute` } );
-        this.element.appendChild( this.ui.docWrapper );
+        this.docWrapper = appendDivTo(this.element, { class: `vrv-doc-wrapper`, style: { position: `absolute` } } );
 
         this.observer;
         try 
         {
-            this.observer = new IntersectionObserver( this.handleObserver );
-            this.observer.view = this;
+            this.observer = new DocumentViewObserver( this.handleObserver, this );
             this.pruning = 0;
-            this.observer.pruningMargin = 10;
-            this.observer.view = this;
         }
         catch ( err ) 
         {
@@ -37,7 +60,7 @@ export class DocumentView extends VerovioView
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateView( update, lightEndLoading = true )
+    async updateView( update: VerovioViewUpdate, lightEndLoading: boolean = true ): Promise<any>
     {
         switch ( update )
         {
@@ -57,11 +80,11 @@ export class DocumentView extends VerovioView
         this.app.endLoading( lightEndLoading );
     }
 
-    async updateActivate()
+    async updateActivate(): Promise<any>
     {
-        while ( this.ui.docWrapper.firstChild )
+        while ( this.docWrapper.firstChild )
         {
-            this.ui.docWrapper.firstChild.remove();
+            this.docWrapper.firstChild.remove();
         }
 
 
@@ -74,7 +97,7 @@ export class DocumentView extends VerovioView
         this.app.settings.justifyVertically = true;
     }
 
-    async updateLoadData( redoLayout = true )
+    async updateLoadData( redoLayout = true ): Promise<any>
     {
         // We do not need to redo the layout when changing zoom with canvas
         if ( redoLayout )
@@ -85,9 +108,9 @@ export class DocumentView extends VerovioView
             this.app.pageCount = pageCount;
         }
 
-        while ( this.ui.docWrapper.firstChild )
+        while ( this.docWrapper.firstChild )
         {
-            this.ui.docWrapper.firstChild.remove();
+            this.docWrapper.firstChild.remove();
         }
 
         await this.updateResized();
@@ -100,12 +123,12 @@ export class DocumentView extends VerovioView
         for ( let idx = 0; idx < this.app.pageCount; idx++ )
         {
             const pageWrapper = elt( 'div', { class: `vrv-page-wrapper` } );
-            this.ui.docWrapper.appendChild( pageWrapper );
+            this.docWrapper.appendChild( pageWrapper );
 
-            pageWrapper.style.height = `${ this.ui.currentPageHeight }px`;
-            pageWrapper.style.width = `${ this.ui.currentPageWidth }px`;
-            pageWrapper.style.marginTop = `${ this.ui.currentDocMargin }px`;
-            pageWrapper.style.marginBottom = `${ this.ui.currentDocMargin }px`;
+            pageWrapper.style.height = `${ this.currentPageHeight }px`;
+            pageWrapper.style.width = `${ this.currentPageWidth }px`;
+            pageWrapper.style.marginTop = `${ this.currentDocMargin }px`;
+            pageWrapper.style.marginBottom = `${ this.currentDocMargin }px`;
             pageWrapper.style.border = `solid ${ this.app.options.documentViewPageBorder }px lightgray`;
             pageWrapper.dataset.page = idx + 1;
 
@@ -113,15 +136,15 @@ export class DocumentView extends VerovioView
             {
                 const img = elt( 'canvas', { class: `` } );
                 let ctx = img.getContext( "2d" );
-                ctx.canvas.width  = this.ui.currentPageWidth;
-                ctx.canvas.height = this.ui.currentPageHeight;
+                ctx.canvas.width  = this.currentPageWidth;
+                ctx.canvas.height = this.currentPageHeight;
                 // font size between 10 and 25
                 let fontSize = Math.max( this.currentScale, 10 );
                 fontSize = Math.min( fontSize, 25 );
                 ctx.font = `${fontSize}px Helvetica`;
                 ctx.fillStyle = "grey";
                 ctx.textAlign = "center";
-                ctx.fillText( "Loading ...", this.ui.currentPageWidth / 2, this.ui.currentPageHeight / 6 );
+                ctx.fillText( "Loading ...", this.currentPageWidth / 2, this.currentPageHeight / 6 );
                 pageWrapper.appendChild( img );
             }
 
@@ -137,46 +160,46 @@ export class DocumentView extends VerovioView
 
     }
 
-    async updateResized() 
+    async updateResized(): Promise<any>
     {
         this.element.style.height = this.element.parentElement.style.height;
         this.element.style.width = this.element.parentElement.style.width;
 
-        if ( this.ui && this.ui.docWrapper )
+        if ( this.ui && this.docWrapper )
         {
-            this.ui.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
+            this.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
 
-            this.ui.currentPageWidth = this.app.settings.pageWidth * this.currentScale / 100;
-            const docWidth = this.ui.currentPageWidth + 2 * this.ui.currentDocMargin + 2 * this.app.options.documentViewPageBorder;
+            this.currentPageWidth = this.app.settings.pageWidth * this.currentScale / 100;
+            const docWidth = this.currentPageWidth + 2 * this.currentDocMargin + 2 * this.app.options.documentViewPageBorder;
             const elementWidth = parseInt( this.element.parentElement.style.width, 10 );
-            this.ui.currentDocWidth = Math.max( elementWidth, docWidth );
-            this.ui.docWrapper.style.width = `${ this.ui.currentDocWidth }px`;
+            this.currentDocWidth = Math.max( elementWidth, docWidth );
+            this.docWrapper.style.width = `${ this.currentDocWidth }px`;
 
-            this.ui.currentPageHeight = this.app.settings.pageHeight * this.currentScale / 100;
-            const docHeight = ( this.ui.currentPageHeight + this.ui.currentDocMargin + 2 * this.app.options.documentViewPageBorder ) * this.app.pageCount + this.ui.currentDocMargin;
+            this.currentPageHeight = this.app.settings.pageHeight * this.currentScale / 100;
+            const docHeight = ( this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder ) * this.app.pageCount + this.currentDocMargin;
             const elementHeight = parseInt( this.element.parentElement.style.height, 10 );
-            this.ui.currentDocHeight = Math.max( elementHeight, docHeight );
-            this.ui.docWrapper.style.height = `${ this.ui.currentDocHeight }px`;
+            this.currentDocHeight = Math.max( elementHeight, docHeight );
+            this.docWrapper.style.height = `${ this.currentDocHeight }px`;
         }
     }
 
-    async updateZoom()
+    async updateZoom(): Promise<any>
     {
         if ( this.app.options.documentViewSVG )
         {
             await this.updateResized();
             for ( let idx = 0; idx < this.app.pageCount; idx++ )
             {
-                let page = this.ui.docWrapper.children[idx];
-                page.style.height = `${ this.ui.currentPageHeight }px`;
-                page.style.width = `${ this.ui.currentPageWidth }px`;
-                page.style.marginTop = `${ this.ui.currentDocMargin }px`;
-                page.style.marginBottom = `${ this.ui.currentDocMargin }px`;
+                let page =  <HTMLElement>this.docWrapper.children[idx];
+                page.style.height = `${ this.currentPageHeight }px`;
+                page.style.width = `${ this.currentPageWidth }px`;
+                page.style.marginTop = `${ this.currentDocMargin }px`;
+                page.style.marginBottom = `${ this.currentDocMargin }px`;
                 // This is the SVG content of the page
                 if ( page.firstChild && page.firstChild )
                 {
-                    page.firstChild.setAttribute( `height`, `${ this.ui.currentPageHeight }px` );
-                    page.firstChild.setAttribute( `width`, `${ this.ui.currentPageWidth }px` );
+                    (<Element> page.firstChild).setAttribute( `height`, `${ this.currentPageHeight }px` );
+                    (<Element> page.firstChild).setAttribute( `width`, `${ this.currentPageWidth }px` );
                 }
             }
         }
@@ -191,16 +214,16 @@ export class DocumentView extends VerovioView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    async renderPage( pageIndex )
+    async renderPage( pageIndex ): Promise<any>
     {
-        const svg = await this.verovio.renderToSVG( pageIndex );
-        const page = this.ui.docWrapper.children[pageIndex - 1];
+        const svg: string = await this.verovio.renderToSVG( pageIndex );
+        const page: Element = this.docWrapper.children[pageIndex - 1];
 
         // SVG
         if ( this.app.options.documentViewSVG )
         {
-            const scaleSvg = this.parseAndScaleSVG( svg, this.ui.currentPageHeight, this.ui.currentPageWidth );
-            this.ui.docWrapper.children[pageIndex - 1].appendChild( scaleSvg );
+            const scaleSvg = this.parseAndScaleSVG( svg, this.currentPageHeight, this.currentPageWidth );
+            this.docWrapper.children[pageIndex - 1].appendChild( scaleSvg );
 
 
             // With SVG we need to prune the document
@@ -216,7 +239,7 @@ export class DocumentView extends VerovioView
         // Canvas
         else
         {
-            const canvas = page.firstElementChild;
+            const canvas: HTMLCanvasElement = <HTMLCanvasElement>page.firstElementChild;
             const ctx = canvas.getContext( "2d" );
             const DOMURL = self.URL || self.webkitURL;
             const img = new Image();
@@ -226,8 +249,8 @@ export class DocumentView extends VerovioView
 
             const originalHeight = this.app.settings.pageHeight;
             const originalWidth = this.app.settings.pageWidth;
-            canvas.height = this.ui.currentPageHeight;
-            canvas.width = this.ui.currentPageWidth;
+            canvas.height = this.currentPageHeight;
+            canvas.width = this.currentPageWidth;
 
             img.onload = function ()
             {
@@ -238,23 +261,23 @@ export class DocumentView extends VerovioView
         }
     }
 
-    handleObserver( entries, observer )
+    handleObserver( entries: Array<IntersectionObserverEntry> , observer: DocumentViewObserver ): void
     {
         // Load page and update first and last page if necessary
         for ( let entry of entries )
         {
             if ( entry.isIntersecting )
             {
-                observer.view.loadPage( entry.target );
+                observer.view.loadPage( <HTMLElement> entry.target );
                 // Already load the next page (null if none)
-                observer.view.loadPage( entry.target.nextSibling );
+                observer.view.loadPage( <HTMLElement> entry.target.nextSibling );
                 // Keep the lastPageLoaded for pruning
-                observer.lastPageIn = parseInt( entry.target.dataset.page );
+                observer.lastPageIn = parseInt( (<HTMLElement> entry.target).dataset.page );
             }
         }
     }
 
-    loadPage( pageElement )
+    loadPage( pageElement: HTMLElement ): void
     {
         // This happens when loading the next page of the last page
         if ( pageElement === null ) return;
@@ -262,16 +285,16 @@ export class DocumentView extends VerovioView
         if ( !pageElement.dataset.loaded )
         {
             // Mark it as loaded so we do not trigger it again
-            pageElement.dataset.loaded = true;
+            pageElement.dataset.loaded = "true";
             this.renderPage( pageElement.dataset.page );
         }
     }
 
-    pruneDocument()
+    pruneDocument(): void
     {
         for ( let idx = 0; idx < this.app.pageCount; idx++ )
         {
-            let page = this.ui.docWrapper.children[idx];
+            let page = <HTMLElement>this.docWrapper.children[idx];
             if ( idx < this.observer.lastPageIn - this.observer.pruningMargin )
             {
                 delete page.dataset.loaded;
