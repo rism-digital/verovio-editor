@@ -2,7 +2,7 @@
  * The DialogGhExport class for navigating GitHub and writing a file.
  */
 
-import { Dialog } from './dialog.js';
+import { Dialog } from '../js-dist/dialog.js';
 
 import { elt } from './utils/functions.js';
 

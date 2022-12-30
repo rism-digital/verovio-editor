@@ -7,7 +7,7 @@ const version = "1.0.0";
 
 import { AppToolbar } from '../js-dist/app-toolbar.js';
 import { AppStatusbar } from '../js-dist/app-statusbar.js';
-import { Dialog } from './dialog.js'
+import { Dialog, DialogType } from '../js-dist/dialog.js'
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DocumentView } from '../js-dist/document-view.js';
@@ -478,7 +478,7 @@ export class App
             }
             else
             {
-                const dlg = new Dialog( this.ui.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.type.Msg } );
+                const dlg = new Dialog( this.ui.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: DialogType.Msg } );
                 dlg.setContent( `The Schema '${ schemaMatch[1] }' could not be loaded<br>The validation will be performed using '${ this.currentSchema }'` );
                 await dlg.show();
             }
@@ -742,7 +742,7 @@ export class App
 
     async helpAbout( e )
     {
-        const dlg = new Dialog( this.ui.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.type.Msg } );
+        const dlg = new Dialog( this.ui.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: DialogType.Msg } );
         dlg.setContent( marked.parse(aboutMsg) );
         await dlg.show();
     }
