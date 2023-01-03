@@ -5,7 +5,7 @@
  */
 
 import { App } from '../js/app.js';
-import { CustomEventManager } from '../js/custom-event-manager.js';
+import { CustomEventManager } from './custom-event-manager.js';
 
 export class GenericView
 {
@@ -29,7 +29,7 @@ export class GenericView
 
         this.active = false;
 
-        this.customEventManager = new CustomEventManager( {} );
+        this.customEventManager = new CustomEventManager();
         this.customEventManager.bind( this, 'onActivate', this.onActivate );
         this.customEventManager.bind( this, 'onDeactivate', this.onDeactivate );
         this.customEventManager.bind( this, 'onEndLoading', this.onEndLoading );

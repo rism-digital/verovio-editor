@@ -11,7 +11,7 @@ import { Dialog, DialogType } from '../js-dist/dialog.js'
 import { DialogGhExport } from '../js-dist/dialog-gh-export.js';
 import { DialogGhImport } from '../js-dist/dialog-gh-import.js';
 import { DocumentView } from '../js-dist/document-view.js';
-import { CustomEventManager } from './custom-event-manager.js';
+import { CustomEventManager } from '../js-dist/custom-event-manager.js';
 import { EditorPanel } from '../js-dist/editor-panel.js';
 import { EventManager } from '../js-dist/event-manager.js';
 import { FileStack } from '../js-dist/file-stack.js';
@@ -38,6 +38,7 @@ export class App
     {
         this.clientId = "fd81068a15354a300522";
         this.host = "https://editor.verovio.org";
+        this.id = this.clientId;
 
         this.githubManager = new GitHubManager( this );
 

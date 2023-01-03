@@ -3,7 +3,7 @@
  * It essentially provide a CustomEventManager and can be activate or deactivated.
  * It should not be instantiated directly but only through inherited classes.
  */
-import { CustomEventManager } from '../js/custom-event-manager.js';
+import { CustomEventManager } from './custom-event-manager.js';
 export class GenericView {
     constructor(div, app) {
         // Root element in which verovio-ui is created
@@ -13,7 +13,7 @@ export class GenericView {
         // Generate an id for the CustomEventManager
         this.id = Math.floor((1 + Math.random()) * Math.pow(16, 16)).toString(16).substring(1);
         this.active = false;
-        this.customEventManager = new CustomEventManager({});
+        this.customEventManager = new CustomEventManager();
         this.customEventManager.bind(this, 'onActivate', this.onActivate);
         this.customEventManager.bind(this, 'onDeactivate', this.onDeactivate);
         this.customEventManager.bind(this, 'onEndLoading', this.onEndLoading);
