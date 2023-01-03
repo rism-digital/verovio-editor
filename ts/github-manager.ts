@@ -15,7 +15,7 @@ export class GitHubManager
     name: string;
     login: string;
     user: any; // GitHub::User object
-    selectedUser: string;
+    selectedUser: any; // GitHub::User object
     selectedOrganization: any; // GitHub::Organization object
     selectedAccountName: string;
     selectedBranchName: string;

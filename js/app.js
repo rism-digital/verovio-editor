@@ -9,7 +9,7 @@ import { AppToolbar } from '../js-dist/app-toolbar.js';
 import { AppStatusbar } from '../js-dist/app-statusbar.js';
 import { Dialog, DialogType } from '../js-dist/dialog.js'
 import { DialogGhExport } from './dialog-gh-export.js';
-import { DialogGhImport } from './dialog-gh-import.js';
+import { DialogGhImport } from '../js-dist/dialog-gh-import.js';
 import { DocumentView } from '../js-dist/document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from '../js-dist/editor-panel.js';

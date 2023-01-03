@@ -2,7 +2,7 @@
  * The DialogGhImport class for navigating GitHub and selecting a file.
  */
 
-import { DialogGhImport } from './dialog-gh-import.js';
+import { DialogGhImport } from '../js-dist/dialog-gh-import.js';
 
 import { elt } from './utils/functions.js';
 

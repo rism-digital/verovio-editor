@@ -2,20 +2,42 @@
  * The DialogGhExport class for navigating GitHub and writing a file.
  */
 
-import { Dialog } from '../js-dist/dialog.js';
-
-import { elt } from './utils/functions.js';
+import { App } from '../js/app.js';
+import { Dialog, DialogOpts } from './dialog.js';
+import { GitHubManager } from './github-manager.js';
+import { appendDivTo } from './utils/functions.js';
 
 const iconsBranch =  '/icons/dialog/branch.png';
 const iconsInstitution =  '/icons/dialog/institution.png';
 const iconsFile =  '/icons/dialog/file.png';
 const iconsFolder =  '/icons/dialog/folder.png';
 const iconsRepo =  '/icons/dialog/repo.png';
-const iconsUser =  '/icons/dialog/user.png';
+const iconsUser = '/icons/dialog/user.png';
+
+interface ItemDataset {
+    name?: string,
+    login?: string,
+    type?: string
+}
 
 export class DialogGhImport extends Dialog
 {
-    constructor( div, app, title, opts, githubManager )
+    data: string | ArrayBuffer | Blob;
+    filename: string;
+    githubManager: GitHubManager;
+
+    tabs: HTMLDivElement;
+    tabUser: HTMLDivElement;
+    tabRepo: HTMLDivElement;
+    tabBranch: HTMLDivElement;
+    tabFile: HTMLDivElement;
+    loading: HTMLDivElement;
+    list: HTMLDivElement;
+    selection: HTMLDivElement;
+    breadCrumbs: HTMLDivElement;
+
+
+    constructor( div: HTMLDivElement, app: App, title: string, opts: DialogOpts, githubManager: GitHubManager )
     {
         super( div, app, title, opts );
 
@@ -25,47 +47,35 @@ export class DialogGhImport extends Dialog
 
         this.githubManager = githubManager;
 
-        this.ui.tabs = elt( 'div', { class: `vrv-dialog-tabs` } );
-        this.ui.content.appendChild( this.ui.tabs );
+        this.tabs = appendDivTo(this.content, { class: `vrv-dialog-tabs` } );
 
-        this.ui.tabUser = elt( 'div', { class: `vrv-dialog-tab active` } );
-        this.ui.tabUser.innerHTML = 'User / Organisations';
-        this.ui.tabUser.dataset.tab = 'user';
-        this.ui.tabs.appendChild( this.ui.tabUser );
-        this.eventManager.bind( this.ui.tabUser, 'click', this.selectTab );
+        this.tabUser = appendDivTo( this.tabs, { class: `vrv-dialog-tab active`, dataset: { tab: `user`} } );
+        this.tabUser.innerHTML = 'User / Organisations';
+        //this.tabUser.dataset.tab = 'user';
+        this.eventManager.bind( this.tabUser, 'click', this.selectTab );
 
-        this.ui.tabRepo = elt( 'div', { class: `vrv-dialog-tab` } );
-        this.ui.tabRepo.innerHTML = 'Repositories';
-        this.ui.tabRepo.dataset.tab = 'repo';
-        this.ui.tabs.appendChild( this.ui.tabRepo );
-        this.eventManager.bind( this.ui.tabRepo, 'click', this.selectTab );
+        this.tabRepo = appendDivTo( this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `rep`} } );
+        this.tabRepo.innerHTML = 'Repositories';
+        //this.tabRepo.dataset.tab = 'repo';
+        this.eventManager.bind( this.tabRepo, 'click', this.selectTab );
 
-        this.ui.tabBranch = elt( 'div', { class: `vrv-dialog-tab` } );
-        this.ui.tabBranch.innerHTML = 'Branches';
-        this.ui.tabBranch.dataset.tab = 'branch';
-        this.ui.tabs.appendChild( this.ui.tabBranch );
-        this.eventManager.bind( this.ui.tabBranch, 'click', this.selectTab );
+        this.tabBranch = appendDivTo( this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `branch`} } );
+        this.tabBranch.innerHTML = 'Branches';
+        //this.tabBranch.dataset.tab = 'branch';
+        this.eventManager.bind( this.tabBranch, 'click', this.selectTab );
 
-        this.ui.tabFile = elt( 'div', { class: `vrv-dialog-tab` } );
-        this.ui.tabFile.innerHTML = 'Files';
-        this.ui.tabFile.dataset.tab = 'file';
-        this.ui.tabs.appendChild( this.ui.tabFile );
-        this.eventManager.bind( this.ui.tabFile, 'click', this.selectTab );
+        this.tabFile = appendDivTo( this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `file`} } );
+        this.tabFile.innerHTML = 'Files';
+        //this.tabFile.dataset.tab = 'file';
+        this.eventManager.bind( this.tabFile, 'click', this.selectTab );
 
-        this.ui.loading = elt( 'div', { class: `vrv-dialog-gh-loading` } );
-        this.ui.content.appendChild( this.ui.loading );
-
-        this.ui.list = elt( 'div', { class: `vrv-dialog-gh-list` } );
-        this.ui.content.appendChild( this.ui.list );
-
-        this.ui.selection = elt( 'div', { class: `vrv-dialog-gh-selection` } );
-        this.ui.content.appendChild( this.ui.selection );
-
-        this.ui.breadCrumbs = elt( 'div', { class: `vrv-dialog-breadcrumbs` } );
-        this.ui.content.appendChild( this.ui.breadCrumbs );
+        this.loading = appendDivTo( this.content, { class: `vrv-dialog-gh-loading` } );
+        this.list = appendDivTo( this.content, { class: `vrv-dialog-gh-list` } );
+        this.selection = appendDivTo( this.content, { class: `vrv-dialog-gh-selection` } );
+        this.breadCrumbs = appendDivTo( this.content, { class: `vrv-dialog-breadcrumbs` } );
 
         // Hide the OK button because the selection is done by clicking on a file
-        this.ui.ok.style.display = 'none';
+        this.okBtn.style.display = 'none';
 
         if ( this.githubManager.selectedBranchName !== '' )
         {
@@ -77,74 +87,68 @@ export class DialogGhImport extends Dialog
         }
     }
 
-    loadingStart( tab )
+    loadingStart( tab: HTMLDivElement ): void
     {
-        for ( const node of this.ui.tabs.querySelectorAll( '.vrv-dialog-tab' ) )
+        for ( const node of this.tabs.querySelectorAll( '.vrv-dialog-tab' ) )
         {
             node.classList.remove( "selected" );
         }
         tab.classList.add( "selected" );
 
-        this.ui.list.innerHTML = "";
-        this.ui.list.style.display = 'none';
-        this.ui.loading.style.display = 'block';
+        this.list.innerHTML = "";
+        this.list.style.display = 'none';
+        this.loading.style.display = 'block';
     }
 
-    loadingEnd()
+    loadingEnd(): void
     {
-        this.ui.list.innerHTML = "";
-        this.ui.list.style.display = 'flex';
-        this.ui.loading.style.display = 'none';
+        this.list.innerHTML = "";
+        this.list.style.display = 'flex';
+        this.loading.style.display = 'none';
     }
 
-    addItemToList( name, icon, dataset, checked, bind )
+    addItemToList( name: string, icon: string, dataset: ItemDataset, checked: boolean, bind: Function ): void
     {
-        const item = elt( 'div', { class: `vrv-dialog-gh-item` } );
-        item.setAttribute( "data-before", name );
-        item.style.backgroundImage = `url(${ icon })`;
+        const item: HTMLDivElement = appendDivTo( this.list, { class: `vrv-dialog-gh-item`, style: { backgroundImage: `url(${icon})` }, 'data-before': `${name}` } );
         const keys = Object.keys( dataset );;
         for ( let i = 0; i < keys.length; i++ )
         {
             item.dataset[keys[i]] = dataset[keys[i]];   
         }
         if ( checked ) item.classList.add( "checked" );
-        this.ui.list.appendChild( item );
         this.eventManager.bind( item, 'click', bind );
     }
 
-    updateSelectionAndBreadcrumbs()
+    updateSelectionAndBreadcrumbs(): void
     {
-        this.ui.selection.style.display = 'none';
-        this.ui.selection.innerHTML = '';
-        this.ui.selection.style.display = 'none';
-        this.ui.breadCrumbs.innerHTML = '';
-        const icon = ( this.githubManager.selectedOrganization !== null ) ? iconsInstitution : iconsUser;
+        this.selection.style.display = 'none';
+        this.selection.innerHTML = '';
+        this.selection.style.display = 'none';
+        this.breadCrumbs.innerHTML = '';
+        const icon: string = ( this.githubManager.selectedOrganization !== null ) ? iconsInstitution : iconsUser;
         if ( !this.addSelection( this.githubManager.selectedAccountName, icon ) ) return;
         if ( !this.addSelection( this.githubManager.selectedRepoName, iconsRepo ) ) return;
         if ( !this.addSelection( this.githubManager.selectedBranchName, iconsBranch ) ) return;
-        const path = this.githubManager.selectedPath;
+        const path: Array<string> = this.githubManager.selectedPath;
         if ( path.length < 2 ) return;
-        this.ui.breadCrumbs.style.display = 'flex';
+        this.breadCrumbs.style.display = 'flex';
         for ( let i = 0; i < path.length; i++ ) this.addCrumb( path[i], i + 1 );
     }
 
-    addSelection( name, icon )
+    addSelection( name: string, icon: string ): boolean
     {
         if ( name === '' ) return false;
-        this.ui.selection.style.display = 'flex';
-        const selection = elt( 'div', { class: `vrv-dialog-gh-selection-item` } );
+        this.selection.style.display = 'flex';
+        const selection: HTMLDivElement = appendDivTo( this.selection, { class: `vrv-dialog-gh-selection-item`, style: { backgroundImage: `url(${icon})` } } );
         selection.innerHTML = name;
-        selection.style.backgroundImage = `url(${ icon })`;
-        this.ui.selection.appendChild( selection );
         return true;
     }
 
-    addCrumb( name, value )
+    addCrumb( name: string, value: number ): void
     {
-        const crumb = elt( 'div', { class: `vrv-dialog-breadcrumb` } );
+        const crumb: HTMLDivElement = appendDivTo( this.breadCrumbs, { class: `vrv-dialog-breadcrumb` } );
         crumb.innerHTML = name;
-        crumb.dataset.value = value;
-        this.ui.breadCrumbs.appendChild( crumb );
+        crumb.dataset.value = value.toString();
         this.eventManager.bind( crumb, 'click', this.selectCrumb );
     }
 
@@ -152,9 +156,10 @@ export class DialogGhImport extends Dialog
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    selectTab( e )
+    selectTab( e: MouseEvent ): void
     {
-        switch ( e.target.dataset.tab )
+        let element: HTMLElement = e.target as HTMLElement;
+        switch ( element.dataset.tab )
         {
             case ( 'user' ): this.listUsers(); break;
             case ( 'repo' ): this.listRepos(); break;
@@ -163,9 +168,9 @@ export class DialogGhImport extends Dialog
         }
     }
 
-    async listUsers()
+    async listUsers(): Promise<any>
     {
-        this.loadingStart( this.ui.tabUser );
+        this.loadingStart( this.tabUser );
         const orgs = await this.githubManager.user.listOrgs();
         this.loadingEnd();
 
@@ -181,10 +186,10 @@ export class DialogGhImport extends Dialog
         this.updateSelectionAndBreadcrumbs();
     }
 
-    async listRepos()
+    async listRepos(): Promise<any>
     {
-        this.loadingStart( this.ui.tabRepo );
-        let repos;
+        this.loadingStart( this.tabRepo );
+        let repos: any;
         if ( this.githubManager.selectedOrganization !== null ) {
             repos = await this.githubManager.selectedOrganization.getRepos();
         }
@@ -203,7 +208,7 @@ export class DialogGhImport extends Dialog
         this.updateSelectionAndBreadcrumbs();
     }
 
-    async listBranches()
+    async listBranches(): Promise<any>
     {
         if ( this.githubManager.selectedRepo === null )
         {   
@@ -211,7 +216,7 @@ export class DialogGhImport extends Dialog
             return;
         }
 
-        this.loadingStart( this.ui.tabBranch );
+        this.loadingStart( this.tabBranch );
         const branches = await this.githubManager.selectedRepo.listBranches();
         branches.data.sort( ( a, b ) => ( a.name > b.name ) ? 1 : -1 )
         this.loadingEnd();
@@ -225,7 +230,7 @@ export class DialogGhImport extends Dialog
         this.updateSelectionAndBreadcrumbs();
     }
 
-    async listFiles()
+    async listFiles(): Promise<any>
     {
         if ( this.githubManager.selectedRepo === null )
         {   
@@ -233,7 +238,7 @@ export class DialogGhImport extends Dialog
             return;
         }
 
-        this.loadingStart( this.ui.tabFile );
+        this.loadingStart( this.tabFile );
         const branch = this.githubManager.selectedBranchName;
         const path = this.githubManager.getPathString();
         const contents = await this.githubManager.selectedRepo.getContents( branch, path );
@@ -256,56 +261,57 @@ export class DialogGhImport extends Dialog
         this.updateSelectionAndBreadcrumbs();
     }
 
-    async selectUser( e )
+    async selectUser( e: MouseEvent ): Promise<any>
     {
-        //console.log( e.target.dataset );
-        await this.githubManager.selectAccount( e.target.dataset.login );
+        let element: HTMLElement = e.target as HTMLElement;
+        await this.githubManager.selectAccount(element.dataset.login);
         this.listRepos();
     }
 
-    async selectRepo( e )
+    async selectRepo( e: MouseEvent): Promise<any>
     {
-        //console.log( e.target.dataset );  
-        await this.githubManager.selectRepo( e.target.dataset.name );
+        let element: HTMLElement = e.target as HTMLElement; 
+        await this.githubManager.selectRepo( element.dataset.name );
         this.listBranches();
     }
 
-    async selectBranch( e )
+    async selectBranch( e: MouseEvent ): Promise<any>
     {
-        //console.log( e.target.dataset );   
-        await this.githubManager.selectBranch( e.target.dataset.name );
+        let element: HTMLElement = e.target as HTMLElement;
+        await this.githubManager.selectBranch(element.dataset.name);
         this.listFiles();
     }
 
-    async selectFile( e )
+    async selectFile( e: MouseEvent ): Promise<any>
     {
-        //console.log( e.target.dataset );
-        if ( e.target.dataset.type === 'dir' )
+        let element: HTMLElement = e.target as HTMLElement;
+        if ( element.dataset.type === 'dir' )
         {
-            if ( e.target.dataset.name === '..' )
+            if ( element.dataset.name === '..' )
             {
                 this.githubManager.selectedPath.pop();
             }
             else
             {
-                this.githubManager.appendToPath( e.target.dataset.name );   
+                this.githubManager.appendToPath( element.dataset.name );   
             }
             this.listFiles();
         }
         else
         {
             const branch = this.githubManager.selectedBranchName;
-            const filename = this.githubManager.getPathString() + '/' + e.target.dataset.name;
+            const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
             const contents = await this.githubManager.selectedRepo.getContents( branch, filename, true );
             this.data = contents.data;
-            this.filename = e.target.dataset.name;
+            this.filename = element.dataset.name;
             this.ok();
         }
     }
 
-    selectCrumb( e )
+    selectCrumb( e: MouseEvent ): void
     {
-        this.githubManager.slicePathTo( e.target.dataset.value );
+        let element: HTMLElement = e.target as HTMLElement;
+        this.githubManager.slicePathTo( Number(element.dataset.value) );
         this.listFiles();
     }
 
