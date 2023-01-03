@@ -51,22 +51,18 @@ export class DialogGhImport extends Dialog
 
         this.tabUser = appendDivTo( this.tabs, { class: `vrv-dialog-tab active`, dataset: { tab: `user`} } );
         this.tabUser.innerHTML = 'User / Organisations';
-        //this.tabUser.dataset.tab = 'user';
         this.eventManager.bind( this.tabUser, 'click', this.selectTab );
 
         this.tabRepo = appendDivTo( this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `rep`} } );
         this.tabRepo.innerHTML = 'Repositories';
-        //this.tabRepo.dataset.tab = 'repo';
         this.eventManager.bind( this.tabRepo, 'click', this.selectTab );
 
         this.tabBranch = appendDivTo( this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `branch`} } );
         this.tabBranch.innerHTML = 'Branches';
-        //this.tabBranch.dataset.tab = 'branch';
         this.eventManager.bind( this.tabBranch, 'click', this.selectTab );
 
         this.tabFile = appendDivTo( this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `file`} } );
         this.tabFile.innerHTML = 'Files';
-        //this.tabFile.dataset.tab = 'file';
         this.eventManager.bind( this.tabFile, 'click', this.selectTab );
 
         this.loading = appendDivTo( this.content, { class: `vrv-dialog-gh-loading` } );
@@ -158,7 +154,7 @@ export class DialogGhImport extends Dialog
 
     selectTab( e: MouseEvent ): void
     {
-        let element: HTMLElement = e.target as HTMLElement;
+        const element: HTMLElement = e.target as HTMLElement;
         switch ( element.dataset.tab )
         {
             case ( 'user' ): this.listUsers(); break;
@@ -263,28 +259,28 @@ export class DialogGhImport extends Dialog
 
     async selectUser( e: MouseEvent ): Promise<any>
     {
-        let element: HTMLElement = e.target as HTMLElement;
+        const element: HTMLElement = e.target as HTMLElement;
         await this.githubManager.selectAccount(element.dataset.login);
         this.listRepos();
     }
 
     async selectRepo( e: MouseEvent): Promise<any>
     {
-        let element: HTMLElement = e.target as HTMLElement; 
+        const element: HTMLElement = e.target as HTMLElement; 
         await this.githubManager.selectRepo( element.dataset.name );
         this.listBranches();
     }
 
     async selectBranch( e: MouseEvent ): Promise<any>
     {
-        let element: HTMLElement = e.target as HTMLElement;
+        const element: HTMLElement = e.target as HTMLElement;
         await this.githubManager.selectBranch(element.dataset.name);
         this.listFiles();
     }
 
     async selectFile( e: MouseEvent ): Promise<any>
     {
-        let element: HTMLElement = e.target as HTMLElement;
+        const element: HTMLElement = e.target as HTMLElement;
         if ( element.dataset.type === 'dir' )
         {
             if ( element.dataset.name === '..' )
@@ -310,7 +306,7 @@ export class DialogGhImport extends Dialog
 
     selectCrumb( e: MouseEvent ): void
     {
-        let element: HTMLElement = e.target as HTMLElement;
+        const element: HTMLElement = e.target as HTMLElement;
         this.githubManager.slicePathTo( Number(element.dataset.value) );
         this.listFiles();
     }

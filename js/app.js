@@ -8,7 +8,7 @@ const version = "1.0.0";
 import { AppToolbar } from '../js-dist/app-toolbar.js';
 import { AppStatusbar } from '../js-dist/app-statusbar.js';
 import { Dialog, DialogType } from '../js-dist/dialog.js'
-import { DialogGhExport } from './dialog-gh-export.js';
+import { DialogGhExport } from '../js-dist/dialog-gh-export.js';
 import { DialogGhImport } from '../js-dist/dialog-gh-import.js';
 import { DocumentView } from '../js-dist/document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
