@@ -2,34 +2,83 @@
  * The CursorPointer class
  */
 
-import { EditorView } from '../js-dist/editor-view.js';
+import { EditorView } from './editor-view.js';
 
-import { elt } from './utils/functions.js';
+import { appendDivTo } from './utils/functions.js';
+
+interface SelectedItem {
+    elementType: string,
+    elementNode: SVGElement,
+    elementId: string,
+    elementX: number,
+    elementY: number,
+};
 
 export class CursorPointer
 {
-    constructor( div, editorView )
+    element: HTMLDivElement;
+    editorView: EditorView;
+
+    lines: HTMLDivElement;
+    pointer: HTMLDivElement;
+
+    activated: boolean;
+    inputMode: boolean;
+
+    pixPerPix: number;
+    viewTop: number;
+    viewLeft: number;
+    lastEvent: any;
+    scrollTop: number;
+    scrollLeft: number;
+    
+    elementClass: string;
+    elementId: string;
+    elementType: string;
+    elementNode: SVGElement;
+    staffNode: SVGElement;
+
+    elementX: number;
+    elementY: number;
+
+    selectedItems: Array<SelectedItem>;
+
+    initX: number;
+    initY: number;
+    currentX: number;
+    currentY: number;
+
+    fixedX: boolean;
+    fixedY: boolean;
+    forceOnPitch: boolean;
+
+    cursorImageHeight: number;
+    cursorImageWidth: number;
+    ledgerLineImageWidth: number;
+
+    currentHeight: number;
+    currentWidth: number;
+    currentLedgerlineWidth: number;
+
+    marginLeft: number;
+    marginTop: number;
+
+    MEIunit: number;
+    lastPitchLine: any;
+
+    topLine: number;
+    bottomLine: number;
+
+    constructor( div: HTMLDivElement, editorView: EditorView )
     {
         // Root element in which verovio-ui is created
-        if ( !div || !( div instanceof HTMLDivElement ) ) 
-        {
-            throw "All GenericView objects must be initialized with 'div' parameter that is a HTMLDivElement element.";
-        }
         this.element = div;
 
         // EditorView object
-        if ( !editorView || !( editorView instanceof EditorView ) ) 
-        {
-            throw "All Cursor objects must be initialized with a 'EditorView' parameter that is an instance of the EditorView class.";
-        }
         this.editorView = editorView;
 
-        this.ui = {}
-        this.ui.lines = elt( 'div', { class: `vrv-cursor-lines` } );
-        this.element.appendChild( this.ui.lines );
-
-        this.ui.pointer = elt( 'div', { class: `vrv-cursor-pointer` } );
-        this.element.appendChild( this.ui.pointer );
+        this.lines = appendDivTo( this.element, { class: `vrv-cursor-lines` } );
+        this.pointer = appendDivTo( this.element, { class: `vrv-cursor-pointer` } );
 
         this.activated = false;
         this.inputMode = false;
@@ -43,6 +92,7 @@ export class CursorPointer
 
         this.elementClass = '';
         this.elementId = '';
+        this.elementType = '';
         this.elementNode = null;
         this.staffNode = null;
 
@@ -64,32 +114,41 @@ export class CursorPointer
         this.cursorImageWidth = 90;
         this.ledgerLineImageWidth = 106;
 
-        this.currentHeigt = this.cursorImageHeight;
+        this.currentHeight = this.cursorImageHeight;
         this.currentWidth = this.cursorImageWidth;
         this.currentLedgerlineWidth = this.ledgerLineImageWidth;
+
+        this.marginLeft = 0;
+        this.marginTop = 0;
+
+        this.MEIunit = 90;
+        this.lastPitchLine = null;
+
+        this.topLine = null;
+        this.bottomLine = null;
     }
 
-    xToMEI( x )
+    xToMEI( x: number ): number
     {
         return Math.round( x - this.viewLeft + this.scrollLeft ) * this.pixPerPix - this.marginLeft;
     }
 
-    yToMEI( y )
+    yToMEI( y: number ): number
     {
         return Math.round( ( y - this.viewTop + this.scrollTop ) * this.pixPerPix - this.marginTop );
     }
 
-    xToView( x )
+    xToView( x: number ): number
     {
         return ( x + this.marginLeft ) / this.pixPerPix - this.scrollLeft + this.viewLeft;
     }
 
-    yToView( y )
+    yToView( y: number ): number
     {
         return ( y + this.marginTop ) / this.pixPerPix - this.scrollTop + this.viewTop;
     }
 
-    init( svgRoot, top, left )
+    init( svgRoot: SVGElement, top: number, left: number ): void
     {
         const svgViewBox = svgRoot.querySelector( 'svg' );
         const actualSizeArr = svgViewBox.getAttribute( 'viewBox' ).split( ' ' );
@@ -116,7 +175,7 @@ export class CursorPointer
         this.viewLeft = left;
     }
 
-    initEvent( event, id, node )
+    initEvent( event: MouseEvent, id: string, node: SVGElement ): void
     {
         this.selectedItems = [];
 
@@ -131,7 +190,6 @@ export class CursorPointer
 
         this.initX = this.xToMEI( event.pageX );
         this.initY = this.yToMEI( event.pageY );
-        this.MEIunit = 90;
         this.lastPitchLine = null;
 
         this.initStaff( node );
@@ -141,16 +199,16 @@ export class CursorPointer
         this.currentWidth = this.cursorImageWidth * scale;
         this.currentLedgerlineWidth = this.ledgerLineImageWidth * scale;
 
-        this.ui.pointer.style.height = `${ this.currentHeight / this.pixPerPix }px`;
-        this.ui.pointer.style.width = `${ this.currentWidth / this.pixPerPix }px`;
-        this.ui.pointer.style.backgroundSize = `${ this.currentWidth / this.pixPerPix }px ${ this.currentHeight / this.pixPerPix }px`;
+        this.pointer.style.height = `${ this.currentHeight / this.pixPerPix }px`;
+        this.pointer.style.width = `${ this.currentWidth / this.pixPerPix }px`;
+        this.pointer.style.backgroundSize = `${ this.currentWidth / this.pixPerPix }px ${ this.currentHeight / this.pixPerPix }px`;
 
-        this.ui.lines.style.height = `${ this.currentHeight / this.pixPerPix }px`;
-        this.ui.lines.style.width = `${ this.currentLedgerlineWidth / this.pixPerPix }px`;
-        this.ui.lines.style.backgroundSize = `${ this.currentLedgerlineWidth / this.pixPerPix }px ${ this.currentHeight / this.pixPerPix }px`;
+        this.lines.style.height = `${ this.currentHeight / this.pixPerPix }px`;
+        this.lines.style.width = `${ this.currentLedgerlineWidth / this.pixPerPix }px`;
+        this.lines.style.backgroundSize = `${ this.currentLedgerlineWidth / this.pixPerPix }px ${ this.currentHeight / this.pixPerPix }px`;
     }
 
-    initStaff( node )
+    initStaff( node: SVGElement ): void
     {
         this.staffNode = this.editorView.getClosestMEIElement( node, "staff" );
 
@@ -185,9 +243,9 @@ export class CursorPointer
         }
     }
 
-    add( id, node, clicked = true )
+    add( id: string, node: SVGElement, clicked: boolean = true): void
     {
-        let positionNode = node;
+        let positionNode: SVGElement = node;
         if ( node.classList.contains( 'note' ) || node.classList.contains( 'rest' ) )
         {
             positionNode = node.querySelector( 'use' );
@@ -195,16 +253,16 @@ export class CursorPointer
 
         if ( !positionNode )
         {
-            console.debug( "Cannot find node with dragging postion" )
+            console.debug( "Cannot find node with dragging position" )
             return;
         }
 
-        let item = {
-            "elementType": node.classList[0],
-            "elementNode": node,
-            "elementId": id,
-            "elementX": parseInt( positionNode.getAttribute( 'x' ) ),
-            "elementY": parseInt( positionNode.getAttribute( 'y' ) )
+        let item: SelectedItem = {
+            elementType: node.classList[0],
+            elementNode: node,
+            elementId: id,
+            elementX: parseInt( positionNode.getAttribute('x') ),
+            elementY: parseInt( positionNode.getAttribute('y') )
         }
 
         this.selectedItems.push( item );
@@ -219,14 +277,15 @@ export class CursorPointer
         this.elementX = item.elementX;
         this.elementY = item.elementY;
 
-        this.initX = this.xToMEI( event.pageX );
-        this.initY = this.yToMEI( event.pageY );
+        //this.initX = this.xToMEI( event.pageX );
+        //this.initY = this.yToMEI( event.pageY );
 
         let children = node.querySelectorAll( 'g:not(.bounding-box):not(.ledgerLines):not(.articPart):not(.notehead):not(.dots):not(.flag):not(.stem)' );
         for ( let child of children )
         {
-            const childId = child.attributes.id.value;
-            this.add( childId, child, false );
+            const element = child as SVGElement;
+            const childId: string = element.attributes[id].value;
+            this.add( childId, element, false );
         }
 
         //console.debug( this.selectedItems );
@@ -236,7 +295,7 @@ export class CursorPointer
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    moveToLastEvent( display = true )
+    moveToLastEvent( display: boolean = true ): void
     {
         this.currentX = this.xToMEI( this.lastEvent.pageX );
         this.currentY = this.yToMEI( this.lastEvent.pageY );
@@ -269,10 +328,10 @@ export class CursorPointer
         //const topLineToCurrentY = this.topLine - this.currentY;
         //const bottomLineToCurrentY = this.bottomLine - this.currentY;
 
-        if ( display ) this.Update();
+        if ( display ) this.update();
     }
 
-    Update()
+    update(): void
     {
         this.inputMode = false;
 
@@ -283,7 +342,7 @@ export class CursorPointer
         if ( !["note", "rest", "chord"].includes( this.elementType ) ) return;
 
         return;
-
+        
         /*
         this.inputMode = true;
 
@@ -301,16 +360,16 @@ export class CursorPointer
         {
             currentToElementY -= this.currentHeight / 2;
         }
-        this.ui.pointer.style.left = `${ currentToElementX / this.pixPerPix }px`;
-        this.ui.pointer.style.top = `${ currentToElementY / this.pixPerPix }px`;
+        this.pointer.style.left = `${ currentToElementX / this.pixPerPix }px`;
+        this.pointer.style.top = `${ currentToElementY / this.pixPerPix }px`;
 
-        this.ui.lines.classList.toggle( "top", false );
-        this.ui.lines.classList.toggle( "bottom", false );
+        this.lines.classList.toggle( "top", false );
+        this.lines.classList.toggle( "bottom", false );
 
         if ( !this.topLine || !this.bottomLine ) return;
 
         const ledgerX = - ( this.currentLedgerlineWidth - this.currentWidth ) / 2;
-        this.ui.lines.style.left = `${ ledgerX / this.pixPerPix }px`;
+        this.lines.style.left = `${ ledgerX / this.pixPerPix }px`;
 
         const topLineToElementY = this.topLine - this.elementY;
         const topLineToCurrentY = this.topLine - this.currentY;
@@ -323,23 +382,23 @@ export class CursorPointer
 
         if ( bottomLineToCurrentY < -this.MEIunit )
         {
-            this.ui.lines.style.bottom = ``;
-            this.ui.lines.style.top = `${ ( bottomLineToElementY + this.MEIunit ) / this.pixPerPix }px`;
-            this.ui.lines.style.height = `${ ( -bottomLineToCurrentY - Math.round( 0.25 * this.currentHeight ) ) / this.pixPerPix }px`;
-            this.ui.lines.classList.toggle( "bottom", true );
+            this.lines.style.bottom = ``;
+            this.lines.style.top = `${ ( bottomLineToElementY + this.MEIunit ) / this.pixPerPix }px`;
+            this.lines.style.height = `${ ( -bottomLineToCurrentY - Math.round( 0.25 * this.currentHeight ) ) / this.pixPerPix }px`;
+            this.lines.classList.toggle( "bottom", true );
 
         }
         else if ( topLineToCurrentY > this.MEIunit )
         {
-            this.ui.lines.style.top = ``;
-            this.ui.lines.style.bottom = `${ ( -topLineToElementY + this.MEIunit ) / this.pixPerPix }px`;
-            this.ui.lines.style.height = `${ ( topLineToCurrentY - Math.round( 0.25 * this.currentHeight ) ) / this.pixPerPix }px`;
-            this.ui.lines.classList.toggle( "top", true );
+            this.lines.style.top = ``;
+            this.lines.style.bottom = `${ ( -topLineToElementY + this.MEIunit ) / this.pixPerPix }px`;
+            this.lines.style.height = `${ ( topLineToCurrentY - Math.round( 0.25 * this.currentHeight ) ) / this.pixPerPix }px`;
+            this.lines.classList.toggle( "top", true );
         }
         */
     }
 
-    staffEnter( staffNode )
+    staffEnter( staffNode: SVGElement ): void
     {
         if ( !this.staffNode )
         {
@@ -357,7 +416,7 @@ export class CursorPointer
         }
     }
 
-    hide()
+    hide(): void
     {
         //console.debug( "hide cursor" );
         this.inputMode = false;

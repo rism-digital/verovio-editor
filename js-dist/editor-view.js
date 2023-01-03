@@ -12,7 +12,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { ResponsiveView } from './responsive-view.js';
-import { CursorPointer } from '../js/cursor-pointer.js';
+import { CursorPointer } from './cursor-pointer.js';
 import { ActionManager } from './action-manager.js';
 import { appendDivTo } from './utils/functions.js';
 import * as soundsImport from '../js/utils/sounds.js';
@@ -279,11 +279,11 @@ export class EditorView extends ResponsiveView {
         }
         // Get MEI element
         let node = this.getClosestMEIElement(e.target);
-        if (!node || !node.attributes.id) {
+        if (!node || !node.id) {
             console.log(node, "MEI element not found or with no id");
             return; // this should never happen, but as a safety 
         }
-        const id = node.attributes.id.value;
+        const id = node.id;
         // Multiple selection - add it to the cursor
         if (e.shiftKey) {
             this.activateHighlight(id);
@@ -376,7 +376,7 @@ export class EditorView extends ResponsiveView {
         this.cursorPointer.scrollTop = element.scrollTop;
         this.cursorPointer.scrollLeft = element.scrollLeft;
         if (this.cursorPointer.lastEvent) {
-            this.cursorPointer.Update();
+            this.cursorPointer.update();
         }
         this.svgWrapper.scrollTop = element.scrollTop;
         this.svgWrapper.scrollLeft = element.scrollLeft;

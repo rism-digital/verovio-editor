@@ -14,7 +14,7 @@ export class VerovioView extends GenericView
     app: App;
     verovio: VerovioWorkerProxy;
     eventManager: EventManager;
-    currentId: number;
+    currentId: string;
     currentPage: number;
     currentZoomIndex: number;
     currentScale: number;

@@ -1,7 +1,7 @@
 /**
  * The ActionManager action class
  */
-import { CursorPointer } from '../js/cursor-pointer.js';
+import { CursorPointer } from './cursor-pointer.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';
 import { WorkerProxy } from './worker-proxy.js'

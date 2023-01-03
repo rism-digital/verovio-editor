@@ -5,7 +5,7 @@
 
 import { App } from '../js/app.js';
 import { ResponsiveView } from './responsive-view.js';
-import { CursorPointer } from '../js/cursor-pointer.js';
+import { CursorPointer } from './cursor-pointer.js';
 import { ActionManager } from './action-manager.js';
 import { VerovioWorkerProxy } from './worker-proxy.js';
 
@@ -21,7 +21,7 @@ export class EditorView extends ResponsiveView
     cursorPointer: CursorPointer;
     mouseMoveTimer: boolean;
     draggingActive: boolean;
-    highlightedCache: Array<number>;
+    highlightedCache: Array<string>;
     audio: any;
     actionManager: ActionManager;
     lastNote: { midiPitch: number, oct: string, pname: string };
@@ -115,7 +115,7 @@ export class EditorView extends ResponsiveView
         this.app.customEventManager.dispatch( event );
     }
 
-    async setCurrent( id: number ): Promise<any>
+    async setCurrent( id: string ): Promise<any>
     {
         this.currentId = id;
         const pageWithElement = await this.verovio.getPageWithElement( id );
@@ -215,7 +215,7 @@ export class EditorView extends ResponsiveView
         this.reapplyHighlights();
     }
 
-    activateHighlight( id: number ):void
+    activateHighlight( id: string ):void
     {
         if ( this.highlightedCache.indexOf( id ) === -1 )
         {
@@ -260,7 +260,7 @@ export class EditorView extends ResponsiveView
         }
     }
 
-    getClosestMEIElement( node: SVGElement, elementType: string = null )
+    getClosestMEIElement( node: SVGElement, elementType: string = null ): SVGElement
     {
         if ( !node )
         {
@@ -349,13 +349,13 @@ export class EditorView extends ResponsiveView
 
         // Get MEI element
         let node = this.getClosestMEIElement( (<SVGElement> e.target) );
-        if ( !node || !node.attributes.id ) 
+        if ( !node || !node.id ) 
         {
             console.log( node, "MEI element not found or with no id" );
             return; // this should never happen, but as a safety 
         }
 
-        const id = node.attributes.id.value;
+        const id = node.id;
 
         // Multiple selection - add it to the cursor
         if ( e.shiftKey )
@@ -396,7 +396,7 @@ export class EditorView extends ResponsiveView
     {
         document.addEventListener( 'keydown', this.boundKeyDown );
         //console.debug( "Hey!" );
-        let node = this.getClosestMEIElement( (<SVGElement> e.target) );
+        let node: SVGElement = this.getClosestMEIElement( (<SVGElement> e.target) );
         if ( node && node.classList.contains( 'staff' ) )
         {
             this.cursorPointer.staffEnter( node );
@@ -480,7 +480,7 @@ export class EditorView extends ResponsiveView
         this.cursorPointer.scrollLeft = element.scrollLeft;
         if ( this.cursorPointer.lastEvent )
         {
-            this.cursorPointer.Update();
+            this.cursorPointer.update();
         }
         this.svgWrapper.scrollTop = element.scrollTop;
         this.svgWrapper.scrollLeft = element.scrollLeft;
