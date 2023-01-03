@@ -28,19 +28,15 @@ export class DialogGhImport extends Dialog {
         this.tabs = appendDivTo(this.content, { class: `vrv-dialog-tabs` });
         this.tabUser = appendDivTo(this.tabs, { class: `vrv-dialog-tab active`, dataset: { tab: `user` } });
         this.tabUser.innerHTML = 'User / Organisations';
-        //this.tabUser.dataset.tab = 'user';
         this.eventManager.bind(this.tabUser, 'click', this.selectTab);
         this.tabRepo = appendDivTo(this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `rep` } });
         this.tabRepo.innerHTML = 'Repositories';
-        //this.tabRepo.dataset.tab = 'repo';
         this.eventManager.bind(this.tabRepo, 'click', this.selectTab);
         this.tabBranch = appendDivTo(this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `branch` } });
         this.tabBranch.innerHTML = 'Branches';
-        //this.tabBranch.dataset.tab = 'branch';
         this.eventManager.bind(this.tabBranch, 'click', this.selectTab);
         this.tabFile = appendDivTo(this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `file` } });
         this.tabFile.innerHTML = 'Files';
-        //this.tabFile.dataset.tab = 'file';
         this.eventManager.bind(this.tabFile, 'click', this.selectTab);
         this.loading = appendDivTo(this.content, { class: `vrv-dialog-gh-loading` });
         this.list = appendDivTo(this.content, { class: `vrv-dialog-gh-list` });
@@ -117,7 +113,7 @@ export class DialogGhImport extends Dialog {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     selectTab(e) {
-        let element = e.target;
+        const element = e.target;
         switch (element.dataset.tab) {
             case ('user'):
                 this.listUsers();
@@ -212,28 +208,28 @@ export class DialogGhImport extends Dialog {
     }
     selectUser(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            let element = e.target;
+            const element = e.target;
             yield this.githubManager.selectAccount(element.dataset.login);
             this.listRepos();
         });
     }
     selectRepo(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            let element = e.target;
+            const element = e.target;
             yield this.githubManager.selectRepo(element.dataset.name);
             this.listBranches();
         });
     }
     selectBranch(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            let element = e.target;
+            const element = e.target;
             yield this.githubManager.selectBranch(element.dataset.name);
             this.listFiles();
         });
     }
     selectFile(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            let element = e.target;
+            const element = e.target;
             if (element.dataset.type === 'dir') {
                 if (element.dataset.name === '..') {
                     this.githubManager.selectedPath.pop();
@@ -254,7 +250,7 @@ export class DialogGhImport extends Dialog {
         });
     }
     selectCrumb(e) {
-        let element = e.target;
+        const element = e.target;
         this.githubManager.slicePathTo(Number(element.dataset.value));
         this.listFiles();
     }

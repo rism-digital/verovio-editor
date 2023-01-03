@@ -1,6 +1,9 @@
 export function appendDivTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'div');
 }
+export function appendInputTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'input');
+}
 export function appendTextAreaTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'textarea');
 }
@@ -19,6 +22,9 @@ function setAttributes(element, attributes) {
         if (prop === 'style') {
             setStyle(element, attributes[prop]);
         }
+        else if (prop === 'dataset') {
+            setDataset(element, attributes[prop]);
+        }
         else {
             element.setAttribute(prop, attributes[prop]);
         }
@@ -29,5 +35,10 @@ function setStyle(element, style) {
         if (!style.hasOwnProperty(cssProp))
             continue;
         element.style[cssProp] = style[cssProp];
+    }
+}
+function setDataset(element, dataset) {
+    for (const value in dataset) {
+        element.dataset[value] = dataset[value];
     }
 }
