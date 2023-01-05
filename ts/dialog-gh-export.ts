@@ -7,7 +7,6 @@ import { DialogGhImport } from './dialog-gh-import.js';
 import { DialogOpts } from './dialog.js';
 import { GitHubManager } from './github-manager.js';
 
-import { elt } from '../js/utils/functions.js';
 import { appendDivTo, appendInputTo, appendTextAreaTo } from './utils/functions.js';
 
 export class DialogGhExport extends DialogGhImport

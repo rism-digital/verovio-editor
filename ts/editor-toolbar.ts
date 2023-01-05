@@ -9,7 +9,6 @@ import { App } from './app.js';
 import { EditorPanel } from './editor-panel.js';
 import { Toolbar } from './toolbar.js' ; 
 
-import { elt } from '../js/utils/functions.js';
 import { appendDivTo } from './utils/functions.js';
 
 export class EditorToolbar extends Toolbar
