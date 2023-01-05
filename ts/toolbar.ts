@@ -3,7 +3,7 @@
  * It should not be instantiated directly but only through inherited classes.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { GenericView } from './generic-view.js';
 import { EventManager } from './event-manager.js';
 

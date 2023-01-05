@@ -4,7 +4,7 @@
  * Events are attached to the App.eventManager
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { DocumentView } from './document-view.js';
 import { EditorPanel } from './editor-panel.js';
 import { ResponsiveView } from './responsive-view.js';

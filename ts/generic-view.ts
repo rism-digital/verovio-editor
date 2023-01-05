@@ -4,7 +4,7 @@
  * It should not be instantiated directly but only through inherited classes.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { CustomEventManager } from './custom-event-manager.js';
 
 export class GenericView

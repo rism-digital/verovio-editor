@@ -2,7 +2,7 @@
  * The MidiToolbar class for controlling the MidiPlayer.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { MidiPlayer } from './midi-player.js';
 import { Toolbar } from './toolbar.js';
 
@@ -49,7 +49,7 @@ export class MidiToolbar extends Toolbar
         this.barWidth = 200;
 
         // sub-toolbar in application 
-        this.midiControls = appendDivTo(this.app.toolbar.midiPlayerSubToolbar, { class: `vrv-btn-group` });
+        this.midiControls = appendDivTo(this.app.appToolbar.midiPlayerSubToolbar, { class: `vrv-btn-group` });
         appendDivTo(this.midiControls, { class: `vrv-h-separator` });
         
         this.play = appendDivTo( this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPlay})` } } );

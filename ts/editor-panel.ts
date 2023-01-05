@@ -2,7 +2,7 @@
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';

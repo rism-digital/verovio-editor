@@ -2,7 +2,7 @@
  * The ResponsiveView class implements a dynamic rendering view fitting and adjusting to the view port.
  */
 
-import { App } from '../js/app.js'
+import { App } from './app.js'
 import { EditorView } from './editor-view.js';
 import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
 

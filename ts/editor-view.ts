@@ -3,7 +3,7 @@
  * It uses a responsive layout. 
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { ResponsiveView } from './responsive-view.js';
 import { CursorPointer } from './cursor-pointer.js';
 import { ActionManager } from './action-manager.js';
@@ -28,7 +28,7 @@ export class EditorView extends ResponsiveView
 
     constructor( div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy )
     {
-        super( div, app, verovio )
+        super(div, app, verovio);
 
         this.sounds = soundsImport;
 
@@ -348,7 +348,7 @@ export class EditorView extends ResponsiveView
         }
 
         // Get MEI element
-        let node = this.getClosestMEIElement( (<SVGElement> e.target) );
+        let node: SVGElement = this.getClosestMEIElement( (<SVGElement> e.target) );
         if ( !node || !node.id ) 
         {
             console.log( node, "MEI element not found or with no id" );

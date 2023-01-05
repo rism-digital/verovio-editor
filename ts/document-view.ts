@@ -5,7 +5,7 @@
  * When SVG rendering is use, a limited number of pages it keep in the DOM.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
 import { VerovioWorkerProxy } from './worker-proxy.js';
 

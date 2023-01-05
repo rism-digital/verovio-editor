@@ -3,17 +3,17 @@
  * It should not be instantiated directly but only through inherited classes.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { Deferred } from './deferred.js';
 import { EventManager } from './event-manager.js';
 
 import { appendDivTo } from './utils/functions.js';
 
 export interface DialogOpts {
-    icon: string;
-    type: DialogType;
-    okLabel: string;
-    cancelLabel: string;
+    icon?: string;
+    type?: DialogType;
+    okLabel?: string;
+    cancelLabel?: string;
 }
 
 export class Dialog

@@ -3,7 +3,7 @@
  * It uses the CodeMirror editor package and a ValidatorMessenger
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { GenericView } from './generic-view.js';
 import { ValidatorWorkerProxy } from './worker-proxy.js';
 

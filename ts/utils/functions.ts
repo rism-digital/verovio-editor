@@ -1,4 +1,8 @@
 
+export function appendAnchorTo(parent: HTMLElement, options: object): HTMLAnchorElement {
+    return <HTMLAnchorElement> appendHTMLElementTo(parent, options, 'a');
+}
+
 export function appendDivTo(parent: HTMLElement, options: object): HTMLDivElement {
     return <HTMLDivElement> appendHTMLElementTo(parent, options, 'div');
 }

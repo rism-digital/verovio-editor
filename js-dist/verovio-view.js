@@ -31,7 +31,6 @@ export class VerovioView extends GenericView {
     // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
     destroy() {
         this.eventManager.unbindAll();
-        //this.events.unsubscribeAll();
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('mouseup', this.boundMouseUp);
         document.removeEventListener('touchmove', this.boundMouseMove);

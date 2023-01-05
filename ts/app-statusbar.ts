@@ -3,7 +3,7 @@
  * Events are attached to the App.eventManager.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { GenericView } from './generic-view.js';
 
 import { elt } from '../js/utils/functions.js';

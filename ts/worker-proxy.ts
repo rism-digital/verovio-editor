@@ -72,6 +72,8 @@ export class ValidatorWorkerProxy extends WorkerProxy
     validateNG: Function;
     setRelaxNGSchema: Function;
 
+    onRuntimeInitialized: Function;
+
     constructor(worker: Worker) {
         super(worker);
     }
@@ -80,6 +82,8 @@ export class ValidatorWorkerProxy extends WorkerProxy
 export class VerovioWorkerProxy extends WorkerProxy
 {
     edit: Function;
+    getElementAttr: Function;
+    getElementsAtTime: Function;
     getOptions: Function;
     getMEI: Function;
     getPageCount: Function;
@@ -87,8 +91,12 @@ export class VerovioWorkerProxy extends WorkerProxy
     loadData: Function;
     redoLayout: Function;
     redoPagePitchPosLayout: Function;
+    renderToMIDI: Function;
     renderToSVG: Function;
     setOptions: Function;
+    getVersion: Function;
+
+    onRuntimeInitialized: Function;
 
     constructor(worker: Worker) {
         super(worker);

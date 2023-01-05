@@ -2,7 +2,7 @@
  * The GitHubManager class managing a connection to GitHub through the GitHub API.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 
 declare global {
     const GitHub;
@@ -105,7 +105,7 @@ export class GitHubManager
         this.selectedUser = this.user;
         this.selectedAccountName = this.login;
 
-        let options = this.app.options.github || {}
+        let options = this.app.options.github;
         if ( options.login === this.login )
         {
             await this.selectAccount( options.account );

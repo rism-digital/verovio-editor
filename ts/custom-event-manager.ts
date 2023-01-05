@@ -4,7 +4,7 @@
 * CustomEventManager hold a propagationList of other managers to call recursively.
 */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { GenericView } from "./generic-view.js";
 
 export class CustomEventManager

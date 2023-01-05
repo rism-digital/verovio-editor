@@ -19,7 +19,7 @@ export class MidiToolbar extends Toolbar {
         // set in the css in .vrv-midi-bar via $midibar-width
         this.barWidth = 200;
         // sub-toolbar in application 
-        this.midiControls = appendDivTo(this.app.toolbar.midiPlayerSubToolbar, { class: `vrv-btn-group` });
+        this.midiControls = appendDivTo(this.app.appToolbar.midiPlayerSubToolbar, { class: `vrv-btn-group` });
         appendDivTo(this.midiControls, { class: `vrv-h-separator` });
         this.play = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPlay})` } });
         this.pause = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPause})` } });

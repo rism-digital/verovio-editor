@@ -73,7 +73,7 @@ export class GitHubManager {
             // also use it as default account
             this.selectedUser = this.user;
             this.selectedAccountName = this.login;
-            let options = this.app.options.github || {};
+            let options = this.app.options.github;
             if (options.login === this.login) {
                 yield this.selectAccount(options.account);
                 yield this.selectRepo(options.repo);

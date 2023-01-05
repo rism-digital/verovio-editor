@@ -4,7 +4,7 @@
  * The VerovioView is attached to a VerovioMessenger.
  */
 
-import { App } from '../js/app.js';
+import { App } from './app.js';
 import { GenericView } from './generic-view.js';
 import { EventManager } from './event-manager.js';
 import { VerovioWorkerProxy } from './worker-proxy.js';
@@ -46,7 +46,6 @@ export class VerovioView extends GenericView
     destroy(): void
     {
         this.eventManager.unbindAll();
-        //this.events.unsubscribeAll();
 
         document.removeEventListener( 'mousemove', this.boundMouseMove );
         document.removeEventListener( 'mouseup', this.boundMouseUp );
