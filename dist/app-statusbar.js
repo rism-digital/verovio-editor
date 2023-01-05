@@ -3,13 +3,12 @@
  * Events are attached to the App.eventManager.
  */
 import { GenericView } from './generic-view.js';
-import { elt } from '../js/utils/functions.js';
+import { appendDivTo } from './utils/functions.js';
 export class AppStatusbar extends GenericView {
     constructor(div, app) {
         super(div, app);
         this.active = true;
-        this.statustext = elt('div', { class: `vrv-status-text` });
-        this.element.appendChild(this.statustext);
+        this.statustext = appendDivTo(this.element, { class: `vrv-status-text` });
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

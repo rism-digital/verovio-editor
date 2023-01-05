@@ -2,7 +2,7 @@
 *  EventManager for binding events to a given parent object to avoid ES6 scope issues.
 */
 
-import { randomHex } from '../js/utils/functions.js';
+import { randomHex } from './utils/functions.js';
 
 export class EventManager
 {

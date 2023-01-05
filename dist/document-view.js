@@ -14,8 +14,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
-import { elt } from '../js/utils/functions.js';
-import { appendDivTo } from './utils/functions.js';
+import { appendCanvasTo, appendDivTo } from './utils/functions.js';
 class DocumentViewObserver extends IntersectionObserver {
     constructor(callback, view, options) {
         super(callback, options);
@@ -90,16 +89,15 @@ export class DocumentView extends VerovioView {
                 this.observer.lastPageIn = 0;
             }
             for (let idx = 0; idx < this.app.pageCount; idx++) {
-                const pageWrapper = elt('div', { class: `vrv-page-wrapper` });
-                this.docWrapper.appendChild(pageWrapper);
+                const pageWrapper = appendDivTo(this.docWrapper, { class: `vrv-page-wrapper` });
                 pageWrapper.style.height = `${this.currentPageHeight}px`;
                 pageWrapper.style.width = `${this.currentPageWidth}px`;
                 pageWrapper.style.marginTop = `${this.currentDocMargin}px`;
                 pageWrapper.style.marginBottom = `${this.currentDocMargin}px`;
                 pageWrapper.style.border = `solid ${this.app.options.documentViewPageBorder}px lightgray`;
-                pageWrapper.dataset.page = idx + 1;
+                pageWrapper.dataset.page = (idx + 1).toString();
                 if (!this.app.options.documentViewSVG) {
-                    const img = elt('canvas', { class: `` });
+                    const img = appendCanvasTo(pageWrapper, { class: `` });
                     let ctx = img.getContext("2d");
                     ctx.canvas.width = this.currentPageWidth;
                     ctx.canvas.height = this.currentPageHeight;

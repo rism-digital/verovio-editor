@@ -130,7 +130,7 @@ export class AppToolbar extends Toolbar
         const fileCopy = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Copy MEI to clipboard` });
         this.app.eventManager.bind(fileCopy, 'click', this.app.fileCopyToClipboard);
 
-        fileMenuContent.appendChild(elt('div', { class: `vrv-v-separator` }));
+        appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
 
         const fileExportPDF = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as PDF` });
         this.app.eventManager.bind(fileExportPDF, 'click', this.app.fileExportPDF);

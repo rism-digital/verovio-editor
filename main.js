@@ -1,4 +1,4 @@
-import { App } from "./js-dist/app.js";
+import { App } from "./dist/app.js";
 
 let isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
     

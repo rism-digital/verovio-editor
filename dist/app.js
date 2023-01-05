@@ -29,8 +29,7 @@ import { PDFGenerator } from './pdf-generator.js';
 import { ResponsiveView } from './responsive-view.js';
 import { RNGLoader } from './rng-loader.js';
 import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './worker-proxy.js';
-import { elt } from '../js/utils/functions.js';
-import { appendAnchorTo, appendDivTo, appendInputTo, appendTextAreaTo } from './utils/functions.js';
+import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 let filter = '/svg/filter.xml';
 const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;
 const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
@@ -76,7 +75,7 @@ export class App {
         while (this.element.firstChild) {
             this.element.firstChild.remove();
         }
-        document.head.appendChild(elt('link', { href: `/css/verovio.css`, rel: `stylesheet` }));
+        appendLinkTo(document.head, { href: `/css/verovio.css`, rel: `stylesheet` });
         this.loadingCount = 0;
         this.eventManager = new EventManager(this);
         this.customEventManager = new CustomEventManager();
@@ -122,7 +121,7 @@ export class App {
         this.customEventManager.bind(this, 'onResized', this.onResized);
         let event = new CustomEvent('onResized');
         this.customEventManager.dispatch(event);
-        const verovioWorker = new Worker('/js-dist/verovio-worker.js');
+        const verovioWorker = new Worker('/dist/verovio-worker.js');
         this.verovio = new VerovioWorkerProxy(verovioWorker);
         this.settings =
             {
@@ -137,7 +136,7 @@ export class App {
             };
         this.pageCount = 0;
         this.currentZoomIndex = 4;
-        const validatorWorker = new Worker('/js-dist/validator-worker.js');
+        const validatorWorker = new Worker('/dist/validator-worker.js');
         this.validator = new ValidatorWorkerProxy(validatorWorker);
         this.rngLoader = new RNGLoader();
         // Set to true when everything is loaded

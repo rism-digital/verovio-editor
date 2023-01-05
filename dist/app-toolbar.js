@@ -7,7 +7,6 @@ import { DocumentView } from './document-view.js';
 import { EditorPanel } from './editor-panel.js';
 import { ResponsiveView } from './responsive-view.js';
 import { Toolbar } from './toolbar.js';
-import { elt } from '../js/utils/functions.js';
 import { appendDivTo } from './utils/functions.js';
 export class AppToolbar extends Toolbar {
     constructor(div, app) {
@@ -73,7 +72,7 @@ export class AppToolbar extends Toolbar {
         this.app.eventManager.bind(fileExport, 'click', this.app.fileExport);
         const fileCopy = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Copy MEI to clipboard` });
         this.app.eventManager.bind(fileCopy, 'click', this.app.fileCopyToClipboard);
-        fileMenuContent.appendChild(elt('div', { class: `vrv-v-separator` }));
+        appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
         const fileExportPDF = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as PDF` });
         this.app.eventManager.bind(fileExportPDF, 'click', this.app.fileExportPDF);
         const fileExportMIDI = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MIDI` });

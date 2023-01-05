@@ -15,6 +15,24 @@ window.ULONG_MAX = 4294967295;
 window._EM_signalStop = 0;
 window._EM_seekSamples = ULONG_MAX;
 
+export function loadScript( url, callback, caller )
+{
+    // Adding the script tag to the head as suggested before
+    var head = document.head;
+    var script = document.createElement( 'script' );
+    script.type = 'text/javascript';
+    script.src = url;
+
+    // Then bind the event to the callback function.
+    // There are several events for cross browser compatibility.
+    script.onreadystatechange = callback;
+    script.onload = callback;
+    script.caller = caller;
+
+    // Fire the loading
+    head.appendChild( script );
+}
+
 window.processAudio = function ( buffer_loc, size ) 
 {
     let buffer = circularBuffer.prepare();

@@ -1,14 +1,23 @@
 export function appendAnchorTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'a');
 }
+export function appendCanvasTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'canvas');
+}
 export function appendDivTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'div');
 }
 export function appendInputTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'input');
 }
+export function appendLinkTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'link');
+}
 export function appendTextAreaTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'textarea');
+}
+export function randomHex(digits) {
+    return Math.floor((1 + Math.random()) * Math.pow(16, digits)).toString(16).substring(1);
 }
 function appendHTMLElementTo(parent, options, tag) {
     const element = document.createElement(tag);
