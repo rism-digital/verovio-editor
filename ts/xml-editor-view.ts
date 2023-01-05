@@ -317,6 +317,8 @@ export class XMLEditorView extends GenericView
         this.CMeditor.refresh();
         this.CMeditor.setSize( this.element.style.width, this.element.style.height );
 
+        this.skipValidation = !this.app.options.editorSplitterShow;
+
         return true;
     }
 

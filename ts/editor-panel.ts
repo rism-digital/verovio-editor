@@ -11,7 +11,6 @@ import { RNGLoader } from './rng-loader.js';
 import { ValidatorWorkerProxy, VerovioWorkerProxy } from './worker-proxy.js';
 import { XMLEditorView } from './xml-editor-view.js';
 
-import { elt } from '../js/utils/functions.js';
 import { appendDivTo } from './utils/functions.js';
 
 export class EditorPanel extends GenericView
