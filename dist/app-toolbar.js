@@ -30,19 +30,19 @@ export class AppToolbar extends Toolbar {
         appendDivTo(viewSelectorSubmenuContent, { class: `vrv-v-separator` });
         let viewCount = 0;
         if (this.app.options.enableDocument) {
-            this.viewDocument = appendDivTo(viewSelectorSubmenuContent, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsDocument})` }, 'data-before': `Document` });
+            this.viewDocument = appendDivTo(viewSelectorSubmenuContent, { class: `vrv-menu-icon-left`, style: { backgroundImage: `url(${iconsDocument})` }, 'data-before': `Document` });
             this.viewDocument.dataset.view = 'document';
             this.app.eventManager.bind(this.viewDocument, 'click', this.app.setView);
             viewCount += 1;
         }
         if (this.app.options.enableResponsive) {
-            this.viewResponsive = appendDivTo(viewSelectorSubmenuContent, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsResponsive})` }, 'data-before': `Responsive` });
+            this.viewResponsive = appendDivTo(viewSelectorSubmenuContent, { class: `vrv-menu-icon-left`, style: { backgroundImage: `url(${iconsResponsive})` }, 'data-before': `Responsive` });
             this.viewResponsive.dataset.view = 'responsive';
             this.app.eventManager.bind(this.viewResponsive, 'click', this.app.setView);
             viewCount += 1;
         }
         if (this.app.options.enableEditor) {
-            this.viewEditor = appendDivTo(viewSelectorSubmenuContent, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsEditor})` }, 'data-before': `Editor` });
+            this.viewEditor = appendDivTo(viewSelectorSubmenuContent, { class: `vrv-menu-icon-left`, style: { backgroundImage: `url(${iconsEditor})` }, 'data-before': `Editor` });
             this.viewEditor.dataset.view = 'editor';
             this.app.eventManager.bind(this.viewEditor, 'click', this.app.setView);
             viewCount += 1;
