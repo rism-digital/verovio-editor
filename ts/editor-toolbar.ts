@@ -150,7 +150,7 @@ export class EditorToolbar extends Toolbar
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e: CustomEvent ): boolean
+    override onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("EditorToolbar::onActivate");
@@ -160,7 +160,7 @@ export class EditorToolbar extends Toolbar
         return true;
     }
 
-    onEndLoading( e: CustomEvent ): boolean
+    override onEndLoading( e: CustomEvent ): boolean
     {
         if ( !super.onEndLoading( e ) ) return false;
         //console.debug("EditorToolbar::onEndLoading");
@@ -170,7 +170,7 @@ export class EditorToolbar extends Toolbar
         return true;
     }
 
-    onSelect( e: CustomEvent ): boolean
+    override onSelect( e: CustomEvent ): boolean
     {
         if ( !super.onSelect( e ) ) return false;
         //console.debug("EditorToolbar::onSelect");
@@ -181,7 +181,7 @@ export class EditorToolbar extends Toolbar
         return true;
     }
 
-    onStartLoading( e: CustomEvent ): boolean
+    override onStartLoading( e: CustomEvent ): boolean
     {
         if ( !super.onStartLoading( e ) ) return false;
         //console.debug("EditorToolbar:onStartLoading");
@@ -192,7 +192,7 @@ export class EditorToolbar extends Toolbar
         return true;
     }
 
-    onUpdateView( e: CustomEvent ): boolean
+    override onUpdateView( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("EditorToolbar::onUpdate");

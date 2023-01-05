@@ -164,7 +164,7 @@ export class MidiToolbar extends Toolbar
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e: CustomEvent ): boolean
+    override onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("MidiToolbar::onActivate");
@@ -174,7 +174,7 @@ export class MidiToolbar extends Toolbar
         return true;
     }
 
-    onEndLoading( e: CustomEvent ): boolean
+    override onEndLoading( e: CustomEvent ): boolean
     {
         if ( !super.onEndLoading( e ) ) return false;
         //console.debug("MidiToolbar::onEndLoading");

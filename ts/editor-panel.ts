@@ -174,7 +174,7 @@ export class EditorPanel extends GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e: CustomEvent ): boolean
+    override onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("EditorPanel::onActivate");
@@ -182,7 +182,7 @@ export class EditorPanel extends GenericView
         this.updateSize();
     }
 
-    onResized( e: CustomEvent ): boolean
+    override onResized( e: CustomEvent ): boolean
     {
         if ( !super.onResized( e ) ) return false;
         //console.debug("EditorPanel::onResized");
@@ -190,7 +190,7 @@ export class EditorPanel extends GenericView
         this.updateSize();
     }
 
-    onUpdateView( e: CustomEvent ): boolean
+    override onUpdateView( e: CustomEvent ): boolean
     {
         if ( !super.onUpdateView( e ) ) return false;
 

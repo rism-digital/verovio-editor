@@ -322,7 +322,7 @@ export class AppToolbar extends Toolbar
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onActivate( e: CustomEvent ): boolean
+    override onActivate( e: CustomEvent ): boolean
     {
         if ( !super.onActivate( e ) ) return false;
         //console.debug("AppToolbar::onActivate");
@@ -332,7 +332,7 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    onEndLoading( e: CustomEvent ): boolean
+    override onEndLoading( e: CustomEvent ): boolean
     {
         if ( !super.onEndLoading( e ) ) return false;
         //console.debug("AppToolbar::onEndLoading");
@@ -342,7 +342,7 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    onStartLoading( e: CustomEvent ): boolean
+    override onStartLoading( e: CustomEvent ): boolean
     {
         if ( !super.onStartLoading( e ) ) return false;
         //console.debug("AppToolbar:onStartLoading");
@@ -355,7 +355,7 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    onUpdateView( e: CustomEvent ): boolean
+    override onUpdateView( e: CustomEvent ): boolean
     {
         if ( !super.onUpdateView( e ) ) return false;
         //console.debug("AppToolbar::onUpdate");
