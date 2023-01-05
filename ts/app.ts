@@ -14,7 +14,7 @@ import { DocumentView } from './document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from './editor-panel.js';
 import { EventManager } from './event-manager.js';
-import { FileStack } from './file-stack.js';
+import { FileStack, File } from './file-stack.js';
 import { GenericView } from './generic-view.js';
 import { GitHubManager } from './github-manager.js';
 import { MidiPlayer } from './midi-player.js';
@@ -38,6 +38,7 @@ const aboutMsg = `The Verovio Editor is an experimental online MEI editor protot
 const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`
 
 export interface AppOptions {
+    appReset?: boolean;
     defaultView: string;
     documentViewPageBorder: number;
     documentViewSVG: boolean;
@@ -132,7 +133,7 @@ export class App
     currentZoomIndex: number;
     currentSchema: string;
 
-    constructor( div: HTMLDivElement, opts? )
+    constructor( div: HTMLDivElement, opts?: AppOptions )
     {
         this.clientId = "fd81068a15354a300522";
         this.host = "https://editor.verovio.org";
@@ -166,7 +167,7 @@ export class App
             defaultView: 'responsive',
         }, opts );
 
-        if ( opts.reset ) window.localStorage.removeItem( "options" );
+        if ( opts.appReset ) window.localStorage.removeItem( "options" );
 
         const storedOptions = localStorage.getItem( "options" );
         if ( storedOptions )
@@ -175,7 +176,7 @@ export class App
         }
 
         this.fileStack = new FileStack();
-        if ( opts.reset ) this.fileStack.reset();
+        if ( opts.appReset ) this.fileStack.reset();
 
         // Root element in which verovio-ui is created
         this.element = div;
@@ -200,7 +201,7 @@ export class App
         this.createFilter();
 
         // Create input for reading files
-        this.input = appendInputTo (this.element, { type: `file`, class: `vrv-file-input` } );
+        this.input = appendInputTo(this.element, { type: `file`, class: `vrv-file-input` } );
         this.input.onchange = this.fileInput.bind( this );
 
         // Create link for writing files
@@ -285,7 +286,7 @@ export class App
 
         this.mei = "";
         this.filename = "untitled.xml";
-        const last = this.fileStack.getLast();
+        const last: File = this.fileStack.getLast();
         if ( last )
         {
             console.log( "Reloading", last.filename );
@@ -334,7 +335,7 @@ export class App
         } );
     }
 
-    destroy()
+    destroy(): void
     {
         this.eventManager.unbindAll();
     }
@@ -343,7 +344,7 @@ export class App
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    createViews()
+    createViews(): void
     {
         this.startLoading( "Loading the views ..." );
 
@@ -404,7 +405,7 @@ export class App
         //this.customEventManager.dispatch( eventResized );
     }
 
-    createToolbar()
+    createToolbar(): void
     {
         this.appToolbar = new AppToolbar( this.toolbar, this );
         this.customEventManager.addToPropagationList( this.appToolbar.customEventManager );
@@ -413,7 +414,7 @@ export class App
         this.customEventManager.addToPropagationList( this.midiToolbar.customEventManager );
     }
 
-    createStatusbar()
+    createStatusbar(): void
     {
         if ( !this.options.enableStatusbar ) return;
 
@@ -421,10 +422,9 @@ export class App
         this.customEventManager.addToPropagationList( this.appStatusbar.customEventManager );
     }
 
-    createFilter()
+    createFilter(): void
     {
-        const filterDiv = elt( 'div', { class: `vrv-filter` } );
-        this.element.appendChild( filterDiv );
+        const filterDiv = appendDivTo( this.element, { class: `vrv-filter` } );
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -437,7 +437,7 @@ export class App
         xhttp.send();
     }
 
-    loadData( mei, filename = "untitled.xml", convert = false, onlyIfEmpty = false )
+    loadData( mei: string, filename: string = "untitled.xml", convert: boolean = false, onlyIfEmpty: boolean = false ): void
     {
         if ( this.mei.length != 0 )
         {
@@ -455,7 +455,7 @@ export class App
         }
     }
 
-    startLoading( msg, light = false )
+    startLoading( msg: string, light: boolean = false ): void
     {
         if ( light )
         {
@@ -478,7 +478,7 @@ export class App
         this.customEventManager.dispatch( event );
     }
 
-    endLoading( light = false )
+    endLoading( light: boolean = false ): void
     {
         if ( !light )
         {
@@ -497,7 +497,7 @@ export class App
         this.customEventManager.dispatch( event );
     }
 
-    showNotification( message )
+    showNotification( message: string ): void
     {
         this.notification.innerHTML = message;
         this.notification.classList.remove( "disabled" );
@@ -513,7 +513,7 @@ export class App
     // Async methods
     ////////////////////////////////////////////////////////////////////////
 
-    async loadMEI( convert: boolean )
+    async loadMEI( convert: boolean ): Promise<any>
     {
         this.startLoading( "Loading the MEI data ..." );
 
@@ -537,7 +537,7 @@ export class App
         this.view.customEventManager.dispatch( event );
     }
 
-    async checkSchema()
+    async checkSchema(): Promise<any>
     {
         const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
         const hasSchemaMatch = hasSchema.exec( this.mei );
@@ -560,14 +560,14 @@ export class App
         }
     }
 
-    async playMEI()
+    async playMEI(): Promise<any>
     {
         const base64midi = await this.verovio.renderToMIDI();
         const midiFile = 'data:audio/midi;base64,' + base64midi;
         this.midiPlayer.playFile( midiFile );
     }
 
-    async generatePDF()
+    async generatePDF(): Promise<any>
     {
         if ( !this.pdf )
         {
@@ -585,7 +585,7 @@ export class App
         this.output.click();
     }
 
-    async generateMIDI()
+    async generateMIDI(): Promise<any>
     {
         const midiOutputStr = await this.verovio.renderToMIDI();
 
@@ -596,7 +596,7 @@ export class App
         this.output.click();
     }
 
-    async confirmLargeFileLoading( size )
+    async confirmLargeFileLoading( size: number ): Promise<any>
     {
         // Approx. 1 MB limit - fairly arbitrarily
         if ( size < 1000000 ) return true;
@@ -611,7 +611,7 @@ export class App
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onResized( e )
+    onResized( e: CustomEvent ): boolean
     {
         // Minimal height and width
         //if (this.element.clientHeight < 400) this.element.style.height = `${400}px`;
@@ -636,7 +636,7 @@ export class App
     // Window event handlers
     ////////////////////////////////////////////////////////////////////////
 
-    onBeforeUnload( e )
+    onBeforeUnload( e: Event ): void
     {
         if ( this.appReset ) return;
 
@@ -653,7 +653,7 @@ export class App
         this.fileStack.store( this.filename, this.mei );
     }
 
-    onResize( e )
+    onResize( e: Event ): void
     {
         clearTimeout( this.resizeTimer );
         const timerThis = this;
@@ -669,7 +669,7 @@ export class App
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 
-    prevPage( e )
+    prevPage( e: MouseEvent ): void
     {
         if ( this.toolbarView.currentPage > 1 )
         {
@@ -680,7 +680,7 @@ export class App
         }
     }
 
-    nextPage( e )
+    nextPage( e: MouseEvent ): void
     {
         if ( this.toolbarView.currentPage < this.pageCount )
         {
@@ -691,7 +691,7 @@ export class App
         }
     }
 
-    zoomOut( e )
+    zoomOut( e: MouseEvent ): void
     {
         if ( this.toolbarView.currentZoomIndex > 0 )
         {
@@ -702,7 +702,7 @@ export class App
         }
     }
 
-    zoomIn( e )
+    zoomIn( e: MouseEvent ): void
     {
         if ( this.toolbarView.currentZoomIndex < this.zoomLevels.length - 1 )
         {
@@ -713,55 +713,57 @@ export class App
         }
     }
 
-    async fileImport( e )
+    async fileImport( e: MouseEvent ): Promise<any>
     {
-        if ( e.target.dataset.ext === 'MEI' ) this.input.accept = ".xml, .mei";
-        else if ( e.target.dataset.ext === 'MusicXML' ) this.input.accept = ".xml, .musicxml";
-        //console.log( e.target.dataset.ext );
-        this.input.dataset.ext = e.target.dataset.ext;
+        const element = e.target as HTMLElement;
+        if ( element.dataset.ext === 'MEI' ) this.input.accept = ".xml, .mei";
+        else if ( element.dataset.ext === 'MusicXML' ) this.input.accept = ".xml, .musicxml";
+        //console.log( element.dataset.ext );
+        this.input.dataset.ext = element.dataset.ext;
         this.input.click();
     }
 
-    async fileInput( e )
+    async fileInput(e: InputEvent): Promise<any>
     {
-        let file = e.target.files[0];
+        const element = e.target as HTMLInputElement;
+        let file = element.files[0];
         if ( !file ) return;
 
         let reader = new FileReader();
         const readerThis = this;
         const filename = file.name;
-        const convert = ( e.target.dataset.ext != 'MEI' ) ? true : false;
+        const convert = ( element.dataset.ext != 'MEI' ) ? true : false;
         reader.onload = async function ( e )
         {
             if ( readerThis.view instanceof EditorPanel )
             {
-                if ( await readerThis.confirmLargeFileLoading( e.target.result ) !== true ) return;
+                if ( await readerThis.confirmLargeFileLoading( file.size ) !== true ) return;
             }
-            readerThis.loadData( e.target.result, filename, convert );
+            readerThis.loadData( e.target.result as string, filename, convert );
         };
         reader.readAsText( file );
     }
 
-    async fileExport( e )
+    async fileExport( e: Event ): Promise<any>
     {
         this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent( this.mei );
         this.output.download = this.filename;
         this.output.click();
     }
 
-    async fileExportPDF( e )
+    async fileExportPDF( e: Event ): Promise<any>
     {
         this.startLoading( "Generating PDF file ..." );
         this.generatePDF();
     }
 
-    async fileExportMIDI( e )
+    async fileExportMIDI( e: Event ): Promise<any>
     {
         this.startLoading( "Generating MIDI file ..." );
         this.generateMIDI();
     }
 
-    async fileCopyToClipboard( e )
+    async fileCopyToClipboard( e: Event ): Promise<any>
     {
         this.fileCopy.value = this.mei;
         this.fileCopy.select();
@@ -769,24 +771,25 @@ export class App
         this.showNotification( "MEI copied to clipboard" );
     }
 
-    async fileLoadRecent( e )
+    async fileLoadRecent( e: Event ): Promise<any>
     {
+        const element = e.target as HTMLElement;
         //console.log( e.target.dataset.idx );
-        let file = this.fileStack.load( e.target.dataset.idx );
+        let file = this.fileStack.load( Number(element.dataset.idx) );
         this.loadData( file.data, file.filename );
     }
 
-    async githubImport( e )
+    async githubImport( e: Event ): Promise<any>
     {
         const dlg = new DialogGhImport( this.dialog, this, "Import an MEI file from GitHub", {}, this.githubManager );
         const dlgRes = await dlg.show();
         if ( dlgRes === 1 )
         {
-            this.loadData( dlg.data, dlg.filename );
+            this.loadData( dlg.data as string, dlg.filename );
         }
     }
 
-    async githubExport( e )
+    async githubExport( e: Event ): Promise<any>
     {
         const dlg = new DialogGhExport( this.dialog, this, "Export an MEI file to GitHub", {}, this.githubManager );
         const dlgRes = await dlg.show();
@@ -795,10 +798,11 @@ export class App
         }
     }
 
-    async xmlOverwriteMEI( e )
+    async xmlOverwriteMEI( e: Event ): Promise<any>
     {
+        const element = e.target as HTMLElement;
         let params = {}
-        if ( e.target.dataset.noIds == 'true' ) params["removeIds"] = true
+        if ( element.dataset.noIds == 'true' ) params["removeIds"] = true
         const mei = await this.verovio.getMEI( params );
         this.mei = mei;
         let event = new CustomEvent( 'onUpdateData', {
@@ -810,19 +814,19 @@ export class App
         this.customEventManager.dispatch( event );
     }
 
-    async xmlIndent( e )
+    async xmlIndent( e: Event ): Promise<any>
     {
         // Not sure how to through this event?
     }
 
-    async helpAbout( e )
+    async helpAbout( e: Event ): Promise<any>
     {
         const dlg = new Dialog( this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: DialogType.Msg } );
         dlg.setContent( marked.parse(aboutMsg) );
         await dlg.show();
     }
 
-    async helpReset( e )
+    async helpReset( e: Event ): Promise<any>
     {
         const dlg = new Dialog( this.dialog, this, "Reset to default", { okLabel: "Yes", icon: "question" } );
         dlg.setContent( marked.parse( resetMsg ) );
@@ -833,24 +837,26 @@ export class App
         location.reload();
     }
 
-    login( e )
+    login( e: Event ): void
     {
         location.href = `https://github.com/login/oauth/authorize?client_id=${ this.clientId }&redirect_uri=${ this.host }/oauth/redirect&scope=public_repo%20read:org`;
     }
 
-    logout( e )
+    logout( e: Event ): void
     {
         location.href = `${ this.host }/oauth/logout`;
     }
 
-    async setView( e )
+    async setView( e: Event ): Promise<any>
     {
+        const element = e.target as HTMLElement;
+
         if ( this.midiToolbar && this.midiToolbar.playing )
         {
             this.midiPlayer.stop();
         }
 
-        if ( e.target.dataset.view === 'editor' )
+        if ( element.dataset.view === 'editor' )
         {
             if ( await this.confirmLargeFileLoading( this.mei.length ) !== true ) return;
         }
@@ -858,17 +864,17 @@ export class App
         let event = new CustomEvent( 'onDeactivate' );
         this.view.customEventManager.dispatch( event );
 
-        if ( e.target.dataset.view == 'document' )
+        if ( element.dataset.view == 'document' )
         {
             this.view = this.viewDocument;
             this.toolbarView = this.viewDocument;
         }
-        else if ( e.target.dataset.view == 'editor' )
+        else if ( element.dataset.view == 'editor' )
         {
             this.view = this.viewEditor;
             this.toolbarView = this.viewEditor.editorView;
         }
-        else if ( e.target.dataset.view == 'responsive' )
+        else if ( element.dataset.view == 'responsive' )
         {
             this.view = this.viewResponsive;
             this.toolbarView = this.viewResponsive;

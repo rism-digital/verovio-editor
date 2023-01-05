@@ -60,14 +60,14 @@ export class App {
             schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
             defaultView: 'responsive',
         }, opts);
-        if (opts.reset)
+        if (opts.appReset)
             window.localStorage.removeItem("options");
         const storedOptions = localStorage.getItem("options");
         if (storedOptions) {
             this.options = Object.assign(this.options, JSON.parse(storedOptions));
         }
         this.fileStack = new FileStack();
-        if (opts.reset)
+        if (opts.appReset)
             this.fileStack.reset();
         // Root element in which verovio-ui is created
         this.element = div;
@@ -246,8 +246,7 @@ export class App {
         this.customEventManager.addToPropagationList(this.appStatusbar.customEventManager);
     }
     createFilter() {
-        const filterDiv = elt('div', { class: `vrv-filter` });
-        this.element.appendChild(filterDiv);
+        const filterDiv = appendDivTo(this.element, { class: `vrv-filter` });
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
@@ -484,28 +483,30 @@ export class App {
     }
     fileImport(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (e.target.dataset.ext === 'MEI')
+            const element = e.target;
+            if (element.dataset.ext === 'MEI')
                 this.input.accept = ".xml, .mei";
-            else if (e.target.dataset.ext === 'MusicXML')
+            else if (element.dataset.ext === 'MusicXML')
                 this.input.accept = ".xml, .musicxml";
-            //console.log( e.target.dataset.ext );
-            this.input.dataset.ext = e.target.dataset.ext;
+            //console.log( element.dataset.ext );
+            this.input.dataset.ext = element.dataset.ext;
             this.input.click();
         });
     }
     fileInput(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            let file = e.target.files[0];
+            const element = e.target;
+            let file = element.files[0];
             if (!file)
                 return;
             let reader = new FileReader();
             const readerThis = this;
             const filename = file.name;
-            const convert = (e.target.dataset.ext != 'MEI') ? true : false;
+            const convert = (element.dataset.ext != 'MEI') ? true : false;
             reader.onload = function (e) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (readerThis.view instanceof EditorPanel) {
-                        if ((yield readerThis.confirmLargeFileLoading(e.target.result)) !== true)
+                        if ((yield readerThis.confirmLargeFileLoading(file.size)) !== true)
                             return;
                     }
                     readerThis.loadData(e.target.result, filename, convert);
@@ -543,8 +544,9 @@ export class App {
     }
     fileLoadRecent(e) {
         return __awaiter(this, void 0, void 0, function* () {
+            const element = e.target;
             //console.log( e.target.dataset.idx );
-            let file = this.fileStack.load(e.target.dataset.idx);
+            let file = this.fileStack.load(Number(element.dataset.idx));
             this.loadData(file.data, file.filename);
         });
     }
@@ -567,8 +569,9 @@ export class App {
     }
     xmlOverwriteMEI(e) {
         return __awaiter(this, void 0, void 0, function* () {
+            const element = e.target;
             let params = {};
-            if (e.target.dataset.noIds == 'true')
+            if (element.dataset.noIds == 'true')
                 params["removeIds"] = true;
             const mei = yield this.verovio.getMEI(params);
             this.mei = mei;
@@ -613,24 +616,25 @@ export class App {
     }
     setView(e) {
         return __awaiter(this, void 0, void 0, function* () {
+            const element = e.target;
             if (this.midiToolbar && this.midiToolbar.playing) {
                 this.midiPlayer.stop();
             }
-            if (e.target.dataset.view === 'editor') {
+            if (element.dataset.view === 'editor') {
                 if ((yield this.confirmLargeFileLoading(this.mei.length)) !== true)
                     return;
             }
             let event = new CustomEvent('onDeactivate');
             this.view.customEventManager.dispatch(event);
-            if (e.target.dataset.view == 'document') {
+            if (element.dataset.view == 'document') {
                 this.view = this.viewDocument;
                 this.toolbarView = this.viewDocument;
             }
-            else if (e.target.dataset.view == 'editor') {
+            else if (element.dataset.view == 'editor') {
                 this.view = this.viewEditor;
                 this.toolbarView = this.viewEditor.editorView;
             }
-            else if (e.target.dataset.view == 'responsive') {
+            else if (element.dataset.view == 'responsive') {
                 this.view = this.viewResponsive;
                 this.toolbarView = this.viewResponsive;
             }
