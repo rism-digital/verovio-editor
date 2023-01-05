@@ -213,7 +213,7 @@ export class App
         this.wrapper = appendDivTo( this.element, { class: `vrv-wrapper` } );
 
         // Create notification div
-        this.notification = appendDivTo( this.element, { class: `vrv-notification disabled` } );
+        this.notification = appendDivTo( this.wrapper, { class: `vrv-notification disabled` } );
 
         // Create a dialog div
         this.dialog = appendDivTo( this.wrapper, { class: `vrv-dialog` } );
