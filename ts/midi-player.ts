@@ -14,8 +14,7 @@ import { initAudio, startAudio, loadScript } from '../js/utils/midi.js';
 
 const BASE64_MARKER = ';base64,';
 
-export class MidiPlayer
-{
+export class MidiPlayer {
     isLoaded: boolean;
     isAudioInit: boolean;
     input: string;
@@ -31,9 +30,8 @@ export class MidiPlayer
     midiToolbar: MidiToolbar;
     view: ResponsiveView;
 
-    constructor()
-    {
-        loadScript( `${ midiPlayerServer }/wildwebmidi.js`, onMidiLoaded, this );
+    constructor() {
+        loadScript(`${midiPlayerServer}/wildwebmidi.js`, onMidiLoaded, this);
 
         this.isLoaded = false;
         this.isAudioInit = false;
@@ -58,70 +56,57 @@ export class MidiPlayer
     // Public method to be called by the user
     ////////////////////////////////////////////////////////////////////////
 
-    playFile( midiFile: string ): void
-    {
-        if ( !this.isLoaded )
-        {
-            console.warn( "MidiPlayer is not loaded yet" );
+    playFile(midiFile: string): void {
+        if (!this.isLoaded) {
+            console.warn("MidiPlayer is not loaded yet");
             this.input = midiFile;
         }
-        else
-        {
-            let byteArray = this.convertDataURIToBinary( midiFile );
-            if ( this.totalSamples > 0 ) 
-            {
+        else {
+            let byteArray = this.convertDataURIToBinary(midiFile);
+            if (this.totalSamples > 0) {
                 this.stop();
                 // a timeout is necessary because otherwise writing to the disk is not done
                 const timerThis = this;
-                setTimeout( function ()
-                {
-                    timerThis.convertFile( "player.midi", byteArray );
-                }, 200 );
+                setTimeout(function () {
+                    timerThis.convertFile("player.midi", byteArray);
+                }, 200);
             }
-            else
-            {
-                this.convertFile( "player.midi", byteArray );
+            else {
+                this.convertFile("player.midi", byteArray);
             }
         }
     }
 
-    play(): void
-    {
-        if ( !this.isLoaded )
-        {
-            console.error( "MidiPlayer is not loaded yet" );
+    play(): void {
+        if (!this.isLoaded) {
+            console.error("MidiPlayer is not loaded yet");
             return;
         }
-        if ( !this.isAudioInit )
-        {
+        if (!this.isAudioInit) {
             initAudio();
             this.isAudioInit = true;
         }
 
-        if ( this.midiToolbar )
-        {
+        if (this.midiToolbar) {
             this.midiToolbar.pausing = false;
             this.midiToolbar.playing = true;
             this.midiToolbar.updateAll();
         }
 
         window._EM_seekSamples = this.currentSamples;
-        if ( this.convertionJob )
-        {
+        if (this.convertionJob) {
             return;
         }
 
         window._EM_signalStop = 0;
 
         const timerThis = this;
-        setTimeout( function ()
-        {
+        setTimeout(function () {
             timerThis.runConversion();
-        }, 100 );
+        }, 100);
     }
 
-    stop(): void
-    {
+    stop(): void {
         window._EM_signalStop = 1;
         window._EM_seekSamples = 0;
         //@ts-ignore
@@ -132,24 +117,21 @@ export class MidiPlayer
         this.totalSamples = 0;
         this.totalTimeStr = "0.00";
 
-        if ( this.midiToolbar )
-        {
+        if (this.midiToolbar) {
             this.midiToolbar.pausing = false;
             this.midiToolbar.playing = false;
             this.midiToolbar.updateAll();
         }
 
-        if ( this.view ) this.view.midiStop();
+        if (this.view) this.view.midiStop();
     }
 
-    pause(): void
-    {
+    pause(): void {
         window._EM_signalStop = 2;
         //@ts-ignore
         circularBuffer.reset();
 
-        if ( this.midiToolbar )
-        {
+        if (this.midiToolbar) {
             this.midiToolbar.pausing = true;
             this.midiToolbar.playing = false;
             this.midiToolbar.updateAll();
@@ -160,22 +142,20 @@ export class MidiPlayer
     // Internal methods for updating the UI
     ////////////////////////////////////////////////////////////////////////
 
-    onUpdate( time: number ): void
-    {
+    onUpdate(time: number): void {
         this.midiToolbar.updateProgressBar();
         // add callback?
-        if ( this.view ) this.view.midiUpdate( time );
+        if (this.view) this.view.midiUpdate(time);
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Internal methods
     ////////////////////////////////////////////////////////////////////////
 
-    runConversion(): void
-    {
+    runConversion(): void {
         this.convertionJob = {
             sourceMidi: this.midiName,
-            targetWav: this.midiName.replace( /\.midi?$/i, '.wav' ),
+            targetWav: this.midiName.replace(/\.midi?$/i, '.wav'),
             targetPath: '',
             conversion_start: Date.now()
         };
@@ -187,35 +167,32 @@ export class MidiPlayer
 
         //console.log( this.convertionJob );
 
-        MidiPlayerModule.ccall( 'wildwebmidi',
+        MidiPlayerModule.ccall('wildwebmidi',
             null, ['string', 'string', 'number'], [this.convertionJob.sourceMidi, this.convertionJob.targetPath, sleep], {
             async: true
-        } );
+        });
     }
 
-    convertDataURIToBinary( dataURI: string ): Uint8Array
-    {
-        let base64Index = dataURI.indexOf( BASE64_MARKER ) + BASE64_MARKER.length;
-        let base64 = dataURI.substring( base64Index );
-        let raw = window.atob( base64 );
+    convertDataURIToBinary(dataURI: string): Uint8Array {
+        let base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+        let base64 = dataURI.substring(base64Index);
+        let raw = window.atob(base64);
         let rawLength = raw.length;
-        let array = new Uint8Array( new ArrayBuffer( rawLength ) );
+        let array = new Uint8Array(new ArrayBuffer(rawLength));
 
-        for ( let i = 0; i < rawLength; i++ )
-        {
-            array[i] = raw.charCodeAt( i );
+        for (let i = 0; i < rawLength; i++) {
+            array[i] = raw.charCodeAt(i);
         }
         return array;
     }
 
-    convertFile( file: string, data: Uint8Array ): void
-    {
+    convertFile(file: string, data: Uint8Array): void {
         this.midiName = file;
         this.input = null;
         //console.log('open ', this.midiName);
-        MidiPlayerModule['FS'].writeFile( this.midiName, data, {
+        MidiPlayerModule['FS'].writeFile(this.midiName, data, {
             encoding: 'binary'
-        } );
+        });
         this.play();
     }
 

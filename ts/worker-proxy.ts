@@ -4,22 +4,18 @@ import { Deferred } from "./deferred.js";
 let id: number = 1;
 let callList: Map<number, Deferred> = new Map<number, Deferred>;
 
-export class WorkerProxy
-{
+export class WorkerProxy {
     private worker: Worker;
 
-    constructor(worker: Worker)
-    {
+    constructor(worker: Worker) {
         this.worker = worker;
         // Listen to response of the service worker
-        this.worker.addEventListener("message", (event) =>
-        {
-            const {taskId, result} = event.data;
+        this.worker.addEventListener("message", (event) => {
+            const { taskId, result } = event.data;
             // Check if there is a Deferred instance in workerTasks
             const task: Deferred | undefined = callList.get(taskId);
 
-            if (task)
-            {
+            if (task) {
                 // If so resolve deferred promise and pass the returned value
                 // @ts-ignore
                 task.resolve(result);
@@ -30,10 +26,8 @@ export class WorkerProxy
 
         // Return a Proxy so it is possible to catch all property and method or function calls of the worker
         return new Proxy(this, {
-            get: (target, method) =>
-            {
-                return function ()
-                {
+            get: (target, method) => {
+                return function () {
                     const taskId = id++;
                     const args = Array.prototype.slice.call(arguments);
 
@@ -56,8 +50,7 @@ export class WorkerProxy
     }
 }
 
-export class PDFWorkerProxy extends WorkerProxy
-{
+export class PDFWorkerProxy extends WorkerProxy {
     addPage: Function;
     end: Function;
     start: Function;
@@ -67,8 +60,7 @@ export class PDFWorkerProxy extends WorkerProxy
     }
 }
 
-export class ValidatorWorkerProxy extends WorkerProxy
-{
+export class ValidatorWorkerProxy extends WorkerProxy {
     validateNG: Function;
     setRelaxNGSchema: Function;
 
@@ -79,8 +71,7 @@ export class ValidatorWorkerProxy extends WorkerProxy
     }
 }
 
-export class VerovioWorkerProxy extends WorkerProxy
-{
+export class VerovioWorkerProxy extends WorkerProxy {
     edit: Function;
     getElementAttr: Function;
     getElementsAtTime: Function;

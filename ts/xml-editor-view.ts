@@ -16,8 +16,7 @@ declare global {
     const CodeMirror;
 }
 
-export class XMLEditorView extends GenericView
-{
+export class XMLEditorView extends GenericView {
     validator: ValidatorWorkerProxy;
     rngLoader: RNGLoader;
     currentId: string;
@@ -32,9 +31,8 @@ export class XMLEditorView extends GenericView
     CMeditor: any;
     app: App;
 
-    constructor( div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader )
-    {
-        super( div, app )
+    constructor(div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader) {
+        super(div, app)
 
         // Validator object
         this.validator = validator;
@@ -44,8 +42,8 @@ export class XMLEditorView extends GenericView
 
         this.currentId = null;
 
-        this.xmlvalid = appendDivTo( this.element, { class: `vrv-xmlvalid` } );
-        this.xmlEditorView = appendTextAreaTo( this.element, { } );
+        this.xmlvalid = appendDivTo(this.element, { class: `vrv-xmlvalid` });
+        this.xmlEditorView = appendTextAreaTo(this.element, {});
 
         this.updateLinting = null;
         this.currentId = "";
@@ -55,8 +53,8 @@ export class XMLEditorView extends GenericView
         this.formatting = false;
 
         const cmThis = this;
-        
-        this.CMeditor = CodeMirror.fromTextArea( this.xmlEditorView, {
+
+        this.CMeditor = CodeMirror.fromTextArea(this.xmlEditorView, {
             lineNumbers: true,
             readOnly: false,
             autoCloseTags: true,
@@ -78,74 +76,64 @@ export class XMLEditorView extends GenericView
                 "getAnnotations": this.validate,
                 "async": true
             }
-        } );
-        this.CMeditor.on( "cursorActivity", function ( cm )
-        {
-            cmThis.onCursorActivity( cm );
-        } );
+        });
+        this.CMeditor.on("cursorActivity", function (cm) {
+            cmThis.onCursorActivity(cm);
+        });
 
-        this.CMeditor.on( "focus", function ( cm )
-        {
-            cmThis.onFocus( cm );
-        } );
+        this.CMeditor.on("focus", function (cm) {
+            cmThis.onFocus(cm);
+        });
 
-        this.CMeditor.on( "keyHandled", function ( cm, string, event )
-        {
-            cmThis.keyHandled( cm, string, event );
-        } );
-        
+        this.CMeditor.on("keyHandled", function (cm, string, event) {
+            cmThis.keyHandled(cm, string, event);
+        });
+
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async validate( text: string, updateLinting: Function, options ): Promise<any>
-    {
+    async validate(text: string, updateLinting: Function, options): Promise<any> {
         //console.debug( "XMLEditorView::validate");
-        if ( options && options.caller && text )
-        {
+        if (options && options.caller && text) {
             const editor: XMLEditorView = options.caller;
             //console.debug( "XMLEditorView::validate", editor );
 
-            if ( editor.formatting ) return;
-            if ( editor.skipValidation ) return;
+            if (editor.formatting) return;
+            if (editor.skipValidation) return;
 
             // keep the callback
-            if ( editor.xmlvalid )
-            {
-                editor.xmlvalid.classList.remove( "ok" );
-                editor.xmlvalid.classList.remove( "error" );
-                editor.xmlvalid.classList.add( "wait" );
+            if (editor.xmlvalid) {
+                editor.xmlvalid.classList.remove("ok");
+                editor.xmlvalid.classList.remove("error");
+                editor.xmlvalid.classList.add("wait");
             }
             editor.updateLinting = updateLinting;
-            editor.app.startLoading( "Validating ...", true );
-            const validation = await editor.validator.validateNG( text );
-            editor.app.endLoading( true );
-            editor.highlightValidation( text, validation, editor.timestamp );
+            editor.app.startLoading("Validating ...", true);
+            const validation = await editor.validator.validateNG(text);
+            editor.app.endLoading(true);
+            editor.highlightValidation(text, validation, editor.timestamp);
         }
     }
 
-    async suspendedValidate( text: string, updateLinting: Function, options ): Promise<any>
-    {
+    async suspendedValidate(text: string, updateLinting: Function, options): Promise<any> {
         // Do nothing...
     }
 
-    async replaceSchema( schemaFile: string ): Promise<any>
-    {
-        try
-        {
+    async replaceSchema(schemaFile: string): Promise<any> {
+        try {
             const response = await fetch(schemaFile);
             const data = await response.text();
-            const res = await this.validator.setRelaxNGSchema( data );
-            console.log( "New schema loaded", res );
-            this.rngLoader.setRelaxNGSchema( data );
+            const res = await this.validator.setRelaxNGSchema(data);
+            console.log("New schema loaded", res);
+            this.rngLoader.setRelaxNGSchema(data);
             this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags
             return true;
         }
-        catch ( error )
-        {
-            console.log( error );
+        catch (error) {
+            console.log(error);
             return false;
         }
     }
@@ -154,83 +142,71 @@ export class XMLEditorView extends GenericView
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    setCurrent( id: string ): void
-    {
+    setCurrent(id: string): void {
         //console.debug( "XMLEditorView::setCurrent" );
-        const cursor = this.CMeditor.getSearchCursor( `xml:id="${ id }"` );
+        const cursor = this.CMeditor.getSearchCursor(`xml:id="${id}"`);
         cursor.findNext();
-        if ( cursor.atOccurrence )
-        {
+        if (cursor.atOccurrence) {
             // Move with a margin in order to make the highlighted line more visible
-            this.CMeditor.scrollIntoView( { line: cursor.pos.from.line, char: 0 }, this.element.clientHeight / 2 );
-            this.CMeditor.setCursor( cursor.from() );
+            this.CMeditor.scrollIntoView({ line: cursor.pos.from.line, char: 0 }, this.element.clientHeight / 2);
+            this.CMeditor.setCursor(cursor.from());
         }
     }
 
-    highlightValidation( text: string, validation, timestamp: number ): void
-    {
+    highlightValidation(text: string, validation, timestamp: number): void {
         let lines = [];
         let found = [];
         let i = 0;
         let messages = [];
 
-        try
-        {
-            lines = text.split( "\n" );
-            messages = JSON.parse( validation );
-        } catch ( err )
-        {
-            console.log( "could not parse json:", err );
+        try {
+            lines = text.split("\n");
+            messages = JSON.parse(validation);
+        } catch (err) {
+            console.log("could not parse json:", err);
             return;
         }
-        while ( i < messages.length )
-        {
-            let line = Math.max( messages[i].line - 1, 0 );
-            found.push( {
-                from: new CodeMirror.Pos( line, 0 ),
-                to: new CodeMirror.Pos( line, lines[line].length ),
+        while (i < messages.length) {
+            let line = Math.max(messages[i].line - 1, 0);
+            found.push({
+                from: new CodeMirror.Pos(line, 0),
+                to: new CodeMirror.Pos(line, lines[line].length),
                 severity: "error",
                 message: messages[i].message
-            } );
+            });
             i += 1;
         }
-        this.updateLinting( this.CMeditor, found );
-        if ( found.length == 0 )
-        {
-            if ( this.loaded && timestamp === this.timestamp )
-            {
+        this.updateLinting(this.CMeditor, found);
+        if (found.length == 0) {
+            if (this.loaded && timestamp === this.timestamp) {
                 this.app.mei = text;
-                this.app.startLoading( "Updating data ...", true );
-                let event = new CustomEvent( 'onUpdateData', {
+                this.app.startLoading("Updating data ...", true);
+                let event = new CustomEvent('onUpdateData', {
                     detail: {
                         caller: this
                     }
-                } );
-                this.app.customEventManager.dispatch( event );
+                });
+                this.app.customEventManager.dispatch(event);
             }
-            else if ( !this.loaded && timestamp === this.timestamp )
-            {
+            else if (!this.loaded && timestamp === this.timestamp) {
                 this.loaded = true;
             }
-            else
-            {
-                console.log( "Validated data is obsolete" );
+            else {
+                console.log("Validated data is obsolete");
             }
-            this.xmlvalid.classList.remove( "wait" );
-            this.xmlvalid.classList.remove( "error" );
-            this.xmlvalid.classList.add( "ok" );
+            this.xmlvalid.classList.remove("wait");
+            this.xmlvalid.classList.remove("error");
+            this.xmlvalid.classList.add("ok");
         }
-        else
-        {
-            this.xmlvalid.classList.remove( "wait" );
-            this.xmlvalid.classList.remove( "ok" );
-            this.xmlvalid.classList.add( "error" );
+        else {
+            this.xmlvalid.classList.remove("wait");
+            this.xmlvalid.classList.remove("ok");
+            this.xmlvalid.classList.add("error");
         }
     }
 
-    formatXML(): void
-    {
-        console.debug( "XMLEditorView::FormatXML" );
+    formatXML(): void {
+        console.debug("XMLEditorView::FormatXML");
         this.formatting = true;
         this.skipValidation = true;
         // Suspend lint.getAnnotations to avoid recursive callbacks
@@ -238,69 +214,61 @@ export class XMLEditorView extends GenericView
         // Store the current line
         let currentLine = this.CMeditor.getCursor();
         var totalLines = this.CMeditor.lineCount();
-        this.CMeditor.autoFormatRange( { line: 0, ch: 0 }, { line: totalLines } );
+        this.CMeditor.autoFormatRange({ line: 0, ch: 0 }, { line: totalLines });
         // Reset everything
         this.formatting = false;
         this.skipValidation = false;
         this.CMeditor.options.lint.getAnnotations = this.validate;
-        this.CMeditor.setCursor( currentLine );
+        this.CMeditor.setCursor(currentLine);
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Codemirror event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onCursorActivity( cm ): void
-    {
-        if ( this.formatting ) return;
+    onCursorActivity(cm): void {
+        if (this.formatting) return;
 
         const cursor = cm.getCursor();
-        const line = cm.getLine( cursor.line );
-        const id = line.match( /.*xml:id=\"([^"]*)\".*/ );
-        const elementType = line.match( /[^\>]*\<([^\ ]*).*/ );
-        if ( id )
-        {
-            if ( this.currentId !== id[1] )
-            {
-                let event = new CustomEvent( 'onSelect', {
+        const line = cm.getLine(cursor.line);
+        const id = line.match(/.*xml:id=\"([^"]*)\".*/);
+        const elementType = line.match(/[^\>]*\<([^\ ]*).*/);
+        if (id) {
+            if (this.currentId !== id[1]) {
+                let event = new CustomEvent('onSelect', {
                     detail: {
                         id: id[1],
                         elementType: elementType[1],
                         caller: this
                     }
-                } );
+                });
                 //console.debug( "Dispatch-onSelect" );
                 this.skipValidation = false;
-                this.app.customEventManager.dispatch( event );
+                this.app.customEventManager.dispatch(event);
             }
             this.currentId = id[1];
         }
     }
 
-    keyHandled( cm, string, event ): void
-    {
-        if ( event.ctrlKey && event.shiftKey && event.key === "P" )
-        {
+    keyHandled(cm, string, event): void {
+        if (event.ctrlKey && event.shiftKey && event.key === "P") {
             this.formatXML();
         }
-        if ( event.key === "Enter" )
-        {
+        if (event.key === "Enter") {
             let ch = cm.getCursor().ch;
             let line = cm.getCursor().line;
-            let nextChar = cm.getLine( line ).substr( cm.getCursor().ch, 1 );
-            let lastLine = cm.getLine( line - 1 );
-            let lastChar = lastLine.substr( lastLine.length - 1 );
-            if ( lastChar === ">" && nextChar === "<" )
-            {
-                let tabSize = cm.getOption( "tabSize" );
-                cm.doc.replaceRange( " ".repeat( tabSize ) + "\n" + " ".repeat( ch ), cm.getCursor() );
-                cm.setCursor( { line: line, ch: ( ch + tabSize ) } );
+            let nextChar = cm.getLine(line).substr(cm.getCursor().ch, 1);
+            let lastLine = cm.getLine(line - 1);
+            let lastChar = lastLine.substr(lastLine.length - 1);
+            if (lastChar === ">" && nextChar === "<") {
+                let tabSize = cm.getOption("tabSize");
+                cm.doc.replaceRange(" ".repeat(tabSize) + "\n" + " ".repeat(ch), cm.getCursor());
+                cm.setCursor({ line: line, ch: (ch + tabSize) });
             }
         }
     }
 
-    onFocus( cm ): void
-    {
+    onFocus(cm): void {
         //console.debug( "XMLEditorView::onFocus" );
         this.skipValidation = false;
     }
@@ -309,63 +277,58 @@ export class XMLEditorView extends GenericView
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    override onActivate( e: CustomEvent ): boolean
-    {
-        if ( !super.onActivate( e ) ) return false;
+    override onActivate(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
         //console.debug("XMLEditorView::onActivate");
-        this.CMeditor.setValue( this.app.mei );
+        this.CMeditor.setValue(this.app.mei);
         this.CMeditor.refresh();
-        this.CMeditor.setSize( this.element.style.width, this.element.style.height );
+        this.CMeditor.setSize(this.element.style.width, this.element.style.height);
 
         this.skipValidation = !this.app.options.editorSplitterShow;
 
         return true;
     }
 
-    override onLoadData( e: CustomEvent ): boolean
-    {
-        if ( !super.onLoadData( e ) ) return false;
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
         //console.debug("XMLEditorView::onLoadData");
 
         this.timestamp = Date.now();
         this.loaded = false;
-        this.CMeditor.setValue( e.detail.mei );
-        this.setCurrent( this.currentId );
+        this.CMeditor.setValue(e.detail.mei);
+        this.setCurrent(this.currentId);
 
         return true;
     }
 
-    override onSelect( e: CustomEvent ): boolean
-    {
-        if ( !super.onSelect( e ) ) return false;
+    override onSelect(e: CustomEvent): boolean {
+        if (!super.onSelect(e)) return false;
         //console.debug("XMLEditorView::onSelect");
 
         this.currentId = e.detail.id;
-        this.setCurrent( this.currentId );
+        this.setCurrent(this.currentId);
 
         return true;
     }
 
-    override onUpdateData( e: CustomEvent ): boolean
-    {
-        if ( !super.onUpdateData( e ) ) return false;
+    override onUpdateData(e: CustomEvent): boolean {
+        if (!super.onUpdateData(e)) return false;
         //console.debug("XMLEditorView::onUpdateData");
 
         this.timestamp = Date.now();
         this.loaded = true;
         this.skipValidation = true;
-        this.CMeditor.setValue( this.app.mei );
-        this.setCurrent( this.currentId );
+        this.CMeditor.setValue(this.app.mei);
+        this.setCurrent(this.currentId);
 
         return true;
     }
 
-    override onResized( e: CustomEvent ): boolean
-    {
-        if ( !super.onResized( e ) ) return false;
+    override onResized(e: CustomEvent): boolean {
+        if (!super.onResized(e)) return false;
         //console.debug("XMLEditorView::onResized");
 
-        this.CMeditor.setSize( this.element.style.width, this.element.style.height );
+        this.CMeditor.setSize(this.element.style.width, this.element.style.height);
 
         return true;
     }
@@ -376,137 +339,116 @@ export class XMLEditorView extends GenericView
 // Could be move to XMLEditorView:: keyHandled ?
 ////////////////////////////////////////////////////////////////////////
 
-function completeAfter( cm, pred ): void
-{
+function completeAfter(cm, pred): void {
     let cur = cm.getCursor();
-    if ( !pred || pred() ) setTimeout( function ()
-    {
-        if ( !cm.state.completionActive )
-            CodeMirror.showHint( cm, CodeMirror.hint.xml, { schemaInfo: CodeMirror.schemaInfo, completeSingle: false } );
-    }, 100 );
+    if (!pred || pred()) setTimeout(function () {
+        if (!cm.state.completionActive)
+            CodeMirror.showHint(cm, CodeMirror.hint.xml, { schemaInfo: CodeMirror.schemaInfo, completeSingle: false });
+    }, 100);
     return CodeMirror.Pass;
 }
 
-function completeIfAfterLt( cm ): void
-{
-    return completeAfter( cm, function ()
-    {
+function completeIfAfterLt(cm): void {
+    return completeAfter(cm, function () {
         let cur = cm.getCursor();
-        return cm.getRange( CodeMirror.Pos( cur.line, cur.ch - 1 ), cur ) == "<";
-    } );
+        return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
+    });
 }
 
-function completeIfInTag( cm ): void
-{
-    return completeAfter( cm, function ()
-    {
-        let tok = cm.getTokenAt( cm.getCursor() );
-        if ( tok.type == "string" && ( !/['"]/.test( tok.string.charAt( tok.string.length - 1 ) ) || tok.string.length == 1 ) ) return false;
-        let inner = CodeMirror.innerMode( cm.getMode(), tok.state ).state;
+function completeIfInTag(cm): void {
+    return completeAfter(cm, function () {
+        let tok = cm.getTokenAt(cm.getCursor());
+        if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
+        let inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
         return inner.tagName;
-    } );
+    });
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CodeMirror extension for autoFormatRange
 ////////////////////////////////////////////////////////////////////////
 
-CodeMirror.extendMode( "xml", {
+CodeMirror.extendMode("xml", {
     commentStart: "<!--",
     commentEnd: "-->",
-    newlineAfterToken: function ( type, content, textAfter )
-    {
+    newlineAfterToken: function (type, content, textAfter) {
         // Never at new lines for now because this causes problem with text in MEI - e.g., with <rend> spacing
         //return ( type == "tag" && />$/.test( content ) || /^<.</.test( textAfter ) ) || ( type == "tag bracket" && />$/.test( content ) );
         return false;
     }
-} );
+});
 
-CodeMirror.defineExtension( "commentRange", function ( isComment, from, to )
-{
-    var cm = this, curMode = CodeMirror.innerMode( cm.getMode(), cm.getTokenAt( from ).state ).mode;
-    cm.operation( function ()
-    {
-        if ( isComment )
-        { // Comment range
-            cm.replaceRange( curMode.commentEnd, to );
-            cm.replaceRange( curMode.commentStart, from );
-            if ( from.line == to.line && from.ch == to.ch ) // An empty comment inserted - put cursor inside
-                cm.setCursor( from.line, from.ch + curMode.commentStart.length );
-        } else
-        { // Uncomment range
-            var selText = cm.getRange( from, to );
-            var startIndex = selText.indexOf( curMode.commentStart );
-            var endIndex = selText.lastIndexOf( curMode.commentEnd );
-            if ( startIndex > -1 && endIndex > -1 && endIndex > startIndex )
-            {
+CodeMirror.defineExtension("commentRange", function (isComment, from, to) {
+    var cm = this, curMode = CodeMirror.innerMode(cm.getMode(), cm.getTokenAt(from).state).mode;
+    cm.operation(function () {
+        if (isComment) { // Comment range
+            cm.replaceRange(curMode.commentEnd, to);
+            cm.replaceRange(curMode.commentStart, from);
+            if (from.line == to.line && from.ch == to.ch) // An empty comment inserted - put cursor inside
+                cm.setCursor(from.line, from.ch + curMode.commentStart.length);
+        } else { // Uncomment range
+            var selText = cm.getRange(from, to);
+            var startIndex = selText.indexOf(curMode.commentStart);
+            var endIndex = selText.lastIndexOf(curMode.commentEnd);
+            if (startIndex > -1 && endIndex > -1 && endIndex > startIndex) {
                 // Take string till comment start
-                selText = selText.substr( 0, startIndex )
+                selText = selText.substr(0, startIndex)
                     // From comment start till comment end
-                    + selText.substring( startIndex + curMode.commentStart.length, endIndex )
+                    + selText.substring(startIndex + curMode.commentStart.length, endIndex)
                     // From comment end till string end
-                    + selText.substr( endIndex + curMode.commentEnd.length );
+                    + selText.substr(endIndex + curMode.commentEnd.length);
             }
-            cm.replaceRange( selText, from, to );
+            cm.replaceRange(selText, from, to);
         }
-    } );
-} );
+    });
+});
 
-CodeMirror.defineExtension( "autoIndentRange", function ( from, to )
-{
+CodeMirror.defineExtension("autoIndentRange", function (from, to) {
     var cmInstance = this;
-    this.operation( function ()
-    {
-        for ( var i = from.line; i <= to.line; i++ )
-        {
-            cmInstance.indentLine( i, "smart" );
+    this.operation(function () {
+        for (var i = from.line; i <= to.line; i++) {
+            cmInstance.indentLine(i, "smart");
         }
-    } );
-} );
+    });
+});
 
-CodeMirror.defineExtension( "autoFormatRange", function ( from, to )
-{
+CodeMirror.defineExtension("autoFormatRange", function (from, to) {
     var cm = this;
-    var outer = cm.getMode(), text = cm.getRange( from, to ).split( "\n" );
-    var state = CodeMirror.copyState( outer, cm.getTokenAt( from ).state );
-    var tabSize = cm.getOption( "tabSize" );
+    var outer = cm.getMode(), text = cm.getRange(from, to).split("\n");
+    var state = CodeMirror.copyState(outer, cm.getTokenAt(from).state);
+    var tabSize = cm.getOption("tabSize");
 
     var out = "", lines = 0, atSol = from.ch == 0;
-    function newline()
-    {
+    function newline() {
         out += "\n";
         atSol = true;
         ++lines;
     }
 
-    for ( var i = 0; i < text.length; ++i )
-    {
-        var stream = new CodeMirror.StringStream( text[i], tabSize );
-        while ( !stream.eol() )
-        {
-            var inner = CodeMirror.innerMode( outer, state );
-            var style = outer.token( stream, state ), cur = stream.current();
+    for (var i = 0; i < text.length; ++i) {
+        var stream = new CodeMirror.StringStream(text[i], tabSize);
+        while (!stream.eol()) {
+            var inner = CodeMirror.innerMode(outer, state);
+            var style = outer.token(stream, state), cur = stream.current();
             stream.start = stream.pos;
-            if ( !atSol || /\S/.test( cur ) )
-            {
+            if (!atSol || /\S/.test(cur)) {
                 out += cur;
                 atSol = false;
             }
 
-            if ( !atSol && inner.mode.newlineAfterToken &&
-                inner.mode.newlineAfterToken( style, cur, stream.string.slice( stream.pos ) || text[i + 1] || "", inner.state ) )
+            if (!atSol && inner.mode.newlineAfterToken &&
+                inner.mode.newlineAfterToken(style, cur, stream.string.slice(stream.pos) || text[i + 1] || "", inner.state))
                 newline();
         }
-        if ( !stream.pos && outer.blankLine ) outer.blankLine( state );
-        if ( !atSol ) newline();
+        if (!stream.pos && outer.blankLine) outer.blankLine(state);
+        if (!atSol) newline();
     }
 
-    cm.operation( function ()
-    {
-        cm.replaceRange( out, from, to );
-        for ( var cur = from.line + 1, end = from.line + lines; cur <= end; ++cur )
-            cm.indentLine( cur, "smart" );
-        cm.setSelection( from, cm.getCursor( false ) );
-    } );
-} );
+    cm.operation(function () {
+        cm.replaceRange(out, from, to);
+        for (var cur = from.line + 1, end = from.line + lines; cur <= end; ++cur)
+            cm.indentLine(cur, "smart");
+        cm.setSelection(from, cm.getCursor(false));
+    });
+});
 

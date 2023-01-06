@@ -7,12 +7,11 @@
 import { ActionManager } from './action-manager.js';
 import { App } from './app.js';
 import { EditorPanel } from './editor-panel.js';
-import { Toolbar } from './toolbar.js' ; 
+import { Toolbar } from './toolbar.js';
 
 import { appendDivTo } from './utils/functions.js';
 
-export class EditorToolbar extends Toolbar
-{
+export class EditorToolbar extends Toolbar {
     app: App;
     panel: EditorPanel;
     selectedElementType: string;
@@ -37,8 +36,7 @@ export class EditorToolbar extends Toolbar
     stemDirDown: HTMLDivElement;
     stemDirAuto: HTMLDivElement;
 
-    constructor(div: HTMLDivElement, app: App, panel: EditorPanel)
-    {
+    constructor(div: HTMLDivElement, app: App, panel: EditorPanel) {
         let editorStemDirUp = '/icons/editor/stem-dir-up.png';
         let editorStemDirDown = '/icons/editor/stem-dir-down.png';
         let editorStemDirAuto = '/icons/editor/stem-dir-auto.png';
@@ -57,7 +55,7 @@ export class EditorToolbar extends Toolbar
         // sub-toolbar in application 
         this.layoutControls = appendDivTo(this.element, { class: `vrv-btn-group` });
         appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
-        
+
         this.panelOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
         this.panelShow = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
 
@@ -98,61 +96,56 @@ export class EditorToolbar extends Toolbar
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateAll(): void
-    {
-        let iconsLayoutH =  '/icons/toolbar/layout-h.png' ; 
-        let iconsLayoutToggle =  '/icons/toolbar/layout-toggle.png' ; 
-        let iconsLayoutToggleV =  '/icons/toolbar/layout-toggle-v.png' ; 
-        let iconsLayoutUnToggle =  '/icons/toolbar/layout-un-toggle.png' ; 
-        let iconsLayoutUnToggleV =  '/icons/toolbar/layout-un-toggle-v.png' ; 
-        let iconsLayoutV =  '/icons/toolbar/layout-v.png' ; 
+    updateAll(): void {
+        let iconsLayoutH = '/icons/toolbar/layout-h.png';
+        let iconsLayoutToggle = '/icons/toolbar/layout-toggle.png';
+        let iconsLayoutToggleV = '/icons/toolbar/layout-toggle-v.png';
+        let iconsLayoutUnToggle = '/icons/toolbar/layout-un-toggle.png';
+        let iconsLayoutUnToggleV = '/icons/toolbar/layout-un-toggle-v.png';
+        let iconsLayoutV = '/icons/toolbar/layout-v.png';
 
-        let toggleOrientation = ( this.app.options.editorSplitterHorizontal ) ? true : false;
-        let toggle = ( this.app.options.editorSplitterShow ) ? true : false;
-        if ( toggleOrientation )
-        {
-            this.panelOrientation.style.backgroundImage = `url(${ iconsLayoutV })`
-            this.panelShow.style.backgroundImage = toggle ? `url(${ iconsLayoutUnToggle })` : `url(${ iconsLayoutToggle })`;
+        let toggleOrientation = (this.app.options.editorSplitterHorizontal) ? true : false;
+        let toggle = (this.app.options.editorSplitterShow) ? true : false;
+        if (toggleOrientation) {
+            this.panelOrientation.style.backgroundImage = `url(${iconsLayoutV})`
+            this.panelShow.style.backgroundImage = toggle ? `url(${iconsLayoutUnToggle})` : `url(${iconsLayoutToggle})`;
         }
-        else
-        {
-            this.panelOrientation.style.backgroundImage = `url(${ iconsLayoutH })`
-            this.panelShow.style.backgroundImage = toggle ? `url(${ iconsLayoutUnToggleV })` : `url(${ iconsLayoutToggleV })`;
+        else {
+            this.panelOrientation.style.backgroundImage = `url(${iconsLayoutH})`
+            this.panelShow.style.backgroundImage = toggle ? `url(${iconsLayoutUnToggleV})` : `url(${iconsLayoutToggleV})`;
         }
-        this.updateToolbarBtn( this.panelOrientation, toggle );
-        this.updateToolbarBtn( this.panelShow, true );
+        this.updateToolbarBtn(this.panelOrientation, toggle);
+        this.updateToolbarBtn(this.panelShow, true);
 
-        this.updateToolbarToggleBtn( this.notes, ( this.selectedElementType === "NOTES" ) );
-        this.updateToolbarToggleBtn( this.controlEvents, ( this.selectedElementType === "CONTROLEVENTS" ) );
+        this.updateToolbarToggleBtn(this.notes, (this.selectedElementType === "NOTES"));
+        this.updateToolbarToggleBtn(this.controlEvents, (this.selectedElementType === "CONTROLEVENTS"));
 
         // Disable hairpin for now
-        this.updateToolbarGrp( this.hairpinFormControls, false );
+        this.updateToolbarGrp(this.hairpinFormControls, false);
         //this.updateToolbarGrp( this.ui.hairpinFormControls, ["CONTROLEVENTS", "hairpin"].includes( this.selectedElementType ) );
-        this.updateToolbarGrp( this.controlEventControls, ["CONTROLEVENTS", "dir", "dynam", "hairpin", "tempo", "pedal"].includes( this.selectedElementType ) );
-        this.updateToolbarGrp( this.stemControls, ["NOTES", "note", "chord"].includes( this.selectedElementType ) );
+        this.updateToolbarGrp(this.controlEventControls, ["CONTROLEVENTS", "dir", "dynam", "hairpin", "tempo", "pedal"].includes(this.selectedElementType));
+        this.updateToolbarGrp(this.stemControls, ["NOTES", "note", "chord"].includes(this.selectedElementType));
     }
 
-    bindEvents( actionManager: ActionManager ): void
-    {
-        actionManager.eventManager.bind( this.formCres, 'click', actionManager.formCres );
-        actionManager.eventManager.bind( this.formDim, 'click', actionManager.formDim );
+    bindEvents(actionManager: ActionManager): void {
+        actionManager.eventManager.bind(this.formCres, 'click', actionManager.formCres);
+        actionManager.eventManager.bind(this.formDim, 'click', actionManager.formDim);
 
-        actionManager.eventManager.bind( this.placeAbove, 'click', actionManager.placeAbove );
-        actionManager.eventManager.bind( this.placeBelow, 'click', actionManager.placeBelow );
-        actionManager.eventManager.bind( this.placeAuto, 'click', actionManager.placeAuto );
+        actionManager.eventManager.bind(this.placeAbove, 'click', actionManager.placeAbove);
+        actionManager.eventManager.bind(this.placeBelow, 'click', actionManager.placeBelow);
+        actionManager.eventManager.bind(this.placeAuto, 'click', actionManager.placeAuto);
 
-        actionManager.eventManager.bind( this.stemDirUp, 'click', actionManager.stemDirUp );
-        actionManager.eventManager.bind( this.stemDirDown, 'click', actionManager.stemDirDown );
-        actionManager.eventManager.bind( this.stemDirAuto, 'click', actionManager.stemDirAuto );
+        actionManager.eventManager.bind(this.stemDirUp, 'click', actionManager.stemDirUp);
+        actionManager.eventManager.bind(this.stemDirDown, 'click', actionManager.stemDirDown);
+        actionManager.eventManager.bind(this.stemDirAuto, 'click', actionManager.stemDirAuto);
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    override onActivate( e: CustomEvent ): boolean
-    {
-        if ( !super.onActivate( e ) ) return false;
+    override onActivate(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
         //console.debug("EditorToolbar::onActivate");
 
         this.updateAll();
@@ -160,9 +153,8 @@ export class EditorToolbar extends Toolbar
         return true;
     }
 
-    override onEndLoading( e: CustomEvent ): boolean
-    {
-        if ( !super.onEndLoading( e ) ) return false;
+    override onEndLoading(e: CustomEvent): boolean {
+        if (!super.onEndLoading(e)) return false;
         //console.debug("EditorToolbar::onEndLoading");
 
         this.updateAll();
@@ -170,9 +162,8 @@ export class EditorToolbar extends Toolbar
         return true;
     }
 
-    override onSelect( e: CustomEvent ): boolean
-    {
-        if ( !super.onSelect( e ) ) return false;
+    override onSelect(e: CustomEvent): boolean {
+        if (!super.onSelect(e)) return false;
         //console.debug("EditorToolbar::onSelect");
 
         this.selectedElementType = e.detail.elementType;
@@ -181,20 +172,18 @@ export class EditorToolbar extends Toolbar
         return true;
     }
 
-    override onStartLoading( e: CustomEvent ): boolean
-    {
-        if ( !super.onStartLoading( e ) ) return false;
+    override onStartLoading(e: CustomEvent): boolean {
+        if (!super.onStartLoading(e)) return false;
         //console.debug("EditorToolbar:onStartLoading");
 
-        this.updateToolbarBtn( this.panelOrientation, false );
-        this.updateToolbarBtn( this.panelShow, false );
+        this.updateToolbarBtn(this.panelOrientation, false);
+        this.updateToolbarBtn(this.panelShow, false);
 
         return true;
     }
 
-    override onUpdateView( e: CustomEvent ): boolean
-    {
-        if ( !super.onActivate( e ) ) return false;
+    override onUpdateView(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
         //console.debug("EditorToolbar::onUpdate");
 
         this.updateAll();
@@ -206,14 +195,12 @@ export class EditorToolbar extends Toolbar
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onNotes( e: Event ): void
-    {
+    onNotes(e: Event): void {
         this.selectedElementType = "NOTES";
         this.updateAll();
     }
 
-    onControlEvents( e: Event ): void
-    {
+    onControlEvents(e: Event): void {
         this.selectedElementType = "CONTROLEVENTS";
         this.updateAll();
     }

@@ -12,8 +12,7 @@ import { Toolbar } from './toolbar.js';
 
 import { appendDivTo } from './utils/functions.js';
 
-export class AppToolbar extends Toolbar
-{
+export class AppToolbar extends Toolbar {
     viewDocument: HTMLDivElement;
     viewResponsive: HTMLDivElement;
     viewSelector: HTMLDivElement;
@@ -174,10 +173,10 @@ export class AppToolbar extends Toolbar
 
         this.pageControls = appendDivTo(this.element, { class: `vrv-btn-group` });
         appendDivTo(this.pageControls, { class: `vrv-h-separator` });
-        
+
         this.prevPage = appendDivTo(this.pageControls, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsArrowLeft})` }, 'data-before': `Previous` });
         this.app.eventManager.bind(this.prevPage, 'click', this.app.prevPage);
-        
+
         this.nextPage = appendDivTo(this.pageControls, { class: `vrv-btn-icon`, style: { backgroundImage: `url(${iconsArrowRight})` }, 'data-before': `Next` });
         this.app.eventManager.bind(this.nextPage, 'click', this.app.nextPage);
 
@@ -187,10 +186,10 @@ export class AppToolbar extends Toolbar
 
         this.zoomControls = appendDivTo(this.element, { class: `vrv-btn-group` });
         appendDivTo(this.zoomControls, { class: `vrv-h-separator` });
-        
+
         this.zoomOut = appendDivTo(this.zoomControls, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsZoomOut})` }, 'data-before': `Zoom out` });
         this.app.eventManager.bind(this.zoomOut, 'click', this.app.zoomOut);
-        
+
         this.zoomIn = appendDivTo(this.zoomControls, { class: `vrv-btn-icon`, style: { backgroundImage: `url(${iconsZoomIn})` }, 'data-before': `Zoom in` });
         this.app.eventManager.bind(this.zoomIn, 'click', this.app.zoomIn);
 
@@ -228,20 +227,18 @@ export class AppToolbar extends Toolbar
         this.logout = appendDivTo(this.loginGroup, { class: `vrv-btn-text`, style: { display: `none` }, 'data-before': `Logout` });
         this.app.eventManager.bind(this.logout, 'click', this.app.logout);
 
-        this.login = appendDivTo(this.loginGroup, { class: `vrv-btn-icon`, style: { backgroundImage: `url(${iconsGithubSignin})` }, 'data-before': `Github` } );
-        this.app.eventManager.bind( this.login, 'click', this.app.login );
+        this.login = appendDivTo(this.loginGroup, { class: `vrv-btn-icon`, style: { backgroundImage: `url(${iconsGithubSignin})` }, 'data-before': `Github` });
+        this.app.eventManager.bind(this.login, 'click', this.app.login);
 
         // Bindings for hiding menu once an item has be click - the corresponding class is
         // removed when the toolbar is moused over
 
-        for ( const node of this.element.querySelectorAll( 'div.vrv-menu' ) ) 
-        {
-            this.eventManager.bind( node, 'mouseover', this.onMouseOver );
+        for (const node of this.element.querySelectorAll('div.vrv-menu')) {
+            this.eventManager.bind(node, 'mouseover', this.onMouseOver);
         }
 
-        for ( const node of this.element.querySelectorAll( 'div.vrv-menu-text' ) ) 
-        {
-            this.eventManager.bind( node, 'click', this.onClick );
+        for (const node of this.element.querySelectorAll('div.vrv-menu-text')) {
+            this.eventManager.bind(node, 'click', this.onClick);
         }
     }
 
@@ -249,50 +246,46 @@ export class AppToolbar extends Toolbar
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateAll(): void
-    {
-        this.updateToolbarBtn( this.prevPage, ( this.app.toolbarView.currentPage > 1 ) );
-        this.updateToolbarBtn( this.nextPage, ( this.app.toolbarView.currentPage < this.app.pageCount ) );
-        this.updateToolbarBtn( this.zoomOut, ( ( this.app.pageCount > 0 ) && ( this.app.toolbarView.currentZoomIndex > 0 ) ) );
-        this.updateToolbarBtn( this.zoomIn, ( ( this.app.pageCount > 0 ) && ( this.app.toolbarView.currentZoomIndex < this.app.zoomLevels.length - 1 ) ) );
+    updateAll(): void {
+        this.updateToolbarBtn(this.prevPage, (this.app.toolbarView.currentPage > 1));
+        this.updateToolbarBtn(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
+        this.updateToolbarBtn(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex > 0)));
+        this.updateToolbarBtn(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex < this.app.zoomLevels.length - 1)));
 
-        let isResponsive = ( ( this.app.view instanceof ResponsiveView ) && !( this.app.view instanceof EditorPanel ) );
-        let isEditor = ( this.app.view instanceof EditorPanel );
-        let isDocument = ( this.app.view instanceof DocumentView );
+        let isResponsive = ((this.app.view instanceof ResponsiveView) && !(this.app.view instanceof EditorPanel));
+        let isEditor = (this.app.view instanceof EditorPanel);
+        let isDocument = (this.app.view instanceof DocumentView);
 
-        this.updateToolbarGrp( this.pageControls, !isDocument );
+        this.updateToolbarGrp(this.pageControls, !isDocument);
 
-        this.updateToolbarGrp( this.midiPlayerSubToolbar, isResponsive );
-        this.updateToolbarGrp( this.editorSubToolbar, isEditor );
+        this.updateToolbarGrp(this.midiPlayerSubToolbar, isResponsive);
+        this.updateToolbarGrp(this.editorSubToolbar, isEditor);
 
-        this.updateToolbarSubmenuBtn( this.viewDocument, isDocument );
-        this.updateToolbarSubmenuBtn( this.viewResponsive, isResponsive );
-        this.updateToolbarSubmenuBtn( this.viewEditor, isEditor );
+        this.updateToolbarSubmenuBtn(this.viewDocument, isDocument);
+        this.updateToolbarSubmenuBtn(this.viewResponsive, isResponsive);
+        this.updateToolbarSubmenuBtn(this.viewEditor, isEditor);
 
-        this.updateToolbarBtnHide( this.xmlMenu, isEditor );
+        this.updateToolbarBtnHide(this.xmlMenu, isEditor);
 
-        if ( this.app.githubManager.isLoggedIn() )
-        {
+        if (this.app.githubManager.isLoggedIn()) {
             this.githubMenu.style.display = 'block';
-            this.updateToolbarBtnHide( this.logout, true);
-            this.login.setAttribute( "data-before", this.app.githubManager.name );    
-            this.login.classList.add( "inactivated" );
+            this.updateToolbarBtnHide(this.logout, true);
+            this.login.setAttribute("data-before", this.app.githubManager.name);
+            this.login.classList.add("inactivated");
         }
 
         this.updateRecent();
     }
 
-    updateRecent(): void
-    {
+    updateRecent(): void {
         this.subSubMenu.innerHTML = "";
 
-        let fileList: Array<{idx: number, filename: string}>  = this.app.fileStack.fileList();
-        for ( let i = 0; i < fileList.length; i++ )
-        {
-            const entry = appendDivTo( this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename } );
+        let fileList: Array<{ idx: number, filename: string }> = this.app.fileStack.fileList();
+        for (let i = 0; i < fileList.length; i++) {
+            const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename });
             entry.dataset.idx = fileList[i].idx.toString();
-            this.app.eventManager.bind( entry, 'click', this.app.fileLoadRecent );
-            this.eventManager.bind( entry, 'click', this.onClick );
+            this.app.eventManager.bind(entry, 'click', this.app.fileLoadRecent);
+            this.eventManager.bind(entry, 'click', this.onClick);
         }
     }
 
@@ -300,21 +293,17 @@ export class AppToolbar extends Toolbar
     // Mouse methods
     ////////////////////////////////////////////////////////////////////////
 
-    onMouseOver( e: CustomEvent ): void
-    {
-        for ( const node of this.element.querySelectorAll( 'div.vrv-menu-content' ) ) 
-        {
+    onMouseOver(e: CustomEvent): void {
+        for (const node of this.element.querySelectorAll('div.vrv-menu-content')) {
             // Hide the menu content
-            node.classList.remove( "clicked" );
+            node.classList.remove("clicked");
         }
     }
 
-    onClick( e: CustomEvent ): void
-    {
-        for ( const node of this.element.querySelectorAll( 'div.vrv-menu-content' ) ) 
-        {
+    onClick(e: CustomEvent): void {
+        for (const node of this.element.querySelectorAll('div.vrv-menu-content')) {
             // Remove the class so the menu content is shown again with a hover
-            node.classList.add( "clicked" );
+            node.classList.add("clicked");
         }
     }
 
@@ -322,9 +311,8 @@ export class AppToolbar extends Toolbar
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 
-    override onActivate( e: CustomEvent ): boolean
-    {
-        if ( !super.onActivate( e ) ) return false;
+    override onActivate(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
         //console.debug("AppToolbar::onActivate");
 
         this.updateAll();
@@ -332,9 +320,8 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    override onEndLoading( e: CustomEvent ): boolean
-    {
-        if ( !super.onEndLoading( e ) ) return false;
+    override onEndLoading(e: CustomEvent): boolean {
+        if (!super.onEndLoading(e)) return false;
         //console.debug("AppToolbar::onEndLoading");
 
         this.updateAll();
@@ -342,22 +329,20 @@ export class AppToolbar extends Toolbar
         return true;
     }
 
-    override onStartLoading( e: CustomEvent ): boolean
-    {
-        if ( !super.onStartLoading( e ) ) return false;
+    override onStartLoading(e: CustomEvent): boolean {
+        if (!super.onStartLoading(e)) return false;
         //console.debug("AppToolbar:onStartLoading");
 
-        this.updateToolbarBtn( this.prevPage, false );
-        this.updateToolbarBtn( this.nextPage, false );
-        this.updateToolbarBtn( this.zoomOut, false );
-        this.updateToolbarBtn( this.zoomIn, false );
+        this.updateToolbarBtn(this.prevPage, false);
+        this.updateToolbarBtn(this.nextPage, false);
+        this.updateToolbarBtn(this.zoomOut, false);
+        this.updateToolbarBtn(this.zoomIn, false);
 
         return true;
     }
 
-    override onUpdateView( e: CustomEvent ): boolean
-    {
-        if ( !super.onUpdateView( e ) ) return false;
+    override onUpdateView(e: CustomEvent): boolean {
+        if (!super.onUpdateView(e)) return false;
         //console.debug("AppToolbar::onUpdate");
 
         this.updateAll();

@@ -25,7 +25,7 @@ import { RNGLoader } from './rng-loader.js';
 import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './worker-proxy.js'
 import { VerovioView } from './verovio-view.js';
 
-import {appendAnchorTo,  appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
+import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 
 let filter = '/svg/filter.xml';
 
@@ -33,7 +33,7 @@ declare global {
     const marked;
 }
 
-const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${ version}`
+const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`
 const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`
 
 export interface AppOptions {
@@ -78,8 +78,7 @@ interface VerovioSettings {
     xmlIdSeed: number;
 }
 
-export class App
-{
+export class App {
     clientId: string;
     host: string;
     id: string;
@@ -132,15 +131,14 @@ export class App
     currentZoomIndex: number;
     currentSchema: string;
 
-    constructor( div: HTMLDivElement, opts?: AppOptions )
-    {
+    constructor(div: HTMLDivElement, opts?: AppOptions) {
         this.clientId = "fd81068a15354a300522";
         this.host = "https://editor.verovio.org";
         this.id = this.clientId;
 
-        this.githubManager = new GitHubManager( this );
+        this.githubManager = new GitHubManager(this);
 
-        this.options = Object.assign( {
+        this.options = Object.assign({
             // The margin around page in docuementView
             documentViewMargin: 100,
             // The border for pages in documentView
@@ -164,18 +162,17 @@ export class App
             schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
 
             defaultView: 'responsive',
-        }, opts );
+        }, opts);
 
-        if ( opts.appReset ) window.localStorage.removeItem( "options" );
+        if (opts.appReset) window.localStorage.removeItem("options");
 
-        const storedOptions = localStorage.getItem( "options" );
-        if ( storedOptions )
-        {
-            this.options = Object.assign( this.options, JSON.parse( storedOptions ) );
+        const storedOptions = localStorage.getItem("options");
+        if (storedOptions) {
+            this.options = Object.assign(this.options, JSON.parse(storedOptions));
         }
 
         this.fileStack = new FileStack();
-        if ( opts.appReset ) this.fileStack.reset();
+        if (opts.appReset) this.fileStack.reset();
 
         // Root element in which verovio-ui is created
         this.element = div;
@@ -183,16 +180,15 @@ export class App
         this.zoomLevels = [5, 10, 20, 35, 75, 100, 150, 200];
 
         // If necessary remove all the children of the div
-        while ( this.element.firstChild )
-        {
+        while (this.element.firstChild) {
             this.element.firstChild.remove();
         }
 
         appendLinkTo(document.head, { href: `/css/verovio.css`, rel: `stylesheet` });
 
         this.loadingCount = 0;
-        this.eventManager = new EventManager( this );
-        this.customEventManager = new CustomEventManager( );
+        this.eventManager = new EventManager(this);
+        this.customEventManager = new CustomEventManager();
 
         this.appToolbar = null;
 
@@ -200,38 +196,37 @@ export class App
         this.createFilter();
 
         // Create input for reading files
-        this.input = appendInputTo(this.element, { type: `file`, class: `vrv-file-input` } );
-        this.input.onchange = this.fileInput.bind( this );
+        this.input = appendInputTo(this.element, { type: `file`, class: `vrv-file-input` });
+        this.input.onchange = this.fileInput.bind(this);
 
         // Create link for writing files
-        this.output = appendAnchorTo( this.element, { class: `vrv-file-output` } );
+        this.output = appendAnchorTo(this.element, { class: `vrv-file-output` });
 
         // Create link for copying files
-        this.fileCopy = appendTextAreaTo( this.element, { class: `vrv-file-copy` } );
+        this.fileCopy = appendTextAreaTo(this.element, { class: `vrv-file-copy` });
 
         // Create the HTML content
-        this.wrapper = appendDivTo( this.element, { class: `vrv-wrapper` } );
+        this.wrapper = appendDivTo(this.element, { class: `vrv-wrapper` });
 
         // Create notification div
-        this.notification = appendDivTo( this.wrapper, { class: `vrv-notification disabled` } );
+        this.notification = appendDivTo(this.wrapper, { class: `vrv-notification disabled` });
 
         // Create a dialog div
-        this.dialog = appendDivTo( this.wrapper, { class: `vrv-dialog` } );
+        this.dialog = appendDivTo(this.wrapper, { class: `vrv-dialog` });
 
         // Create a toolbar div
-        this.toolbar = appendDivTo( this.wrapper, { class: `vrv-toolbar` } );
+        this.toolbar = appendDivTo(this.wrapper, { class: `vrv-toolbar` });
 
         // Views
-        this.views = appendDivTo( this.wrapper, { class: `vrv-views` } );
+        this.views = appendDivTo(this.wrapper, { class: `vrv-views` });
 
         // Loader
-        this.loader = appendDivTo( this.views, { class: `vrv-loading` } );
-        this.loaderText = appendDivTo( this.loader, { class: `vrv-loading-text` } );
+        this.loader = appendDivTo(this.views, { class: `vrv-loading` });
+        this.loaderText = appendDivTo(this.loader, { class: `vrv-loading-text` });
 
         // Status bar
-        this.statusbar = appendDivTo( this.wrapper, { class: `vrv-statusbar` } );
-        if ( !this.options.enableStatusbar )
-        {
+        this.statusbar = appendDivTo(this.wrapper, { class: `vrv-statusbar` });
+        if (!this.options.enableStatusbar) {
             this.statusbar.style.minHeight = '0px';
         }
 
@@ -246,17 +241,17 @@ export class App
 
         // Handling the resizing of the window
         this.resizeTimer = 0; // Used to prevent per-pixel re-render events when the window is resized
-        window.onresize = this.onResize.bind( this );
+        window.onresize = this.onResize.bind(this);
 
-        window.onbeforeunload = this.onBeforeUnload.bind( this );
+        window.onbeforeunload = this.onBeforeUnload.bind(this);
         //window.addEventListener("beforeunload", this.onBeforeUnload);
 
-        this.customEventManager.bind( this, 'onResized', this.onResized );
-        let event = new CustomEvent( 'onResized' );
-        this.customEventManager.dispatch( event );
+        this.customEventManager.bind(this, 'onResized', this.onResized);
+        let event = new CustomEvent('onResized');
+        this.customEventManager.dispatch(event);
 
-        const verovioWorker = new Worker( '/dist/verovio-worker.js' );
-        this.verovio = new VerovioWorkerProxy( verovioWorker );
+        const verovioWorker = new Worker('/dist/verovio-worker.js');
+        this.verovio = new VerovioWorkerProxy(verovioWorker);
 
         this.settings =
         {
@@ -273,8 +268,8 @@ export class App
         this.pageCount = 0;
         this.currentZoomIndex = 4;
 
-        const validatorWorker = new Worker( '/dist/validator-worker.js' )
-        this.validator = new ValidatorWorkerProxy( validatorWorker );
+        const validatorWorker = new Worker('/dist/validator-worker.js')
+        this.validator = new ValidatorWorkerProxy(validatorWorker);
 
         this.rngLoader = new RNGLoader();
 
@@ -286,56 +281,51 @@ export class App
         this.mei = "";
         this.filename = "untitled.xml";
         const last: File = this.fileStack.getLast();
-        if ( last )
-        {
-            console.log( "Reloading", last.filename );
-            this.loadData( last.data, last.filename );
+        if (last) {
+            console.log("Reloading", last.filename);
+            this.loadData(last.data, last.filename);
         }
 
         // Listen and wait for Module to emit onRuntimeInitialized
-        this.startLoading( "Loading Verovio ..." );
+        this.startLoading("Loading Verovio ...");
 
-        this.verovio.onRuntimeInitialized().then( async () =>
-        {
+        this.verovio.onRuntimeInitialized().then(async () => {
             const version = await this.verovio.getVersion();
-            console.log( version );
+            console.log(version);
 
             this.endLoading();
-            this.startLoading( "Loading the XML validator ..." );
+            this.startLoading("Loading the XML validator ...");
 
             this.midiPlayer = new MidiPlayer();
 
             // Listen and wait for Module to emit onRuntimeInitialized
-            this.validator.onRuntimeInitialized().then( async () =>
-            {
+            this.validator.onRuntimeInitialized().then(async () => {
                 this.currentSchema = this.options.schema;
-                const response = await fetch( this.currentSchema );
+                const response = await fetch(this.currentSchema);
                 const data = await response.text();
-                const res = await this.validator.setRelaxNGSchema( data );
-                console.log( "Schema loaded", res );
-                this.rngLoader.setRelaxNGSchema( data );
+                const res = await this.validator.setRelaxNGSchema(data);
+                console.log("Schema loaded", res);
+                this.rngLoader.setRelaxNGSchema(data);
 
                 this.createToolbar();
                 this.createViews();
                 this.createStatusbar();
 
-                this.customEventManager.bind( this, 'onResized', this.onResized );
-                let event = new CustomEvent( 'onResized' );
-                this.customEventManager.dispatch( event );
+                this.customEventManager.bind(this, 'onResized', this.onResized);
+                let event = new CustomEvent('onResized');
+                this.customEventManager.dispatch(event);
 
                 this.appIsLoaded = true;
                 this.endLoading();
 
-                if ( this.mei )
-                {
+                if (this.mei) {
                     this.loadMEI(false);
                 }
-            } );
-        } );
+            });
+        });
     }
 
-    destroy(): void
-    {
+    destroy(): void {
         this.eventManager.unbindAll();
     }
 
@@ -343,45 +333,38 @@ export class App
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    createViews(): void
-    {
-        this.startLoading( "Loading the views ..." );
+    createViews(): void {
+        this.startLoading("Loading the views ...");
 
         this.view = null;
         this.toolbarView = null;
 
-        if ( this.options.enableDocument )
-        {
+        if (this.options.enableDocument) {
             this.currentZoomIndex = this.options.documentZoom;
-            this.view1 = appendDivTo( this.views, { class: `vrv-view` } );
-            this.viewDocument = new DocumentView( this.view1, this, this.verovio );
-            this.customEventManager.addToPropagationList( this.viewDocument.customEventManager );
-            if ( this.options.defaultView === 'document' )
-            {
+            this.view1 = appendDivTo(this.views, { class: `vrv-view` });
+            this.viewDocument = new DocumentView(this.view1, this, this.verovio);
+            this.customEventManager.addToPropagationList(this.viewDocument.customEventManager);
+            if (this.options.defaultView === 'document') {
                 this.view = this.viewDocument;
                 this.toolbarView = this.viewDocument;
             }
         }
-        if ( this.options.enableEditor )
-        {
+        if (this.options.enableEditor) {
             this.currentZoomIndex = this.options.editorZoom;
-            this.view2 = appendDivTo( this.views, { class: `vrv-view` } );
-            this.viewEditor = new EditorPanel( this.view2, this, this.verovio, this.validator, this.rngLoader );
-            this.customEventManager.addToPropagationList( this.viewEditor.customEventManager );
-            if ( this.options.defaultView === 'editor' )
-            {
+            this.view2 = appendDivTo(this.views, { class: `vrv-view` });
+            this.viewEditor = new EditorPanel(this.view2, this, this.verovio, this.validator, this.rngLoader);
+            this.customEventManager.addToPropagationList(this.viewEditor.customEventManager);
+            if (this.options.defaultView === 'editor') {
                 this.view = this.viewEditor;
                 this.toolbarView = this.viewEditor.editorView;
             }
         }
-        if ( this.options.enableResponsive )
-        {
+        if (this.options.enableResponsive) {
             this.currentZoomIndex = this.options.responsiveZoom;
-            this.view3 = appendDivTo( this.views, { class: `vrv-view` } );
-            this.viewResponsive = new ResponsiveView( this.view3, this, this.verovio );
-            this.customEventManager.addToPropagationList( this.viewResponsive.customEventManager );
-            if ( this.options.defaultView === 'responsive' )
-            {
+            this.view3 = appendDivTo(this.views, { class: `vrv-view` });
+            this.viewResponsive = new ResponsiveView(this.view3, this, this.verovio);
+            this.customEventManager.addToPropagationList(this.viewResponsive.customEventManager);
+            if (this.options.defaultView === 'responsive') {
                 this.view = this.viewResponsive;
                 this.toolbarView = this.viewResponsive;
             }
@@ -390,243 +373,215 @@ export class App
         }
 
         // Root element in which verovio-ui is created
-        if ( !this.view )
-        {
-            throw `No view enabled or unknown default view '${ this.options.defaultView }' selected.`;
+        if (!this.view) {
+            throw `No view enabled or unknown default view '${this.options.defaultView}' selected.`;
         }
 
         this.endLoading();
 
-        let eventActivate = new CustomEvent( 'onActivate' );
-        this.view.customEventManager.dispatch( eventActivate );
+        let eventActivate = new CustomEvent('onActivate');
+        this.view.customEventManager.dispatch(eventActivate);
 
         //let eventResized = new CustomEvent( 'onResized' );
         //this.customEventManager.dispatch( eventResized );
     }
 
-    createToolbar(): void
-    {
-        this.appToolbar = new AppToolbar( this.toolbar, this );
-        this.customEventManager.addToPropagationList( this.appToolbar.customEventManager );
+    createToolbar(): void {
+        this.appToolbar = new AppToolbar(this.toolbar, this);
+        this.customEventManager.addToPropagationList(this.appToolbar.customEventManager);
 
-        this.midiToolbar = new MidiToolbar( this.toolbar, this, this.midiPlayer );
-        this.customEventManager.addToPropagationList( this.midiToolbar.customEventManager );
+        this.midiToolbar = new MidiToolbar(this.toolbar, this, this.midiPlayer);
+        this.customEventManager.addToPropagationList(this.midiToolbar.customEventManager);
     }
 
-    createStatusbar(): void
-    {
-        if ( !this.options.enableStatusbar ) return;
+    createStatusbar(): void {
+        if (!this.options.enableStatusbar) return;
 
-        this.appStatusbar = new AppStatusbar( this.statusbar, this );
-        this.customEventManager.addToPropagationList( this.appStatusbar.customEventManager );
+        this.appStatusbar = new AppStatusbar(this.statusbar, this);
+        this.customEventManager.addToPropagationList(this.appStatusbar.customEventManager);
     }
 
-    createFilter(): void
-    {
-        const filterDiv = appendDivTo( this.element, { class: `vrv-filter` } );
+    createFilter(): void {
+        const filterDiv = appendDivTo(this.element, { class: `vrv-filter` });
 
         var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if ( this.readyState == 4 && this.status == 200 )
-            {
-                filterDiv.appendChild( this.responseXML.documentElement );
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                filterDiv.appendChild(this.responseXML.documentElement);
             }
         };
         xhttp.open("GET", filter, true);
         xhttp.send();
     }
 
-    loadData( mei: string, filename: string = "untitled.xml", convert: boolean = false, onlyIfEmpty: boolean = false ): void
-    {
-        if ( this.mei.length != 0 )
-        {
+    loadData(mei: string, filename: string = "untitled.xml", convert: boolean = false, onlyIfEmpty: boolean = false): void {
+        if (this.mei.length != 0) {
             // This is useful for loading the app with a default file but not if one exists
-            if ( onlyIfEmpty ) return;
+            if (onlyIfEmpty) return;
 
-            this.fileStack.store( this.filename, this.mei );
+            this.fileStack.store(this.filename, this.mei);
             if (this.appToolbar !== null) this.appToolbar.updateRecent();
         }
         this.mei = mei;
         this.filename = filename;
-        if ( this.appIsLoaded )
-        {
-            this.loadMEI( convert );
+        if (this.appIsLoaded) {
+            this.loadMEI(convert);
         }
     }
 
-    startLoading( msg: string, light: boolean = false ): void
-    {
-        if ( light )
-        {
+    startLoading(msg: string, light: boolean = false): void {
+        if (light) {
             this.views.style.pointerEvents = 'none';
             //this.ui.views.style.opacity = '0.6';
         }
-        else
-        {
+        else {
             this.views.style.overflow = 'hidden';
             this.loader.style.display = `flex`;
             this.loadingCount++;
         }
         this.loaderText.innerHTML = msg;
-        let event = new CustomEvent( 'onStartLoading', {
+        let event = new CustomEvent('onStartLoading', {
             detail: {
                 light: light,
                 msg: msg
             }
-        } );
-        this.customEventManager.dispatch( event );
+        });
+        this.customEventManager.dispatch(event);
     }
 
-    endLoading( light: boolean = false ): void
-    {
-        if ( !light )
-        {
+    endLoading(light: boolean = false): void {
+        if (!light) {
             this.loadingCount--;
-            if ( this.loadingCount < 0 ) console.error( "endLoading index corrupted" );
+            if (this.loadingCount < 0) console.error("endLoading index corrupted");
         }
 
         // We have other tasks being performed
-        if ( this.loadingCount > 0 ) return;
+        if (this.loadingCount > 0) return;
 
         this.views.style.overflow = 'scroll';
         this.loader.style.display = 'none';
         this.views.style.pointerEvents = '';
         this.views.style.opacity = '';
-        let event = new CustomEvent( 'onEndLoading' );
-        this.customEventManager.dispatch( event );
+        let event = new CustomEvent('onEndLoading');
+        this.customEventManager.dispatch(event);
     }
 
-    showNotification( message: string ): void
-    {
+    showNotification(message: string): void {
         this.notification.innerHTML = message;
-        this.notification.classList.remove( "disabled" );
+        this.notification.classList.remove("disabled");
 
         const notification = this.notification;
-        setTimeout( function ()
-        {
-            notification.classList.add( "disabled" );
-        }, 2500 );
+        setTimeout(function () {
+            notification.classList.add("disabled");
+        }, 2500);
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Async methods
     ////////////////////////////////////////////////////////////////////////
 
-    async loadMEI( convert: boolean ): Promise<any>
-    {
-        this.startLoading( "Loading the MEI data ..." );
+    async loadMEI(convert: boolean): Promise<any> {
+        this.startLoading("Loading the MEI data ...");
 
-        await this.verovio.loadData( this.mei );
+        await this.verovio.loadData(this.mei);
         this.pageCount = await this.verovio.getPageCount();
 
-        if ( convert )
-        {
-            this.mei = await this.verovio.getMEI( {} );
+        if (convert) {
+            this.mei = await this.verovio.getMEI({});
         }
 
         await this.checkSchema();
 
-        let event = new CustomEvent( 'onLoadData', {
+        let event = new CustomEvent('onLoadData', {
             detail: {
                 pageCount: this.pageCount,
                 mei: this.mei
             }
-        } );
+        });
 
-        this.view.customEventManager.dispatch( event );
+        this.view.customEventManager.dispatch(event);
     }
 
-    async checkSchema(): Promise<any>
-    {
+    async checkSchema(): Promise<any> {
         const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
-        const hasSchemaMatch = hasSchema.exec( this.mei );
-        if ( !hasSchemaMatch ) return;
+        const hasSchemaMatch = hasSchema.exec(this.mei);
+        if (!hasSchemaMatch) return;
         const schema = /<\?xml-model.*href="([^"]*).*/;
-        const schemaMatch = schema.exec( this.mei );
-        if ( schemaMatch && schemaMatch[1] !== this.currentSchema )
-        {
-            if ( await this.viewEditor.xmlEditorView.replaceSchema( schemaMatch[1] ) )
-            {
+        const schemaMatch = schema.exec(this.mei);
+        if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
+            if (await this.viewEditor.xmlEditorView.replaceSchema(schemaMatch[1])) {
                 this.currentSchema = schemaMatch[1];
-                this.showNotification( `Current MEI Schema changed to '${ this.currentSchema }'` );
+                this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
             }
-            else
-            {
-                const dlg = new Dialog( this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: DialogType.Msg } );
-                dlg.setContent( `The Schema '${ schemaMatch[1] }' could not be loaded<br>The validation will be performed using '${ this.currentSchema }'` );
+            else {
+                const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: DialogType.Msg });
+                dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.currentSchema}'`);
                 await dlg.show();
             }
         }
     }
 
-    async playMEI(): Promise<any>
-    {
+    async playMEI(): Promise<any> {
         const base64midi = await this.verovio.renderToMIDI();
         const midiFile = 'data:audio/midi;base64,' + base64midi;
-        this.midiPlayer.playFile( midiFile );
+        this.midiPlayer.playFile(midiFile);
     }
 
-    async generatePDF(): Promise<any>
-    {
-        if ( !this.pdf )
-        {
-            const pdfWorker =  new Worker( './pdf-worker.js' );
-            this.pdf = new PDFWorkerProxy( pdfWorker );
+    async generatePDF(): Promise<any> {
+        if (!this.pdf) {
+            const pdfWorker = new Worker('./pdf-worker.js');
+            this.pdf = new PDFWorkerProxy(pdfWorker);
         }
 
-        const pdfGenerator = new PDFGenerator( this.verovio, this.pdf, this.settings.scale );
+        const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.settings.scale);
         const pdfOutputStr = await pdfGenerator.generateFile();
 
         this.endLoading();
 
-        this.output.href = `${ pdfOutputStr }`;
-        this.output.download = this.filename.replace( /\.[^\.]*$/, '.pdf' );
+        this.output.href = `${pdfOutputStr}`;
+        this.output.download = this.filename.replace(/\.[^\.]*$/, '.pdf');
         this.output.click();
     }
 
-    async generateMIDI(): Promise<any>
-    {
+    async generateMIDI(): Promise<any> {
         const midiOutputStr = await this.verovio.renderToMIDI();
 
         this.endLoading();
 
-        this.output.href = `data:audio/midi;base64,${ midiOutputStr }`;
-        this.output.download = this.filename.replace( /\.[^\.]*$/, '.mid' );
+        this.output.href = `data:audio/midi;base64,${midiOutputStr}`;
+        this.output.download = this.filename.replace(/\.[^\.]*$/, '.mid');
         this.output.click();
     }
 
-    async confirmLargeFileLoading( size: number ): Promise<any>
-    {
+    async confirmLargeFileLoading(size: number): Promise<any> {
         // Approx. 1 MB limit - fairly arbitrarily
-        if ( size < 1000000 ) return true;
+        if (size < 1000000) return true;
 
-        const dlg = new Dialog( this.dialog, this, "Large file warning", { okLabel: "Continue", icon: "warning" } );
-        dlg.setContent( "You are trying to load a large file into the Editor. This can yield poor performance.<br>Do you want to proceed?" )
+        const dlg = new Dialog(this.dialog, this, "Large file warning", { okLabel: "Continue", icon: "warning" });
+        dlg.setContent("You are trying to load a large file into the Editor. This can yield poor performance.<br>Do you want to proceed?")
         const dlgRes = await dlg.show();
-        return ( dlgRes !== 0 );
+        return (dlgRes !== 0);
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onResized( e: CustomEvent ): boolean
-    {
+    onResized(e: CustomEvent): boolean {
         // Minimal height and width
         //if (this.element.clientHeight < 400) this.element.style.height = `${400}px`;
         //if (this.element.clientWidth < 200) this.element.style.width = `${200}px`;
 
         let height = this.element.clientHeight - this.toolbar.clientHeight - this.statusbar.clientHeight;
-        if ( height < parseInt( this.views.style.minHeight, 10 ) )
-        {
+        if (height < parseInt(this.views.style.minHeight, 10)) {
             height = Number(this.views.style.minHeight);
-            this.element.style.height = `${ height + this.toolbar.clientHeight }px`;
+            this.element.style.height = `${height + this.toolbar.clientHeight}px`;
         }
 
-        this.views.style.height = `${ height }px`
-        this.views.style.width = `${ this.element.clientWidth }px`;
+        this.views.style.height = `${height}px`
+        this.views.style.width = `${this.element.clientWidth}px`;
 
-        this.statusbar.style.top = `${ height }px`;
+        this.statusbar.style.top = `${height}px`;
 
         return true;
     }
@@ -635,258 +590,222 @@ export class App
     // Window event handlers
     ////////////////////////////////////////////////////////////////////////
 
-    onBeforeUnload( e: Event ): void
-    {
-        if ( this.appReset ) return;
+    onBeforeUnload(e: Event): void {
+        if (this.appReset) return;
 
         // Store zoom of each view
-        if ( this.viewDocument ) this.options.documentZoom = this.viewDocument.currentZoomIndex;
-        if ( this.viewResponsive ) this.options.responsiveZoom = this.viewResponsive.currentZoomIndex;
-        if ( this.viewEditor ) this.options.editorZoom = this.viewEditor.editorView.currentZoomIndex;
+        if (this.viewDocument) this.options.documentZoom = this.viewDocument.currentZoomIndex;
+        if (this.viewResponsive) this.options.responsiveZoom = this.viewResponsive.currentZoomIndex;
+        if (this.viewEditor) this.options.editorZoom = this.viewEditor.editorView.currentZoomIndex;
         // Store current view
-        if ( this.view == this.viewDocument ) this.options.defaultView = 'document';
-        else if ( this.view == this.viewResponsive ) this.options.defaultView = 'responsive';
-        else if ( this.view == this.viewEditor ) this.options.defaultView = 'editor';
-        window.localStorage.setItem( "options", JSON.stringify( this.options ) );
+        if (this.view == this.viewDocument) this.options.defaultView = 'document';
+        else if (this.view == this.viewResponsive) this.options.defaultView = 'responsive';
+        else if (this.view == this.viewEditor) this.options.defaultView = 'editor';
+        window.localStorage.setItem("options", JSON.stringify(this.options));
 
-        this.fileStack.store( this.filename, this.mei );
+        this.fileStack.store(this.filename, this.mei);
     }
 
-    onResize( e: Event ): void
-    {
-        clearTimeout( this.resizeTimer );
+    onResize(e: Event): void {
+        clearTimeout(this.resizeTimer);
         const timerThis = this;
-        this.resizeTimer = setTimeout( function ()
-        {
-            timerThis.startLoading( "Resizing ...", true );
-            let event = new CustomEvent( 'onResized' );
-            timerThis.customEventManager.dispatch( event );
-        }, 100 );
+        this.resizeTimer = setTimeout(function () {
+            timerThis.startLoading("Resizing ...", true);
+            let event = new CustomEvent('onResized');
+            timerThis.customEventManager.dispatch(event);
+        }, 100);
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 
-    prevPage( e: MouseEvent ): void
-    {
-        if ( this.toolbarView.currentPage > 1 )
-        {
+    prevPage(e: MouseEvent): void {
+        if (this.toolbarView.currentPage > 1) {
             this.toolbarView.currentPage -= 1;
-            this.startLoading( "Loading content ...", true );
-            let event = new CustomEvent( 'onPage' );
-            this.customEventManager.dispatch( event );
+            this.startLoading("Loading content ...", true);
+            let event = new CustomEvent('onPage');
+            this.customEventManager.dispatch(event);
         }
     }
 
-    nextPage( e: MouseEvent ): void
-    {
-        if ( this.toolbarView.currentPage < this.pageCount )
-        {
+    nextPage(e: MouseEvent): void {
+        if (this.toolbarView.currentPage < this.pageCount) {
             this.toolbarView.currentPage += 1;
-            this.startLoading( "Loading content ...", true );
-            let event = new CustomEvent( 'onPage' );
-            this.customEventManager.dispatch( event );
+            this.startLoading("Loading content ...", true);
+            let event = new CustomEvent('onPage');
+            this.customEventManager.dispatch(event);
         }
     }
 
-    zoomOut( e: MouseEvent ): void
-    {
-        if ( this.toolbarView.currentZoomIndex > 0 )
-        {
+    zoomOut(e: MouseEvent): void {
+        if (this.toolbarView.currentZoomIndex > 0) {
             this.toolbarView.currentZoomIndex -= 1;
-            this.startLoading( "Adjusting size ...", true );
-            let event = new CustomEvent( 'onZoom' );
-            this.customEventManager.dispatch( event );
+            this.startLoading("Adjusting size ...", true);
+            let event = new CustomEvent('onZoom');
+            this.customEventManager.dispatch(event);
         }
     }
 
-    zoomIn( e: MouseEvent ): void
-    {
-        if ( this.toolbarView.currentZoomIndex < this.zoomLevels.length - 1 )
-        {
+    zoomIn(e: MouseEvent): void {
+        if (this.toolbarView.currentZoomIndex < this.zoomLevels.length - 1) {
             this.toolbarView.currentZoomIndex += 1;
-            this.startLoading( "Adjusting size ...", true );
-            let event = new CustomEvent( 'onZoom' );
-            this.customEventManager.dispatch( event );
+            this.startLoading("Adjusting size ...", true);
+            let event = new CustomEvent('onZoom');
+            this.customEventManager.dispatch(event);
         }
     }
 
-    async fileImport( e: MouseEvent ): Promise<any>
-    {
+    async fileImport(e: MouseEvent): Promise<any> {
         const element = e.target as HTMLElement;
-        if ( element.dataset.ext === 'MEI' ) this.input.accept = ".xml, .mei";
-        else if ( element.dataset.ext === 'MusicXML' ) this.input.accept = ".xml, .musicxml";
+        if (element.dataset.ext === 'MEI') this.input.accept = ".xml, .mei";
+        else if (element.dataset.ext === 'MusicXML') this.input.accept = ".xml, .musicxml";
         //console.log( element.dataset.ext );
         this.input.dataset.ext = element.dataset.ext;
         this.input.click();
     }
 
-    async fileInput(e: InputEvent): Promise<any>
-    {
+    async fileInput(e: InputEvent): Promise<any> {
         const element = e.target as HTMLInputElement;
         let file = element.files[0];
-        if ( !file ) return;
+        if (!file) return;
 
         let reader = new FileReader();
         const readerThis = this;
         const filename = file.name;
-        const convert = ( element.dataset.ext != 'MEI' ) ? true : false;
-        reader.onload = async function ( e )
-        {
-            if ( readerThis.view instanceof EditorPanel )
-            {
-                if ( await readerThis.confirmLargeFileLoading( file.size ) !== true ) return;
+        const convert = (element.dataset.ext != 'MEI') ? true : false;
+        reader.onload = async function (e) {
+            if (readerThis.view instanceof EditorPanel) {
+                if (await readerThis.confirmLargeFileLoading(file.size) !== true) return;
             }
-            readerThis.loadData( e.target.result as string, filename, convert );
+            readerThis.loadData(e.target.result as string, filename, convert);
         };
-        reader.readAsText( file );
+        reader.readAsText(file);
     }
 
-    async fileExport( e: Event ): Promise<any>
-    {
-        this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent( this.mei );
+    async fileExport(e: Event): Promise<any> {
+        this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(this.mei);
         this.output.download = this.filename;
         this.output.click();
     }
 
-    async fileExportPDF( e: Event ): Promise<any>
-    {
-        this.startLoading( "Generating PDF file ..." );
+    async fileExportPDF(e: Event): Promise<any> {
+        this.startLoading("Generating PDF file ...");
         this.generatePDF();
     }
 
-    async fileExportMIDI( e: Event ): Promise<any>
-    {
-        this.startLoading( "Generating MIDI file ..." );
+    async fileExportMIDI(e: Event): Promise<any> {
+        this.startLoading("Generating MIDI file ...");
         this.generateMIDI();
     }
 
-    async fileCopyToClipboard( e: Event ): Promise<any>
-    {
+    async fileCopyToClipboard(e: Event): Promise<any> {
         this.fileCopy.value = this.mei;
         this.fileCopy.select();
-        document.execCommand( 'copy' );
-        this.showNotification( "MEI copied to clipboard" );
+        document.execCommand('copy');
+        this.showNotification("MEI copied to clipboard");
     }
 
-    async fileLoadRecent( e: Event ): Promise<any>
-    {
+    async fileLoadRecent(e: Event): Promise<any> {
         const element = e.target as HTMLElement;
         //console.log( e.target.dataset.idx );
-        let file = this.fileStack.load( Number(element.dataset.idx) );
-        this.loadData( file.data, file.filename );
+        let file = this.fileStack.load(Number(element.dataset.idx));
+        this.loadData(file.data, file.filename);
     }
 
-    async githubImport( e: Event ): Promise<any>
-    {
-        const dlg = new DialogGhImport( this.dialog, this, "Import an MEI file from GitHub", {}, this.githubManager );
+    async githubImport(e: Event): Promise<any> {
+        const dlg = new DialogGhImport(this.dialog, this, "Import an MEI file from GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
-        if ( dlgRes === 1 )
-        {
-            this.loadData( dlg.data as string, dlg.filename );
+        if (dlgRes === 1) {
+            this.loadData(dlg.data as string, dlg.filename);
         }
     }
 
-    async githubExport( e: Event ): Promise<any>
-    {
-        const dlg = new DialogGhExport( this.dialog, this, "Export an MEI file to GitHub", {}, this.githubManager );
+    async githubExport(e: Event): Promise<any> {
+        const dlg = new DialogGhExport(this.dialog, this, "Export an MEI file to GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
-        if ( dlgRes === 1 )
-        {
+        if (dlgRes === 1) {
         }
     }
 
-    async xmlOverwriteMEI( e: Event ): Promise<any>
-    {
+    async xmlOverwriteMEI(e: Event): Promise<any> {
         const element = e.target as HTMLElement;
         let params = {}
-        if ( element.dataset.noIds == 'true' ) params["removeIds"] = true
-        const mei = await this.verovio.getMEI( params );
+        if (element.dataset.noIds == 'true') params["removeIds"] = true
+        const mei = await this.verovio.getMEI(params);
         this.mei = mei;
-        let event = new CustomEvent( 'onUpdateData', {
+        let event = new CustomEvent('onUpdateData', {
             detail: {
                 currentId: this.clientId,
                 caller: this.view
             }
-        } );
-        this.customEventManager.dispatch( event );
+        });
+        this.customEventManager.dispatch(event);
     }
 
-    async xmlIndent( e: Event ): Promise<any>
-    {
+    async xmlIndent(e: Event): Promise<any> {
         // Not sure how to through this event?
     }
 
-    async helpAbout( e: Event ): Promise<any>
-    {
-        const dlg = new Dialog( this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: DialogType.Msg } );
-        dlg.setContent( marked.parse(aboutMsg) );
+    async helpAbout(e: Event): Promise<any> {
+        const dlg = new Dialog(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: DialogType.Msg });
+        dlg.setContent(marked.parse(aboutMsg));
         await dlg.show();
     }
 
-    async helpReset( e: Event ): Promise<any>
-    {
-        const dlg = new Dialog( this.dialog, this, "Reset to default", { okLabel: "Yes", icon: "question" } );
-        dlg.setContent( marked.parse( resetMsg ) );
-        if ( await dlg.show() === 0 ) return;
+    async helpReset(e: Event): Promise<any> {
+        const dlg = new Dialog(this.dialog, this, "Reset to default", { okLabel: "Yes", icon: "question" });
+        dlg.setContent(marked.parse(resetMsg));
+        if (await dlg.show() === 0) return;
         this.fileStack.reset();
-        window.localStorage.removeItem( "options" );
+        window.localStorage.removeItem("options");
         this.appReset = true;
         location.reload();
     }
 
-    login( e: Event ): void
-    {
-        location.href = `https://github.com/login/oauth/authorize?client_id=${ this.clientId }&redirect_uri=${ this.host }/oauth/redirect&scope=public_repo%20read:org`;
+    login(e: Event): void {
+        location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
     }
 
-    logout( e: Event ): void
-    {
-        location.href = `${ this.host }/oauth/logout`;
+    logout(e: Event): void {
+        location.href = `${this.host}/oauth/logout`;
     }
 
-    async setView( e: Event ): Promise<any>
-    {
+    async setView(e: Event): Promise<any> {
         const element = e.target as HTMLElement;
 
-        if ( this.midiToolbar && this.midiToolbar.playing )
-        {
+        if (this.midiToolbar && this.midiToolbar.playing) {
             this.midiPlayer.stop();
         }
 
-        if ( element.dataset.view === 'editor' )
-        {
-            if ( await this.confirmLargeFileLoading( this.mei.length ) !== true ) return;
+        if (element.dataset.view === 'editor') {
+            if (await this.confirmLargeFileLoading(this.mei.length) !== true) return;
         }
 
-        let event = new CustomEvent( 'onDeactivate' );
-        this.view.customEventManager.dispatch( event );
+        let event = new CustomEvent('onDeactivate');
+        this.view.customEventManager.dispatch(event);
 
-        if ( element.dataset.view == 'document' )
-        {
+        if (element.dataset.view == 'document') {
             this.view = this.viewDocument;
             this.toolbarView = this.viewDocument;
         }
-        else if ( element.dataset.view == 'editor' )
-        {
+        else if (element.dataset.view == 'editor') {
             this.view = this.viewEditor;
             this.toolbarView = this.viewEditor.editorView;
         }
-        else if ( element.dataset.view == 'responsive' )
-        {
+        else if (element.dataset.view == 'responsive') {
             this.view = this.viewResponsive;
             this.toolbarView = this.viewResponsive;
         }
 
-        this.startLoading( "Switching view ..." );
-        let eventActivate = new CustomEvent( 'onActivate', {
+        this.startLoading("Switching view ...");
+        let eventActivate = new CustomEvent('onActivate', {
             detail: {
                 loadData: true
             }
-        } );
-        this.view.customEventManager.dispatch( eventActivate );
-        this.appToolbar.customEventManager.dispatch( eventActivate );
+        });
+        this.view.customEventManager.dispatch(eventActivate);
+        this.appToolbar.customEventManager.dispatch(eventActivate);
     }
 }
 

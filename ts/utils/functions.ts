@@ -1,34 +1,33 @@
 
 export function appendAnchorTo(parent: HTMLElement, options: object): HTMLAnchorElement {
-    return <HTMLAnchorElement> appendHTMLElementTo(parent, options, 'a');
+    return <HTMLAnchorElement>appendHTMLElementTo(parent, options, 'a');
 }
 
 export function appendCanvasTo(parent: HTMLCanvasElement, options: object): HTMLCanvasElement {
-    return <HTMLCanvasElement> appendHTMLElementTo(parent, options, 'canvas');
+    return <HTMLCanvasElement>appendHTMLElementTo(parent, options, 'canvas');
 }
 
 export function appendDivTo(parent: HTMLElement, options: object): HTMLDivElement {
-    return <HTMLDivElement> appendHTMLElementTo(parent, options, 'div');
+    return <HTMLDivElement>appendHTMLElementTo(parent, options, 'div');
 }
 
 export function appendInputTo(parent: HTMLElement, options: object): HTMLInputElement {
-    return <HTMLInputElement> appendHTMLElementTo(parent, options, 'input');
+    return <HTMLInputElement>appendHTMLElementTo(parent, options, 'input');
 }
 
 export function appendLinkTo(parent: HTMLElement, options: object): HTMLLinkElement {
-    return <HTMLLinkElement> appendHTMLElementTo(parent, options, 'link');
+    return <HTMLLinkElement>appendHTMLElementTo(parent, options, 'link');
 }
 
 export function appendTextAreaTo(parent: HTMLElement, options: object): HTMLTextAreaElement {
-    return <HTMLTextAreaElement> appendHTMLElementTo(parent, options, 'textarea');
+    return <HTMLTextAreaElement>appendHTMLElementTo(parent, options, 'textarea');
 }
 
-export function randomHex( digits: number ): string
-{
-    return Math.floor( ( 1 + Math.random() ) * Math.pow( 16, digits ) ).toString( 16 ).substring( 1 );
+export function randomHex(digits: number): string {
+    return Math.floor((1 + Math.random()) * Math.pow(16, digits)).toString(16).substring(1);
 }
 
-function appendHTMLElementTo( parent: HTMLElement, options: object, tag: string ): HTMLElement {
+function appendHTMLElementTo(parent: HTMLElement, options: object, tag: string): HTMLElement {
     const element = document.createElement(tag);
     setAttributes(element, options);
     parent.appendChild(element);
