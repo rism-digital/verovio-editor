@@ -2,8 +2,8 @@
  * The Worker for Verovio
  */
 
-//importScripts( "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" );
-importScripts("http://localhost:8082/emscripten/build/verovio-toolkit-wasm.js");
+importScripts( "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" );
+//importScripts("http://localhost:8082/emscripten/build/verovio-toolkit-wasm.js");
 
 class VerovioDeferred {
     promise: Promise<unknown>;
