@@ -7,14 +7,14 @@ import { Toolbar } from './toolbar.js';
 import { appendDivTo } from './utils/functions.js';
 export class EditorToolbar extends Toolbar {
     constructor(div, app, panel) {
-        let editorStemDirUp = '/icons/editor/stem-dir-up.png';
-        let editorStemDirDown = '/icons/editor/stem-dir-down.png';
-        let editorStemDirAuto = '/icons/editor/stem-dir-auto.png';
-        let editorPlaceBelow = '/icons/editor/place-below.png';
-        let editorPlaceAuto = '/icons/editor/place-auto.png';
-        let editorPlaceAbove = '/icons/editor/place-above.png';
-        let editorFormDim = '/icons/editor/form-dim.png';
-        let editorFormCres = '/icons/editor/form-cres.png';
+        let editorStemDirUp = `${app.host}/icons/editor/stem-dir-up.png`;
+        let editorStemDirDown = `${app.host}/icons/editor/stem-dir-down.png`;
+        let editorStemDirAuto = `${app.host}/icons/editor/stem-dir-auto.png`;
+        let editorPlaceBelow = `${app.host}/icons/editor/place-below.png`;
+        let editorPlaceAuto = `${app.host}/icons/editor/place-auto.png`;
+        let editorPlaceAbove = `${app.host}/icons/editor/place-above.png`;
+        let editorFormDim = `${app.host}/icons/editor/form-dim.png`;
+        let editorFormCres = `${app.host}/icons/editor/form-cres.png`;
         super(div, app);
         this.panel = panel;
         this.active = true;
@@ -55,12 +55,12 @@ export class EditorToolbar extends Toolbar {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     updateAll() {
-        let iconsLayoutH = '/icons/toolbar/layout-h.png';
-        let iconsLayoutToggle = '/icons/toolbar/layout-toggle.png';
-        let iconsLayoutToggleV = '/icons/toolbar/layout-toggle-v.png';
-        let iconsLayoutUnToggle = '/icons/toolbar/layout-un-toggle.png';
-        let iconsLayoutUnToggleV = '/icons/toolbar/layout-un-toggle-v.png';
-        let iconsLayoutV = '/icons/toolbar/layout-v.png';
+        let iconsLayoutH = `${this.app.host}/icons/toolbar/layout-h.png`;
+        let iconsLayoutToggle = `${this.app.host}/icons/toolbar/layout-toggle.png`;
+        let iconsLayoutToggleV = `${this.app.host}/icons/toolbar/layout-toggle-v.png`;
+        let iconsLayoutUnToggle = `${this.app.host}/icons/toolbar/layout-un-toggle.png`;
+        let iconsLayoutUnToggleV = `${this.app.host}/icons/toolbar/layout-un-toggle-v.png`;
+        let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
         let toggleOrientation = (this.app.options.editorSplitterHorizontal) ? true : false;
         let toggle = (this.app.options.editorSplitterShow) ? true : false;
         if (toggleOrientation) {

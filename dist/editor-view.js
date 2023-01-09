@@ -15,7 +15,7 @@ import { ResponsiveView } from './responsive-view.js';
 import { CursorPointer } from './cursor-pointer.js';
 import { ActionManager } from './action-manager.js';
 import { appendDivTo } from './utils/functions.js';
-import * as soundsImport from '../js/utils/sounds.js';
+import * as soundsImport from '../javascript/utils/sounds.js';
 export class EditorView extends ResponsiveView {
     constructor(div, app, verovio) {
         super(div, app, verovio);

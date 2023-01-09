@@ -53,15 +53,15 @@ export class AppToolbar extends Toolbar {
 
         this.active = true;
 
-        let iconsArrowLeft = '/icons/toolbar/arrow-left.png';
-        let iconsArrowRight = '/icons/toolbar/arrow-right.png';
-        let iconsDocument = '/icons/toolbar/document.png';
-        let iconsEditor = '/icons/toolbar/editor.png';
-        let iconsGithubSignin = '/icons/toolbar/github-signin.png';
-        let iconsLayout = '/icons/toolbar/layout.png';
-        let iconsResponsive = '/icons/toolbar/responsive.png';
-        let iconsZoomIn = '/icons/toolbar/zoom-in.png';
-        let iconsZoomOut = '/icons/toolbar/zoom-out.png';
+        let iconsArrowLeft = `${app.host}/icons/toolbar/arrow-left.png`;
+        let iconsArrowRight = `${app.host}/icons/toolbar/arrow-right.png`;
+        let iconsDocument = `${app.host}/icons/toolbar/document.png`;
+        let iconsEditor = `${app.host}/icons/toolbar/editor.png`;
+        let iconsGithubSignin = `${app.host}/icons/toolbar/github-signin.png`;
+        let iconsLayout = `${app.host}/icons/toolbar/layout.png`;
+        let iconsResponsive = `${app.host}/icons/toolbar/responsive.png`;
+        let iconsZoomIn = `${app.host}/icons/toolbar/zoom-in.png`;
+        let iconsZoomOut = `${app.host}/icons/toolbar/zoom-out.png`;
 
         ////////////////////////////////////////////////////////////////////////
         // View selection
@@ -103,6 +103,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
 
         const fileMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        if (!app.options.enableEditor) fileMenu.style.display = 'none';
         this.fileMenuBtn = appendDivTo(fileMenu, { class: `vrv-btn-text`, 'data-before': `File` });
         const fileMenuContent = appendDivTo(fileMenu, { class: `vrv-menu-content` });
         appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
@@ -207,6 +208,7 @@ export class AppToolbar extends Toolbar {
         appendDivTo(this.element, { class: `vrv-h-separator` });
 
         const helpMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        if (!app.options.enableEditor) helpMenu.style.display = 'none';
         appendDivTo(helpMenu, { class: `vrv-btn-text`, 'data-before': `Help` });
         const helpMenuContent = appendDivTo(helpMenu, { class: `vrv-menu-content` });
         appendDivTo(helpMenuContent, { class: `vrv-v-separator` });
@@ -222,6 +224,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
 
         this.loginGroup = appendDivTo(this.element, { class: `vrv-btn-group-right` });
+        if (!app.options.enableEditor) this.loginGroup.style.display = 'none';
         appendDivTo(this.loginGroup, { class: `vrv-h-separator` });
 
         this.logout = appendDivTo(this.loginGroup, { class: `vrv-btn-text`, style: { display: `none` }, 'data-before': `Logout` });

@@ -11,7 +11,7 @@ import { VerovioWorkerProxy } from './worker-proxy.js';
 
 import { appendDivTo } from './utils/functions.js';
 
-import * as soundsImport from '../js/utils/sounds.js';
+import * as soundsImport from '../javascript/utils/sounds.js';
 
 export class EditorView extends ResponsiveView {
     sounds: soundsImport;

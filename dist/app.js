@@ -37,6 +37,7 @@ export class App {
     constructor(div, opts) {
         this.clientId = "fd81068a15354a300522";
         this.host = "https://editor.verovio.org";
+        //this.host = "http://localhost:8081";
         this.id = this.clientId;
         this.githubManager = new GitHubManager(this);
         this.options = Object.assign({
@@ -75,7 +76,7 @@ export class App {
         while (this.element.firstChild) {
             this.element.firstChild.remove();
         }
-        appendLinkTo(document.head, { href: `/css/verovio.css`, rel: `stylesheet` });
+        appendLinkTo(document.head, { href: `${this.host}/css/verovio.css`, rel: `stylesheet` });
         this.loadingCount = 0;
         this.eventManager = new EventManager(this);
         this.customEventManager = new CustomEventManager();
@@ -111,8 +112,9 @@ export class App {
         this.pdf = null;
         // VerovioMessenger object
         this.verovio = null;
-        // Validator object
+        // Validator and rngLoader objects
         this.validator = null;
+        this.rngLoader = null;
         // Handling the resizing of the window
         this.resizeTimer = 0; // Used to prevent per-pixel re-render events when the window is resized
         window.onresize = this.onResize.bind(this);
@@ -121,7 +123,8 @@ export class App {
         this.customEventManager.bind(this, 'onResized', this.onResized);
         let event = new CustomEvent('onResized');
         this.customEventManager.dispatch(event);
-        const verovioWorker = new Worker('/dist/verovio-worker.js');
+        const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
+        const verovioWorker = new Worker(verovioWorkerURL);
         this.verovio = new VerovioWorkerProxy(verovioWorker);
         this.settings =
             {
@@ -136,9 +139,12 @@ export class App {
             };
         this.pageCount = 0;
         this.currentZoomIndex = 4;
-        const validatorWorker = new Worker('/dist/validator-worker.js');
-        this.validator = new ValidatorWorkerProxy(validatorWorker);
-        this.rngLoader = new RNGLoader();
+        if (this.options.enableEditor) {
+            const validatorWorkerURL = this.getWorkerURL(`${this.host}/dist/validator-worker.js`);
+            const validatorWorker = new Worker(validatorWorkerURL);
+            this.validator = new ValidatorWorkerProxy(validatorWorker);
+            this.rngLoader = new RNGLoader();
+        }
         // Set to true when everything is loaded
         this.appIsLoaded = false;
         // Use to avoid saving config when resetting the app
@@ -156,28 +162,24 @@ export class App {
             const version = yield this.verovio.getVersion();
             console.log(version);
             this.endLoading();
-            this.startLoading("Loading the XML validator ...");
             this.midiPlayer = new MidiPlayer();
-            // Listen and wait for Module to emit onRuntimeInitialized
-            this.validator.onRuntimeInitialized().then(() => __awaiter(this, void 0, void 0, function* () {
-                this.currentSchema = this.options.schema;
-                const response = yield fetch(this.currentSchema);
-                const data = yield response.text();
-                const res = yield this.validator.setRelaxNGSchema(data);
-                console.log("Schema loaded", res);
-                this.rngLoader.setRelaxNGSchema(data);
-                this.createToolbar();
-                this.createViews();
-                this.createStatusbar();
-                this.customEventManager.bind(this, 'onResized', this.onResized);
-                let event = new CustomEvent('onResized');
-                this.customEventManager.dispatch(event);
-                this.appIsLoaded = true;
-                this.endLoading();
-                if (this.mei) {
-                    this.loadMEI(false);
-                }
-            }));
+            if (this.options.enableEditor) {
+                this.startLoading("Loading the XML validator ...");
+                // Listen and wait for Module to emit onRuntimeInitialized
+                this.validator.onRuntimeInitialized().then(() => __awaiter(this, void 0, void 0, function* () {
+                    this.currentSchema = this.options.schema;
+                    const response = yield fetch(this.currentSchema);
+                    const data = yield response.text();
+                    const res = yield this.validator.setRelaxNGSchema(data);
+                    console.log("Schema loaded", res);
+                    this.rngLoader.setRelaxNGSchema(data);
+                    this.endLoading();
+                    this.createInterfaceAndLoadData();
+                }));
+            }
+            else {
+                this.createInterfaceAndLoadData();
+            }
         }));
     }
     destroy() {
@@ -186,6 +188,24 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    getWorkerURL(url) {
+        const content = `importScripts("${url}");`;
+        return URL.createObjectURL(new Blob([content], { type: "text/javascript" }));
+    }
+    createInterfaceAndLoadData() {
+        this.startLoading("Create the interface ...");
+        this.createToolbar();
+        this.createViews();
+        this.createStatusbar();
+        this.customEventManager.bind(this, 'onResized', this.onResized);
+        let event = new CustomEvent('onResized');
+        this.customEventManager.dispatch(event);
+        this.appIsLoaded = true;
+        this.endLoading();
+        if (this.mei) {
+            this.loadMEI(false);
+        }
+    }
     createViews() {
         this.startLoading("Loading the views ...");
         this.view = null;
@@ -252,7 +272,7 @@ export class App {
                 filterDiv.appendChild(this.responseXML.documentElement);
             }
         };
-        xhttp.open("GET", filter, true);
+        xhttp.open("GET", `${this.host}${filter}`, true);
         xhttp.send();
     }
     loadData(mei, filename = "untitled.xml", convert = false, onlyIfEmpty = false) {
@@ -336,6 +356,8 @@ export class App {
     }
     checkSchema() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.options.enableEditor)
+                return;
             const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
             const hasSchemaMatch = hasSchema.exec(this.mei);
             if (!hasSchemaMatch)

@@ -7,13 +7,6 @@ import { Dialog, DialogOpts } from './dialog.js';
 import { GitHubManager } from './github-manager.js';
 import { appendDivTo } from './utils/functions.js';
 
-const iconsBranch = '/icons/dialog/branch.png';
-const iconsInstitution = '/icons/dialog/institution.png';
-const iconsFile = '/icons/dialog/file.png';
-const iconsFolder = '/icons/dialog/folder.png';
-const iconsRepo = '/icons/dialog/repo.png';
-const iconsUser = '/icons/dialog/user.png';
-
 interface ItemDataset {
     name?: string,
     login?: string,
@@ -24,6 +17,13 @@ export class DialogGhImport extends Dialog {
     data: string | ArrayBuffer | Blob;
     filename: string;
     githubManager: GitHubManager;
+
+    iconsBranch: string;
+    iconsInstitution: string;
+    iconsFile: string;
+    iconsFolder: string;
+    iconsRepo: string;
+    iconsUser: string;
 
     tabs: HTMLDivElement;
     tabUser: HTMLDivElement;
@@ -38,6 +38,13 @@ export class DialogGhImport extends Dialog {
 
     constructor(div: HTMLDivElement, app: App, title: string, opts: DialogOpts, githubManager: GitHubManager) {
         super(div, app, title, opts);
+
+        this.iconsBranch = `${app.host}/icons/dialog/branch.png`;
+        this.iconsInstitution = `${app.host}/icons/dialog/institution.png`;
+        this.iconsFile = `${app.host}/icons/dialog/file.png`;
+        this.iconsFolder = `${app.host}/icons/dialog/folder.png`;
+        this.iconsRepo = `${app.host}/icons/dialog/repo.png`;
+        this.iconsUser = `${app.host}/icons/dialog/user.png`;
 
         // output members
         this.data = null;
@@ -111,10 +118,10 @@ export class DialogGhImport extends Dialog {
         this.selection.innerHTML = '';
         this.selection.style.display = 'none';
         this.breadCrumbs.innerHTML = '';
-        const icon: string = (this.githubManager.selectedOrganization !== null) ? iconsInstitution : iconsUser;
+        const icon: string = (this.githubManager.selectedOrganization !== null) ? this.iconsInstitution : this.iconsUser;
         if (!this.addSelection(this.githubManager.selectedAccountName, icon)) return;
-        if (!this.addSelection(this.githubManager.selectedRepoName, iconsRepo)) return;
-        if (!this.addSelection(this.githubManager.selectedBranchName, iconsBranch)) return;
+        if (!this.addSelection(this.githubManager.selectedRepoName, this.iconsRepo)) return;
+        if (!this.addSelection(this.githubManager.selectedBranchName, this.iconsBranch)) return;
         const path: Array<string> = this.githubManager.selectedPath;
         if (path.length < 2) return;
         this.breadCrumbs.style.display = 'flex';
@@ -156,11 +163,11 @@ export class DialogGhImport extends Dialog {
         this.loadingEnd();
 
         const userChecked = (this.githubManager.selectedAccountName === this.githubManager.login);
-        this.addItemToList(this.githubManager.login, iconsUser, { login: this.githubManager.login }, userChecked, this.selectUser);
+        this.addItemToList(this.githubManager.login, this.iconsUser, { login: this.githubManager.login }, userChecked, this.selectUser);
         for (let i = 0; i < orgs.data.length; i++) {
             const login = orgs.data[i].login;
             const checked = (this.githubManager.selectedAccountName === login)
-            this.addItemToList(login, iconsInstitution, { login: login }, checked, this.selectUser);
+            this.addItemToList(login, this.iconsInstitution, { login: login }, checked, this.selectUser);
         }
 
         this.updateSelectionAndBreadcrumbs();
@@ -180,7 +187,7 @@ export class DialogGhImport extends Dialog {
         for (let i = 0; i < repos.data.length; i++) {
             const name = repos.data[i].name;
             const checked = (this.githubManager.selectedRepoName === name);
-            this.addItemToList(name, iconsRepo, { name: name }, checked, this.selectRepo);
+            this.addItemToList(name, this.iconsRepo, { name: name }, checked, this.selectRepo);
         }
 
         this.updateSelectionAndBreadcrumbs();
@@ -199,7 +206,7 @@ export class DialogGhImport extends Dialog {
         for (let i = 0; i < branches.data.length; i++) {
             const name = branches.data[i].name;
             const checked = (this.githubManager.selectedBranchName === name);
-            this.addItemToList(name, iconsBranch, { name: name }, checked, this.selectBranch);
+            this.addItemToList(name, this.iconsBranch, { name: name }, checked, this.selectBranch);
         }
 
         this.updateSelectionAndBreadcrumbs();
@@ -219,13 +226,13 @@ export class DialogGhImport extends Dialog {
         this.loadingEnd();
 
         if (this.githubManager.selectedPath.length > 1) {
-            this.addItemToList('..', iconsFolder, { name: '..', type: 'dir' }, false, this.selectFile);
+            this.addItemToList('..', this.iconsFolder, { name: '..', type: 'dir' }, false, this.selectFile);
         }
 
         for (let i = 0; i < contents.data.length; i++) {
             const name = contents.data[i].name;
             const type = contents.data[i].type;
-            const icon = (type === 'dir') ? iconsFolder : iconsFile;
+            const icon = (type === 'dir') ? this.iconsFolder : this.iconsFile;
             this.addItemToList(name, icon, { name: name, type: type }, false, this.selectFile);
         }
 

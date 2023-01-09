@@ -5,9 +5,9 @@ import { Toolbar } from './toolbar.js';
 import { appendDivTo } from './utils/functions.js';
 export class MidiToolbar extends Toolbar {
     constructor(div, app, midiPlayer) {
-        let iconsPlay = '/icons/toolbar/play.png';
-        let iconsPause = '/icons/toolbar/pause.png';
-        let iconsStop = '/icons/toolbar/stop.png';
+        let iconsPlay = `${app.host}/icons/toolbar/play.png`;
+        let iconsPause = `${app.host}/icons/toolbar/pause.png`;
+        let iconsStop = `${app.host}/icons/toolbar/stop.png`;
         super(div, app);
         this.active = true;
         this.midiPlayer = midiPlayer;
