@@ -2,7 +2,7 @@ name: Editor deployment
 
 on:
   push:
-    branches: [ develop-ts ]
+    branches: [ main ]
 
 jobs:
   build:
