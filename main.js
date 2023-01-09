@@ -1,4 +1,4 @@
-import { App } from "./js/app.js";
+import { App } from "./dist/app.js";
 
 let isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
     
@@ -24,7 +24,7 @@ const options =
 }
 
 // Rescue option to reset to default before loading
-if ( getParameterByName( 'reset' ) != null ) options.reset = true;
+if ( getParameterByName( 'reset' ) != null ) options.appReset = true;
 
 // Create the app - here with an empty option object
 const app = new App( document.getElementById( "app" ), options );

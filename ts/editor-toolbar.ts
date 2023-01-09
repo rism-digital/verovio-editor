@@ -1,0 +1,207 @@
+/**
+ * The EditorToolbar class is the implementation of the editor toolbar.
+ * It uses the App.view and App.toolbarView for enabling / disabling button.
+ * Events are attached to the App.eventManager
+ */
+
+import { ActionManager } from './action-manager.js';
+import { App } from './app.js';
+import { EditorPanel } from './editor-panel.js';
+import { Toolbar } from './toolbar.js';
+
+import { appendDivTo } from './utils/functions.js';
+
+export class EditorToolbar extends Toolbar {
+    app: App;
+    panel: EditorPanel;
+    selectedElementType: string;
+
+    layoutControls: HTMLDivElement;
+    panelOrientation: HTMLDivElement;
+    panelShow: HTMLDivElement;
+    notes: HTMLDivElement;
+    controlEvents: HTMLDivElement;
+
+    controlEventControls: HTMLDivElement;
+    placeAbove: HTMLDivElement;
+    placeBelow: HTMLDivElement;
+    placeAuto: HTMLDivElement;
+
+    hairpinFormControls: HTMLDivElement;
+    formCres: HTMLDivElement;
+    formDim: HTMLDivElement;
+
+    stemControls: HTMLDivElement;
+    stemDirUp: HTMLDivElement;
+    stemDirDown: HTMLDivElement;
+    stemDirAuto: HTMLDivElement;
+
+    constructor(div: HTMLDivElement, app: App, panel: EditorPanel) {
+        let editorStemDirUp = `${app.host}/icons/editor/stem-dir-up.png`;
+        let editorStemDirDown = `${app.host}/icons/editor/stem-dir-down.png`;
+        let editorStemDirAuto = `${app.host}/icons/editor/stem-dir-auto.png`;
+        let editorPlaceBelow = `${app.host}/icons/editor/place-below.png`;
+        let editorPlaceAuto = `${app.host}/icons/editor/place-auto.png`;
+        let editorPlaceAbove = `${app.host}/icons/editor/place-above.png`;
+        let editorFormDim = `${app.host}/icons/editor/form-dim.png`;
+        let editorFormCres = `${app.host}/icons/editor/form-cres.png`;
+
+        super(div, app);
+
+        this.panel = panel;
+        this.active = true;
+        this.selectedElementType = null;
+
+        // sub-toolbar in application 
+        this.layoutControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
+
+        this.panelOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+        this.panelShow = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+
+        appendDivTo(this.element, { class: `vrv-h-separator` });
+        this.notes = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Notes` });
+
+        appendDivTo(this.element, { class: `vrv-h-separator` });
+        this.controlEvents = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Control events` });
+
+        // binding
+        this.panel.eventManager.bind(this.panelOrientation, 'click', this.panel.onToggleOrientation);
+        this.panel.eventManager.bind(this.panelShow, 'click', this.panel.onToggle);
+        this.eventManager.bind(this.notes, 'click', this.onNotes);
+        this.eventManager.bind(this.controlEvents, 'click', this.onControlEvents);
+
+        // controlEventControls
+        this.controlEventControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        appendDivTo(this.controlEventControls, { class: `vrv-h-separator` });
+        this.placeAbove = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceAbove})` } });
+        this.placeBelow = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceBelow})` } });
+        this.placeAuto = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceAuto})` } });
+
+        // hairpinFormControls
+        this.hairpinFormControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        appendDivTo(this.hairpinFormControls, { class: `vrv-h-separator` });
+        this.formCres = appendDivTo(this.hairpinFormControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorFormCres})` } });
+        this.formDim = appendDivTo(this.hairpinFormControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorFormDim})` } });
+
+        // stemControls
+        this.stemControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        appendDivTo(this.stemControls, { class: `vrv-h-separator` });
+        this.stemDirUp = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirUp})` } });
+        this.stemDirDown = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirDown})` } });
+        this.stemDirAuto = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirAuto})` } });
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
+    updateAll(): void {
+        let iconsLayoutH = `${this.app.host}/icons/toolbar/layout-h.png`;
+        let iconsLayoutToggle = `${this.app.host}/icons/toolbar/layout-toggle.png`;
+        let iconsLayoutToggleV = `${this.app.host}/icons/toolbar/layout-toggle-v.png`;
+        let iconsLayoutUnToggle = `${this.app.host}/icons/toolbar/layout-un-toggle.png`;
+        let iconsLayoutUnToggleV = `${this.app.host}/icons/toolbar/layout-un-toggle-v.png`;
+        let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
+
+        let toggleOrientation = (this.app.options.editorSplitterHorizontal) ? true : false;
+        let toggle = (this.app.options.editorSplitterShow) ? true : false;
+        if (toggleOrientation) {
+            this.panelOrientation.style.backgroundImage = `url(${iconsLayoutV})`
+            this.panelShow.style.backgroundImage = toggle ? `url(${iconsLayoutUnToggle})` : `url(${iconsLayoutToggle})`;
+        }
+        else {
+            this.panelOrientation.style.backgroundImage = `url(${iconsLayoutH})`
+            this.panelShow.style.backgroundImage = toggle ? `url(${iconsLayoutUnToggleV})` : `url(${iconsLayoutToggleV})`;
+        }
+        this.updateToolbarBtn(this.panelOrientation, toggle);
+        this.updateToolbarBtn(this.panelShow, true);
+
+        this.updateToolbarToggleBtn(this.notes, (this.selectedElementType === "NOTES"));
+        this.updateToolbarToggleBtn(this.controlEvents, (this.selectedElementType === "CONTROLEVENTS"));
+
+        // Disable hairpin for now
+        this.updateToolbarGrp(this.hairpinFormControls, false);
+        //this.updateToolbarGrp( this.ui.hairpinFormControls, ["CONTROLEVENTS", "hairpin"].includes( this.selectedElementType ) );
+        this.updateToolbarGrp(this.controlEventControls, ["CONTROLEVENTS", "dir", "dynam", "hairpin", "tempo", "pedal"].includes(this.selectedElementType));
+        this.updateToolbarGrp(this.stemControls, ["NOTES", "note", "chord"].includes(this.selectedElementType));
+    }
+
+    bindEvents(actionManager: ActionManager): void {
+        actionManager.eventManager.bind(this.formCres, 'click', actionManager.formCres);
+        actionManager.eventManager.bind(this.formDim, 'click', actionManager.formDim);
+
+        actionManager.eventManager.bind(this.placeAbove, 'click', actionManager.placeAbove);
+        actionManager.eventManager.bind(this.placeBelow, 'click', actionManager.placeBelow);
+        actionManager.eventManager.bind(this.placeAuto, 'click', actionManager.placeAuto);
+
+        actionManager.eventManager.bind(this.stemDirUp, 'click', actionManager.stemDirUp);
+        actionManager.eventManager.bind(this.stemDirDown, 'click', actionManager.stemDirDown);
+        actionManager.eventManager.bind(this.stemDirAuto, 'click', actionManager.stemDirAuto);
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Custom event methods
+    ////////////////////////////////////////////////////////////////////////
+
+    override onActivate(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
+        //console.debug("EditorToolbar::onActivate");
+
+        this.updateAll();
+
+        return true;
+    }
+
+    override onEndLoading(e: CustomEvent): boolean {
+        if (!super.onEndLoading(e)) return false;
+        //console.debug("EditorToolbar::onEndLoading");
+
+        this.updateAll();
+
+        return true;
+    }
+
+    override onSelect(e: CustomEvent): boolean {
+        if (!super.onSelect(e)) return false;
+        //console.debug("EditorToolbar::onSelect");
+
+        this.selectedElementType = e.detail.elementType;
+        this.updateAll();
+
+        return true;
+    }
+
+    override onStartLoading(e: CustomEvent): boolean {
+        if (!super.onStartLoading(e)) return false;
+        //console.debug("EditorToolbar:onStartLoading");
+
+        this.updateToolbarBtn(this.panelOrientation, false);
+        this.updateToolbarBtn(this.panelShow, false);
+
+        return true;
+    }
+
+    override onUpdateView(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
+        //console.debug("EditorToolbar::onUpdate");
+
+        this.updateAll();
+
+        return true;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
+
+    onNotes(e: Event): void {
+        this.selectedElementType = "NOTES";
+        this.updateAll();
+    }
+
+    onControlEvents(e: Event): void {
+        this.selectedElementType = "CONTROLEVENTS";
+        this.updateAll();
+    }
+}

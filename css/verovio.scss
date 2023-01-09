@@ -112,7 +112,7 @@ $font-family: Helvetica Neue, Helvetica,Arial, sans-serif;
 .vrv-wrapper {
     // reset potential previous values
     border: 0 none;
-    display: 'block';
+    display: block;
     font-weight: normal;
     font-family: $font-family;
     font-style: normal;
@@ -799,7 +799,6 @@ $font-family: Helvetica Neue, Helvetica,Arial, sans-serif;
             padding-top: 12px;
             display: flex;
             justify-content: right;
-            align-items: top;
         }
         .vrv-dialog-input {
             background-color: $background;

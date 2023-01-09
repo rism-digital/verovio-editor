@@ -1,0 +1,190 @@
+/**
+ * The ResponsiveView class implements a dynamic rendering view fitting and adjusting to the view port.
+ */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { EditorView } from './editor-view.js';
+import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
+import { appendDivTo } from './utils/functions.js';
+export class ResponsiveView extends VerovioView {
+    constructor(div, app, verovio) {
+        super(div, app, verovio);
+        // initializes ui underneath the parent element, as well as Verovio communication
+        this.svgWrapper = appendDivTo(this.element, { class: `vrv-svg-wrapper` });
+        this.midiIds = [];
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // VerovioView update methods
+    ////////////////////////////////////////////////////////////////////////
+    updateView(update, lightEndLoading = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            switch (update) {
+                case (VerovioViewUpdate.Activate):
+                    yield this.updateActivate();
+                    break;
+                case (VerovioViewUpdate.LoadData):
+                    yield this.updateLoadData();
+                    break;
+                case (VerovioViewUpdate.Resized):
+                    yield this.updateResized();
+                    break;
+                case (VerovioViewUpdate.Update):
+                    yield this.updateUpdateData();
+                    break;
+                case (VerovioViewUpdate.Zoom):
+                    yield this.updateZoom();
+                    break;
+            }
+            this.app.endLoading(lightEndLoading);
+        });
+    }
+    updateActivate() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.app.settings.adjustPageHeight = true;
+            this.app.settings.breaks = 'auto';
+            this.app.settings.footer = 'none';
+            this.app.settings.scale = this.currentScale;
+            this.app.settings.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.settings.scale);
+            this.app.settings.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.settings.scale);
+            this.app.settings.justifyVertically = false;
+            this.midiIds = [];
+            if (this.app.settings.pageHeight !== 0) {
+                yield this.verovio.setOptions(this.app.settings);
+            }
+        });
+    }
+    updateLoadData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!(this instanceof EditorView)) {
+                this.element.style.height = this.element.parentElement.style.height;
+                this.element.style.width = this.element.parentElement.style.width;
+            }
+            if (this.ui && this.element && this.svgWrapper) {
+                this.updateSVGDimensions();
+                // Reset pageHeight and pageWidth to match the effective scaled viewport width
+                this.app.settings.scale = this.currentScale;
+                this.app.settings.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.settings.scale);
+                this.app.settings.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.settings.scale);
+                // Not sure why we need to remove the top margin from the calculation... to be investigated
+                this.app.settings.pageHeight -= (this.app.settings.pageMarginTop) * (100 / this.app.settings.scale);
+                if (this.app.settings.pageHeight !== 0) {
+                    yield this.verovio.setOptions(this.app.settings);
+                }
+                if (this.app.pageCount > 0) {
+                    yield this.verovio.setOptions(this.app.settings);
+                    yield this.verovio.redoLayout(this.app.settings);
+                    this.app.pageCount = yield this.verovio.getPageCount();
+                    if (this.currentPage > this.app.pageCount) {
+                        this.currentPage = this.app.pageCount;
+                    }
+                    yield this.renderPage();
+                }
+            }
+        });
+    }
+    updateResized() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateLoadData();
+        });
+    }
+    updateUpdateData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.verovio.loadData(this.app.mei);
+            this.app.pageCount = yield this.verovio.getPageCount();
+            yield this.updateLoadData();
+        });
+    }
+    updateZoom() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updateLoadData();
+        });
+    }
+    renderPage(lightEndLoading = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const svg = yield this.verovio.renderToSVG(this.currentPage);
+            this.svgWrapper.innerHTML = svg;
+            if (lightEndLoading)
+                this.app.endLoading(true);
+        });
+    }
+    midiUpdate(time) {
+        return __awaiter(this, void 0, void 0, function* () {
+            //const animateStart = document.getElementById( "highlighting-start" );
+            let vrvTime = Math.max(0, time - 500);
+            let elementsAtTime = yield this.app.verovio.getElementsAtTime(vrvTime);
+            if (Object.keys(elementsAtTime).length === 0 || elementsAtTime.page === 0) {
+                //console.debug( "Nothing returned by getElementsAtTime" );
+                return;
+            }
+            if (elementsAtTime.page != this.currentPage) {
+                this.currentPage = elementsAtTime.page;
+                this.app.startLoading("Loading content ...", true);
+                let event = new CustomEvent('onPage');
+                this.app.customEventManager.dispatch(event);
+            }
+            if ((elementsAtTime.notes.length > 0) && (this.midiIds != elementsAtTime.notes)) {
+                //updatePageOrScrollTo(elementsAtTime.notes[0]);
+                for (let i = 0, len = this.midiIds.length; i < len; i++) {
+                    let noteid = this.midiIds[i];
+                    if (elementsAtTime.notes.indexOf(noteid) === -1) {
+                        let note = this.svgWrapper.querySelector('#' + noteid);
+                        if (note)
+                            note.style.filter = "";
+                    }
+                }
+                ;
+                this.midiIds = elementsAtTime.notes;
+                for (let i = 0, len = this.midiIds.length; i < len; i++) {
+                    let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
+                    if (note)
+                        note.style.filter = "url(#highlighting)";
+                    //if ( note ) animateStart.beginElement();
+                }
+                ;
+            }
+        });
+    }
+    midiStop() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (let i = 0, len = this.midiIds.length; i < len; i++) {
+                let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
+                if (note)
+                    note.style.filter = "";
+            }
+            ;
+            this.midiIds = [];
+        });
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+    updateSVGDimensions() {
+        this.svgWrapper.style.height = this.element.style.height;
+        this.svgWrapper.style.width = this.element.style.width;
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Custom event methods
+    ////////////////////////////////////////////////////////////////////////
+    onPage(e) {
+        if (!super.onPage(e))
+            return false;
+        //console.debug("ResponsiveView::onPage");
+        this.renderPage(true);
+        return true;
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Event listeners
+    ////////////////////////////////////////////////////////////////////////
+    scrollListener(e) {
+        let element = e.target;
+        this.svgWrapper.scrollTop = element.scrollTop;
+        this.svgWrapper.scrollLeft = element.scrollLeft;
+    }
+}
