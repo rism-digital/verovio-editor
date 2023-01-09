@@ -79,57 +79,66 @@ interface VerovioSettings {
 }
 
 export class App {
-    clientId: string;
-    host: string;
-    id: string;
-    githubManager: GitHubManager;
-    options: AppOptions;
-    fileStack: FileStack;
-    element: HTMLDivElement;
-    customEventManager: CustomEventManager;
-    zoomLevels: Array<number>;
-    loadingCount: number;
-    eventManager: EventManager;
-    appToolbar: AppToolbar;
-    appStatusbar: AppStatusbar;
-    midiToolbar: MidiToolbar;
-    resizeTimer: number;
-    mei: string;
-    appIsLoaded: boolean;
-    appReset: boolean;
-    filename: string;
+    // private members
+    private clientId: string;
+    private host: string;
+    private element: HTMLDivElement;
 
-    view: GenericView;
-    toolbarView: VerovioView;
-    viewDocument: DocumentView;
-    viewEditor: EditorPanel;
-    viewResponsive: ResponsiveView;
+    private loadingCount: number;
+    public appToolbar: AppToolbar;
+    private appStatusbar: AppStatusbar;
+    private midiToolbar: MidiToolbar;
+    private resizeTimer: number;
+    private appIsLoaded: boolean;
+    private appReset: boolean;
+    private filename: string;
 
-    verovio: VerovioWorkerProxy;
-    validator: ValidatorWorkerProxy;
-    pdf: PDFWorkerProxy;
-    rngLoader: RNGLoader;
-    midiPlayer: MidiPlayer;
+    private viewDocument: DocumentView;
+    private viewEditor: EditorPanel;
+    private viewResponsive: ResponsiveView;
 
-    input: HTMLInputElement;
-    output: HTMLAnchorElement;
-    fileCopy: HTMLTextAreaElement;
-    wrapper: HTMLDivElement;
-    notification: HTMLDivElement;
-    dialog: HTMLDivElement;
-    toolbar: HTMLDivElement;
-    views: HTMLDivElement;
-    loader: HTMLDivElement;
-    loaderText: HTMLDivElement;
-    statusbar: HTMLDivElement;
-    view1: HTMLDivElement;
-    view2: HTMLDivElement;
-    view3: HTMLDivElement;
+    private pdf: PDFWorkerProxy;
+    private midiPlayer: MidiPlayer;
+    private currentSchema: string;
 
-    settings: VerovioSettings;
-    pageCount: number;
-    currentZoomIndex: number;
-    currentSchema: string;
+    private input: HTMLInputElement;
+    private output: HTMLAnchorElement;
+    private fileCopy: HTMLTextAreaElement;
+    private wrapper: HTMLDivElement;
+    private notification: HTMLDivElement;
+    private dialog: HTMLDivElement;
+    private toolbar: HTMLDivElement;
+    private views: HTMLDivElement;
+    private loader: HTMLDivElement;
+    private loaderText: HTMLDivElement;
+    private statusbar: HTMLDivElement;
+    private view1: HTMLDivElement;
+    private view2: HTMLDivElement;
+    private view3: HTMLDivElement;
+    
+    // readonly members
+    readonly customEventManager: CustomEventManager;
+    readonly zoomLevels: Array<number>;
+    readonly eventManager: EventManager;
+    readonly id: string;
+    readonly githubManager: GitHubManager;
+    readonly options: AppOptions;
+    readonly fileStack: FileStack;
+
+    readonly verovio: VerovioWorkerProxy;
+    readonly validator: ValidatorWorkerProxy;
+    readonly rngLoader: RNGLoader;
+
+    readonly settings: VerovioSettings;
+
+    // public members
+    public view: GenericView;
+    public toolbarView: VerovioView;
+
+    public pageCount: number;
+    public currentZoomIndex: number;
+
+    public mei: string;
 
     constructor(div: HTMLDivElement, opts?: AppOptions) {
         this.clientId = "fd81068a15354a300522";

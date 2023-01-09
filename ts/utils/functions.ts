@@ -3,7 +3,7 @@ export function appendAnchorTo(parent: HTMLElement, options: object): HTMLAnchor
     return <HTMLAnchorElement>appendHTMLElementTo(parent, options, 'a');
 }
 
-export function appendCanvasTo(parent: HTMLCanvasElement, options: object): HTMLCanvasElement {
+export function appendCanvasTo(parent: HTMLElement, options: object): HTMLCanvasElement {
     return <HTMLCanvasElement>appendHTMLElementTo(parent, options, 'canvas');
 }
 
