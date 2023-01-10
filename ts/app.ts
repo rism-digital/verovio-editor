@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.2";
+const version = "1.1.3";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -38,6 +38,7 @@ const resetMsg = `This will reset all default options, reset the default file, r
 
 export interface AppOptions {
     appReset?: boolean;
+    isSafari?: boolean;
     viewerOnly?: boolean;
     defaultView: string;
     documentViewPageBorder: number;
@@ -51,6 +52,7 @@ export interface AppOptions {
     enableEditor: boolean;
     enableResponsive: boolean;
     enableStatusbar: boolean;
+    enableValidation: boolean;
     github: GithubOptions;
     responsiveZoom: number;
     schema: string;
@@ -83,6 +85,7 @@ export class App {
     // private members
     private clientId: string;
     private element: HTMLDivElement;
+    public notificationStack: Array<string>;
 
     private loadingCount: number;
     public appToolbar: AppToolbar;
@@ -147,6 +150,7 @@ export class App {
         //this.host = "http://localhost:8081";
         this.id = this.clientId;
 
+        this.notificationStack = [];
         this.githubManager = new GitHubManager(this);
 
         this.options = Object.assign({
@@ -168,11 +172,14 @@ export class App {
             enableEditor: true,
             enableResponsive: true,
             enableStatusbar: true,
+            enableValidation: true,
 
             // The default schema (latest MEI release by default)
-            schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
+            //schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
 
             defaultView: 'responsive',
+
+            isSafari: false
         }, opts);
 
         if (opts.appReset) window.localStorage.removeItem("options");
@@ -318,8 +325,10 @@ export class App {
                     this.currentSchema = this.options.schema;
                     const response = await fetch(this.currentSchema);
                     const data = await response.text();
-                    const res = await this.validator.setRelaxNGSchema(data);
-                    console.log("Schema loaded", res);
+                    if (this.options.enableValidation) {
+                        const res = await this.validator.setRelaxNGSchema(data);
+                        console.log("Schema loaded", res);
+                    }
                     this.rngLoader.setRelaxNGSchema(data);
                     this.endLoading();
                     this.createInterfaceAndLoadData();
@@ -353,6 +362,10 @@ export class App {
         this.customEventManager.bind(this, 'onResized', this.onResized);
         let event = new CustomEvent('onResized');
         this.customEventManager.dispatch(event);
+
+        if (this.options.isSafari) {
+            this.showNotification("It seems that you are using Safari, on which XML validation unfortunately does not work.<br/>Please use another browser to have XML validation enabled.");
+        }
 
         this.appIsLoaded = true;
         this.endLoading();
@@ -496,13 +509,20 @@ export class App {
     }
 
     showNotification(message: string): void {
-        this.notification.innerHTML = message;
+        this.notificationStack.push(message);
+        if (this.notificationStack.length < 2) this.pushNotification();
+    }
+
+    pushNotification() {
+        this.notification.innerHTML = this.notificationStack[0];
         this.notification.classList.remove("disabled");
 
-        const notification = this.notification;
+        const timerThis = this;
         setTimeout(function () {
-            notification.classList.add("disabled");
-        }, 2500);
+            timerThis.notification.classList.add("disabled");
+            timerThis.notificationStack.shift();
+            if (timerThis.notificationStack.length > 0) timerThis.pushNotification();
+        }, 3500);
     }
 
     ////////////////////////////////////////////////////////////////////////

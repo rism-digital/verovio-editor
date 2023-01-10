@@ -1,11 +1,5 @@
 import { App } from "./dist/app.js";
 
-let isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
-    
-if (isSafari) {
-    alert("It seems that you are using Safari, on which the Verovio Editor unfortunately does not work at this stage.\nPlease use another browser.");
-}
-
 function getParameterByName( name )
 {
     var match = RegExp( '[?&]' + name + '=([^&]*)' ).exec( window.location.search );
@@ -20,7 +14,15 @@ const options =
     enableEditor: true,
     defaultZoom: 5,
     defaultView: 'editor',
-    editorSplitterShow: true
+    editorSplitterShow: true,
+    enableValidation: true
+}
+
+let isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
+if ( isSafari )
+{
+    options.isSafari = true;
+    options.enableValidation = false;
 }
 
 // Rescue option to reset to default before loading

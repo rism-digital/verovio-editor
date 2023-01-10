@@ -61,8 +61,11 @@ export class PDFWorkerProxy extends WorkerProxy {
 }
 
 export class ValidatorWorkerProxy extends WorkerProxy {
+    check: Function;
+    validate: Function;
     validateNG: Function;
     setRelaxNGSchema: Function;
+    setSchema: Function;
 
     onRuntimeInitialized: Function;
 

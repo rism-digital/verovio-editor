@@ -282,7 +282,7 @@
     color: white;
     z-index: 8;
     opacity: 1;
-    transition: opacity 400ms; }
+    transition: opacity 800ms; }
   .vrv-wrapper .vrv-notification.disabled {
     opacity: 0;
     z-index: -1; }

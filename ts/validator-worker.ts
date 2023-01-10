@@ -2,7 +2,8 @@
  * The Worker for XML validation.
  */
 
-importScripts("https://www.verovio.org/javascript/validator/xml-validator.js");
+importScripts("https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js");
+//importScripts("http://localhost:8083/build/xml-validator-2.10.3.js");
 
 class ValidatorDeferred {
     promise: Promise<unknown>;
@@ -18,6 +19,7 @@ class ValidatorDeferred {
 }
 
 let methods = {
+    check: null,
     setSchema: null,
     validate: null,
     setRelaxNGSchema: null,
@@ -29,6 +31,8 @@ const isValidatorModuleReady = new ValidatorDeferred();
 
 //@ts-ignore
 Module.onRuntimeInitialized = function () {
+    //@ts-ignore
+    methods.check = Module.cwrap('check', 'string', ['string']);
     //@ts-ignore
     methods.setSchema = Module.cwrap('set_schema', 'bool', ['string']);
     //@ts-ignore

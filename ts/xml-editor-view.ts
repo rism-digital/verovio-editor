@@ -111,7 +111,13 @@ export class XMLEditorView extends GenericView {
             }
             editor.updateLinting = updateLinting;
             editor.app.startLoading("Validating ...", true);
-            const validation = await editor.validator.validateNG(text);
+            let validation = "[]";
+            if (editor.app.options.enableValidation) {
+                validation = await editor.validator.validateNG(text);
+            }
+            else {
+                validation = await editor.validator.check(text);
+            }
             editor.app.endLoading(true);
             editor.highlightValidation(text, validation, editor.timestamp);
         }
@@ -125,8 +131,10 @@ export class XMLEditorView extends GenericView {
         try {
             const response = await fetch(schemaFile);
             const data = await response.text();
-            const res = await this.validator.setRelaxNGSchema(data);
-            console.log("New schema loaded", res);
+            if (this.app.options.enableValidation) {
+                const res = await this.validator.setRelaxNGSchema(data);
+                console.log("New schema loaded", res);
+            }
             this.rngLoader.setRelaxNGSchema(data);
             this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags
             return true;
@@ -152,7 +160,7 @@ export class XMLEditorView extends GenericView {
         }
     }
 
-    highlightValidation(text: string, validation, timestamp: number): void {
+    highlightValidation(text: string, validation: string, timestamp: number): void {
         let lines = [];
         let found = [];
         let i = 0;
@@ -450,6 +458,6 @@ if (typeof CodeMirror !== 'undefined') {
                 cm.indentLine(cur, "smart");
             cm.setSelection(from, cm.getCursor(false));
         });
-    });   
+    });
 }
 

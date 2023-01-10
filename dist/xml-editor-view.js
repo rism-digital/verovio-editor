@@ -85,7 +85,13 @@ export class XMLEditorView extends GenericView {
                 }
                 editor.updateLinting = updateLinting;
                 editor.app.startLoading("Validating ...", true);
-                const validation = yield editor.validator.validateNG(text);
+                let validation = "[]";
+                if (editor.app.options.enableValidation) {
+                    validation = yield editor.validator.validateNG(text);
+                }
+                else {
+                    validation = yield editor.validator.check(text);
+                }
                 editor.app.endLoading(true);
                 editor.highlightValidation(text, validation, editor.timestamp);
             }
@@ -101,8 +107,10 @@ export class XMLEditorView extends GenericView {
             try {
                 const response = yield fetch(schemaFile);
                 const data = yield response.text();
-                const res = yield this.validator.setRelaxNGSchema(data);
-                console.log("New schema loaded", res);
+                if (this.app.options.enableValidation) {
+                    const res = yield this.validator.setRelaxNGSchema(data);
+                    console.log("New schema loaded", res);
+                }
                 this.rngLoader.setRelaxNGSchema(data);
                 this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
                 return true;
