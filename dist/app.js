@@ -387,7 +387,8 @@ export class App {
     generatePDF() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.pdf) {
-                const pdfWorker = new Worker('./pdf-worker.js');
+                const pdfWorkerURL = this.getWorkerURL(`${this.host}/dist/pdf-worker.js`);
+                const pdfWorker = new Worker(pdfWorkerURL);
                 this.pdf = new PDFWorkerProxy(pdfWorker);
             }
             const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.settings.scale);

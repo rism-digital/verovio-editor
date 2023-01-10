@@ -559,7 +559,8 @@ export class App {
 
     async generatePDF(): Promise<any> {
         if (!this.pdf) {
-            const pdfWorker = new Worker('./pdf-worker.js');
+            const pdfWorkerURL = this.getWorkerURL(`${this.host}/dist/pdf-worker.js`);
+            const pdfWorker = new Worker(pdfWorkerURL);
             this.pdf = new PDFWorkerProxy(pdfWorker);
         }
 
