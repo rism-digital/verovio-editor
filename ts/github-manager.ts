@@ -94,7 +94,7 @@ export class GitHubManager {
         this.selectedAccountName = this.login;
 
         let options = this.app.options.github;
-        if (options.login === this.login) {
+        if (options && options.login === this.login) {
             await this.selectAccount(options.account);
             await this.selectRepo(options.repo);
             await this.selectBranch(options.branch);
