@@ -1,6 +1,6 @@
 /**
  * The VerovioView class is the based class for other view implementation featuring Verovio rendering.
- * It should not be instanciated directly but only through inherited classes.
+ * It should not be instantiated directly but only through inherited classes.
  * The VerovioView is attached to a VerovioMessenger.
  */
 

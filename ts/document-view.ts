@@ -211,11 +211,11 @@ export class DocumentView extends VerovioView {
         else {
             const canvas: HTMLCanvasElement = <HTMLCanvasElement>page.firstElementChild;
             const ctx = canvas.getContext("2d");
-            const DOMURL = self.URL || self.webkitURL;
+            const domURL = self.URL || self.webkitURL;
             const img = new Image();
 
             const svgBlob = new Blob([`${svg}`], { type: "image/svg+xml" });
-            const svgUrl = DOMURL.createObjectURL(svgBlob);
+            const svgUrl = domURL.createObjectURL(svgBlob);
 
             const originalHeight = this.app.verovioOptions.pageHeight;
             const originalWidth = this.app.verovioOptions.pageWidth;

@@ -14,7 +14,7 @@ export class GitHubManager {
     constructor(app) {
         this.app = app;
         this.name = 'GitHub';
-        this.login = 'unkown';
+        this.login = 'unknown';
         this.user = null;
         this.selectedUser = null;
         this.selectedOrganization = null;

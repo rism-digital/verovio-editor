@@ -132,9 +132,9 @@ export class ResponsiveView extends VerovioView {
             if ((elementsAtTime.notes.length > 0) && (this.midiIds != elementsAtTime.notes)) {
                 //updatePageOrScrollTo(elementsAtTime.notes[0]);
                 for (let i = 0, len = this.midiIds.length; i < len; i++) {
-                    let noteid = this.midiIds[i];
-                    if (elementsAtTime.notes.indexOf(noteid) === -1) {
-                        let note = this.svgWrapper.querySelector('#' + noteid);
+                    let noteId = this.midiIds[i];
+                    if (elementsAtTime.notes.indexOf(noteId) === -1) {
+                        let note = this.svgWrapper.querySelector('#' + noteId);
                         if (note)
                             note.style.filter = "";
                     }

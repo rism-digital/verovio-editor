@@ -104,7 +104,7 @@ addEventListener('message', function (event) {
         SVGtoPDF(doc, args[0], 0, 0, options);
     }
     else {
-        console.warn("Unkown function", method);
+        console.warn("Unknown function", method);
     }
 
     // Always respond to worker calls with postMessage
