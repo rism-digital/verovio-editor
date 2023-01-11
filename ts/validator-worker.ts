@@ -72,7 +72,7 @@ addEventListener('message', function (event: MessageEvent<any>) {
         result = fn.apply(null, args || []);
     }
     else {
-        console.warn("Unkown call ", method);
+        console.warn("Unknown call ", method);
     }
 
     // Always respond to worker calls with postMessage

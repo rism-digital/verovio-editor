@@ -16,7 +16,7 @@ export class MidiToolbar extends Toolbar {
         this.playing = false;
         this.pageDragStart = 0;
         this.barDragStart = 0;
-        // set in the css in .vrv-midi-bar via $midibar-width
+        // set in the css in .vrv-midi-bar via $midi-bar-width
         this.barWidth = 200;
         // sub-toolbar in application 
         this.midiControls = appendDivTo(this.app.appToolbar.midiPlayerSubToolbar, { class: `vrv-btn-group` });

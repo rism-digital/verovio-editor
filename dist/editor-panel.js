@@ -17,9 +17,9 @@ export class EditorPanel extends GenericView {
         this.toolbar = appendDivTo(this.element, { class: `vrv-editor-toolbar` });
         this.editorToolbar = new EditorToolbar(this.toolbar, this.app, this);
         this.customEventManager.addToPropagationList(this.editorToolbar.customEventManager);
-        this.hsplit = appendDivTo(this.element, { class: `vrv-hsplit` });
-        this.toolpanel = appendDivTo(this.hsplit, { class: `vrv-editor-toolpanel` });
-        this.split = appendDivTo(this.hsplit, { class: `vrv-split` });
+        this.hSplit = appendDivTo(this.element, { class: `vrv-h-split` });
+        this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
+        this.split = appendDivTo(this.hSplit, { class: `vrv-split` });
         let orientation = (this.app.options.editorSplitterHorizontal) ? "vertical" : "horizontal";
         this.split.classList.add(orientation);
         this.editor = appendDivTo(this.split, { class: `vrv-view`, style: `` });
@@ -63,13 +63,13 @@ export class EditorPanel extends GenericView {
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
         let height = this.element.clientHeight - this.toolbar.offsetHeight;
-        let width = this.element.clientWidth - this.toolpanel.offsetWidth;
+        let width = this.element.clientWidth - this.toolPanel.offsetWidth;
         this.split.style.height = `${height}px`;
         this.split.style.width = `${width}px`;
         this.xmlEditor.style.display = 'block';
         this.splitter.style.display = 'block';
         if (!this.app.options.editorSplitterShow) {
-            // Ideally we would send a onActive / onDeactiveate event
+            // Ideally we would send a onActive / onDeactivate event
             this.xmlEditor.style.display = 'none';
             this.xmlEditor.style.height = `0px`;
             this.xmlEditor.style.width = `0px`;
@@ -156,7 +156,7 @@ export class EditorPanel extends GenericView {
             let event = new CustomEvent('onResized');
             this.xmlEditorView.customEventManager.dispatch(event);
             // To update Verovio 
-            //this.app.startLoading( "Ajusting size ...", true );
+            //this.app.startLoading( "Adjusting size ...", true );
             //this.updateSplitterSize();
             //let event = new CustomEvent( 'onResized' );
             //this.editorView.customEventManager.dispatch( event );
@@ -167,8 +167,8 @@ export class EditorPanel extends GenericView {
         // Remove listeners
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('mouseup', this.boundMouseUp);
-        // Update the splitter postion and resize all
-        this.app.startLoading("Ajusting size ...", true);
+        // Update the splitter position and resize all
+        this.app.startLoading("Adjusting size ...", true);
         this.updateSplitterSize();
         let event = new CustomEvent('onResized');
         this.customEventManager.dispatch(event);
@@ -177,13 +177,13 @@ export class EditorPanel extends GenericView {
         this.app.options.editorSplitterHorizontal = !this.app.options.editorSplitterHorizontal;
         this.split.classList.toggle("vertical");
         this.split.classList.toggle("horizontal");
-        this.app.startLoading("Ajusting size ...", true);
+        this.app.startLoading("Adjusting size ...", true);
         let event = new CustomEvent('onResized');
         this.app.customEventManager.dispatch(event);
     }
     onToggle() {
         this.app.options.editorSplitterShow = !this.app.options.editorSplitterShow;
-        this.app.startLoading("Ajusting size ...", true);
+        this.app.startLoading("Adjusting size ...", true);
         let event = new CustomEvent('onResized');
         this.app.customEventManager.dispatch(event);
     }

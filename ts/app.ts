@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.5";
+const version = "1.1.6";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -108,7 +108,7 @@ export class App {
         this.githubManager = new GitHubManager(this);
 
         this.options = Object.assign({
-            // The margin around page in docuementView
+            // The margin around page in documentView
             documentViewMargin: 100,
             // The border for pages in documentView
             documentViewPageBorder: 1,
@@ -400,14 +400,14 @@ export class App {
     createFilter(): void {
         const filterDiv = appendDivTo(this.element, { class: `vrv-filter` });
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
+        var xHttp = new XMLHttpRequest();
+        xHttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 filterDiv.appendChild(this.responseXML.documentElement);
             }
         };
-        xhttp.open("GET", `${this.host}${filter}`, true);
-        xhttp.send();
+        xHttp.open("GET", `${this.host}${filter}`, true);
+        xHttp.send();
     }
 
     loadData(mei: string, filename: string = "untitled.xml", convert: boolean = false, onlyIfEmpty: boolean = false): void {

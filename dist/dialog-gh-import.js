@@ -27,7 +27,7 @@ export class DialogGhImport extends Dialog {
         this.githubManager = githubManager;
         this.tabs = appendDivTo(this.content, { class: `vrv-dialog-tabs` });
         this.tabUser = appendDivTo(this.tabs, { class: `vrv-dialog-tab active`, dataset: { tab: `user` } });
-        this.tabUser.innerHTML = 'User / Organisations';
+        this.tabUser.innerHTML = 'User / Organizations';
         this.eventManager.bind(this.tabUser, 'click', this.selectTab);
         this.tabRepo = appendDivTo(this.tabs, { class: `vrv-dialog-tab`, dataset: { tab: `rep` } });
         this.tabRepo.innerHTML = 'Repositories';

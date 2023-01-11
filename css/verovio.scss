@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////
 // To change dark / light theme - also rename icons directories
 ////////////////////////////////////////////////////////////////////////
-$darktheme: true;
+$dark-theme: true;
 
 $background: lightgrey;
 $background-light: lighten($background, 10%);
@@ -20,7 +20,7 @@ $hover-filter: invert(100%);
 $filtered-primary: invert($primary);
 $filtered-background-grey-active: invert($background-active);
 
-@if $darktheme ==true {
+@if $dark-theme == true {
     $background: rgb(60, 60, 60);
     $background-light: lighten($background, 10%);
     $background-extra-light: lighten($background, 20%);
@@ -45,7 +45,7 @@ $filtered-background-grey-active: invert($background-active);
 $toolbar-height: 36px;
 $menu-height: 18px;
 $statusbar-height: 20px;
-$editor-toolpanel-width: 0px;
+$editor-tool-panel-width: 0px;
 $btn-height: 40px;
 $dialog-gh-list-height: 350px;
 
@@ -57,7 +57,7 @@ $z-index-notification: 8;
 $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
 ////////////////////////////////////////////////////////////////////////
-// Hidden form / file maniupulation elements
+// Hidden form / file manipulation elements
 ////////////////////////////////////////////////////////////////////////
 
 .vrv-filter,
@@ -137,7 +137,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     overflow: initial;
     padding: 0;
     text-align: initial;
-    vertical-align: baseline;
 
     *,
     ::before,
@@ -191,7 +190,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
 
             ////////////////////////////////////////////////////////////////////////
-            // Editoror view cursor
+            // Editor view cursor
             ////////////////////////////////////////////////////////////////////////        
 
             .vrv-editor-cursor {
@@ -240,14 +239,14 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             // Editor panel and splitter
             ////////////////////////////////////////////////////////////////////////
 
-            .vrv-editor-toolpanel {
-                min-width: $editor-toolpanel-width;
+            .vrv-editor-tool-panel {
+                min-width: $editor-tool-panel-width;
                 background-color: $background;
                 border-top: 1px solid $background-border;
                 border-bottom: 1px solid $background-border;
             }
 
-            .vrv-hsplit {
+            .vrv-h-split {
                 display: flex;
             }
 
@@ -258,7 +257,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 overflow: hidden;
             }
 
-            // commmon to vertical and horizontal
+            // common to vertical and horizontal
             .vrv-split> :nth-child(2) {
                 position: relative;
             }
@@ -315,24 +314,24 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 }
             }
 
-            .vrv-xmlvalid {
+            .vrv-xml-valid {
                 z-index: $z-index-valid;
                 position: absolute;
                 min-height: 16px;
                 min-width: 16px;
             }
 
-            .vrv-xmlvalid.ok {
+            .vrv-xml-valid.ok {
                 background: url(../icons/xml/ok.png) no-repeat center;
                 background-color: green;
             }
 
-            .vrv-xmlvalid.wait {
+            .vrv-xml-valid.wait {
                 background: url(../icons/xml/wait.png) no-repeat center;
                 background-color: darkorange;
             }
 
-            .vrv-xmlvalid.error {
+            .vrv-xml-valid.error {
                 background: url(../icons/xml/stop.png) no-repeat center;
                 background-color: #B00;
             }
@@ -348,7 +347,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     $menu-padding: 5px;
     $btn-small: 16px;
     $btn-large: 32px;
-    $midibar-width: 200px;
+    $midi-bar-width: 200px;
 
     ////////////////////////////////////////////////////////////////////////
     // Toolbar
@@ -395,7 +394,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             font-size: 16px;
         }
 
-        // Attribute for setting text programatically 
+        // Attribute for setting text programmatically 
         .vrv-btn-text {
             @extend .vrv-btn;
         }
@@ -446,7 +445,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             .vrv-midi-bar {
                 height: 12px;
                 margin-top: 11px;
-                width: $midibar-width;
+                width: $midi-bar-width;
                 background: lighten(lightgrey, 10%);
                 cursor: pointer;
                 display: inline-block;

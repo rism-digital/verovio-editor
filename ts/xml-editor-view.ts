@@ -21,7 +21,7 @@ export class XMLEditorView extends GenericView {
     rngLoader: RNGLoader;
     currentId: string;
     element: HTMLDivElement;
-    xmlvalid: HTMLDivElement;
+    xmlValid: HTMLDivElement;
     xmlEditorView: HTMLTextAreaElement;
     updateLinting: Function;
     loaded: boolean;
@@ -41,7 +41,7 @@ export class XMLEditorView extends GenericView {
 
         this.currentId = null;
 
-        this.xmlvalid = appendDivTo(this.element, { class: `vrv-xmlvalid` });
+        this.xmlValid = appendDivTo(this.element, { class: `vrv-xml-valid` });
         this.xmlEditorView = appendTextAreaTo(this.element, {});
 
         this.updateLinting = null;
@@ -104,10 +104,10 @@ export class XMLEditorView extends GenericView {
             if (editor.skipValidation) return;
 
             // keep the callback
-            if (editor.xmlvalid) {
-                editor.xmlvalid.classList.remove("ok");
-                editor.xmlvalid.classList.remove("error");
-                editor.xmlvalid.classList.add("wait");
+            if (editor.xmlValid) {
+                editor.xmlValid.classList.remove("ok");
+                editor.xmlValid.classList.remove("error");
+                editor.xmlValid.classList.add("wait");
             }
             editor.updateLinting = updateLinting;
             editor.app.startLoading("Validating ...", true);
@@ -201,14 +201,14 @@ export class XMLEditorView extends GenericView {
             else {
                 console.log("Validated data is obsolete");
             }
-            this.xmlvalid.classList.remove("wait");
-            this.xmlvalid.classList.remove("error");
-            this.xmlvalid.classList.add("ok");
+            this.xmlValid.classList.remove("wait");
+            this.xmlValid.classList.remove("error");
+            this.xmlValid.classList.add("ok");
         }
         else {
-            this.xmlvalid.classList.remove("wait");
-            this.xmlvalid.classList.remove("ok");
-            this.xmlvalid.classList.add("error");
+            this.xmlValid.classList.remove("wait");
+            this.xmlValid.classList.remove("ok");
+            this.xmlValid.classList.add("error");
         }
     }
 

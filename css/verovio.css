@@ -1,4 +1,7 @@
-.vrv-filter, .vrv-file-input, .vrv-file-output, .vrv-file-copy {
+.vrv-filter,
+.vrv-file-input,
+.vrv-file-output,
+.vrv-file-copy {
   position: absolute;
   left: -9999px;
   z-index: -1; }
@@ -25,7 +28,8 @@
 .vrv-selectable.selected, .vrv-wrapper .vrv-dialog-tabs .selected.vrv-dialog-tab {
   background-color: #3c3c3c; }
 
-.vrv-text-no-select, .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper text, .vrv-wrapper .vrv-views .vrv-view .vrv-svg-overlay text, .vrv-wrapper .vrv-dialog-tabs .vrv-dialog-tab {
+.vrv-text-no-select, .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper text,
+.vrv-wrapper .vrv-views .vrv-view .vrv-svg-overlay text, .vrv-wrapper .vrv-dialog-tabs .vrv-dialog-tab {
   -webkit-touch-callout: none;
   /* iOS Safari */
   -webkit-user-select: none;
@@ -38,7 +42,7 @@
   /* Internet Explorer/Edge */
   user-select: none;
   /* Non-prefixed version, currently
-     supported by Chrome and Opera */ }
+                                  supported by Chrome and Opera */ }
 
 .vrv-wrapper {
   border: 0 none;
@@ -52,8 +56,7 @@
   outline: 0;
   overflow: initial;
   padding: 0;
-  text-align: initial;
-  vertical-align: baseline; }
+  text-align: initial; }
   .vrv-wrapper *,
   .vrv-wrapper ::before,
   .vrv-wrapper ::after {
@@ -75,10 +78,12 @@
         background: url(./loading.svg) no-repeat center; }
     .vrv-wrapper .vrv-views .vrv-view {
       display: none; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper, .vrv-wrapper .vrv-views .vrv-view .vrv-svg-overlay {
+      .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper,
+      .vrv-wrapper .vrv-views .vrv-view .vrv-svg-overlay {
         overflow: auto;
         position: absolute; }
-        .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper svg, .vrv-wrapper .vrv-views .vrv-view .vrv-svg-overlay svg {
+        .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper svg,
+        .vrv-wrapper .vrv-views .vrv-view .vrv-svg-overlay svg {
           float: left; }
       .vrv-wrapper .vrv-views .vrv-view .vrv-editor-cursor {
         display: none;
@@ -103,12 +108,12 @@
           margin: auto auto;
           background: white;
           box-shadow: 2px 2px 4px #343434; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-editor-toolpanel {
+      .vrv-wrapper .vrv-views .vrv-view .vrv-editor-tool-panel {
         min-width: 0px;
         background-color: #3c3c3c;
         border-top: 1px solid #565656;
         border-bottom: 1px solid #565656; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-hsplit {
+      .vrv-wrapper .vrv-views .vrv-view .vrv-h-split {
         display: flex; }
       .vrv-wrapper .vrv-views .vrv-view .vrv-split {
         display: flex;
@@ -144,18 +149,18 @@
       .vrv-wrapper .vrv-views .vrv-view .vrv-split div .vrv-xml {
         position: absolute;
         background: lightgrey; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-xmlvalid {
+      .vrv-wrapper .vrv-views .vrv-view .vrv-xml-valid {
         z-index: 5;
         position: absolute;
         min-height: 16px;
         min-width: 16px; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-xmlvalid.ok {
+      .vrv-wrapper .vrv-views .vrv-view .vrv-xml-valid.ok {
         background: url(../icons/xml/ok.png) no-repeat center;
         background-color: green; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-xmlvalid.wait {
+      .vrv-wrapper .vrv-views .vrv-view .vrv-xml-valid.wait {
         background: url(../icons/xml/wait.png) no-repeat center;
         background-color: darkorange; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-xmlvalid.error {
+      .vrv-wrapper .vrv-views .vrv-view .vrv-xml-valid.error {
         background: url(../icons/xml/stop.png) no-repeat center;
         background-color: #B00; }
   .vrv-wrapper svg {
@@ -205,7 +210,9 @@
     .vrv-wrapper .vrv-toolbar .vrv-midi-progress, .vrv-wrapper .vrv-editor-toolbar .vrv-midi-progress {
       height: 36px;
       float: left; }
-      .vrv-wrapper .vrv-toolbar .vrv-midi-progress .vrv-midi-current-time, .vrv-wrapper .vrv-editor-toolbar .vrv-midi-progress .vrv-midi-current-time, .vrv-wrapper .vrv-toolbar .vrv-midi-progress .vrv-midi-total-time, .vrv-wrapper .vrv-editor-toolbar .vrv-midi-progress .vrv-midi-total-time {
+      .vrv-wrapper .vrv-toolbar .vrv-midi-progress .vrv-midi-current-time, .vrv-wrapper .vrv-editor-toolbar .vrv-midi-progress .vrv-midi-current-time,
+      .vrv-wrapper .vrv-toolbar .vrv-midi-progress .vrv-midi-total-time,
+      .vrv-wrapper .vrv-editor-toolbar .vrv-midi-progress .vrv-midi-total-time {
         margin: 8px;
         font-size: 16px;
         display: inline-block; }
@@ -355,7 +362,8 @@
           display: block;
           content: '';
           margin-top: 10px; }
-        .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content a, .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content a:visited {
+        .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content a,
+        .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content a:visited {
           color: white; }
       .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-bottom {
         display: flex;
@@ -469,7 +477,8 @@
 .cm-s-vrv .CodeMirror-gutters {
   background: #3f3f3f !important; }
 
-.cm-s-vrv .CodeMirror-foldgutter-open, .CodeMirror-foldgutter-folded {
+.cm-s-vrv .CodeMirror-foldgutter-open,
+.CodeMirror-foldgutter-folded {
   color: #ccc; }
 
 .cm-s-vrv .CodeMirror-cursor {
