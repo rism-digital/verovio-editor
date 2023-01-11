@@ -2,4 +2,4 @@
 
 # Verovio Editor
 
-A JavaScript Editor prototype built on Verovio
+A TypeScript Editor prototype built on Verovio
