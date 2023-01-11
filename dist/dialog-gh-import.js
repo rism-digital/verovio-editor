@@ -13,8 +13,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Dialog } from './dialog.js';
 import { appendDivTo } from './utils/functions.js';
 export class DialogGhImport extends Dialog {
-    constructor(div, app, title, opts, githubManager) {
-        super(div, app, title, opts);
+    constructor(div, app, title, options, githubManager) {
+        super(div, app, title, options);
         this.iconsBranch = `${app.host}/icons/dialog/branch.png`;
         this.iconsInstitution = `${app.host}/icons/dialog/institution.png`;
         this.iconsFile = `${app.host}/icons/dialog/file.png`;

@@ -64,10 +64,10 @@ export class VerovioView extends GenericView {
         if (!super.onActivate(e))
             return false;
         //console.debug("VerovioView::onActivate");
-        this.updateView(VerovioViewUpdate.Activate);
+        this.updateView(VerovioView.Update.Activate);
         // This occurs when switching views
         if (e.detail && e.detail.loadData) {
-            this.updateView(VerovioViewUpdate.LoadData, false);
+            this.updateView(VerovioView.Update.LoadData, false);
         }
         return true;
     }
@@ -75,21 +75,21 @@ export class VerovioView extends GenericView {
         if (!super.onLoadData(e))
             return false;
         //console.debug("VerovioView::onLoadData");
-        this.updateView(VerovioViewUpdate.LoadData, false);
+        this.updateView(VerovioView.Update.LoadData, false);
         return true;
     }
     onResized(e) {
         if (!super.onResized(e))
             return false;
         //console.debug("VerovioView::onResized");
-        this.updateView(VerovioViewUpdate.Resized);
+        this.updateView(VerovioView.Update.Resized);
         return true;
     }
     onUpdateData(e) {
         if (!super.onUpdateData(e))
             return false;
         //console.debug("VerovioView::onUpdateData");
-        this.updateView(VerovioViewUpdate.Update);
+        this.updateView(VerovioView.Update.Update);
         return true;
     }
     onZoom(e) {
@@ -97,7 +97,7 @@ export class VerovioView extends GenericView {
             return false;
         //console.debug("VerovioView::onZoom");
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
-        this.updateView(VerovioViewUpdate.Zoom);
+        this.updateView(VerovioView.Update.Zoom);
         return true;
     }
     ////////////////////////////////////////////////////////////////////////
@@ -108,12 +108,18 @@ export class VerovioView extends GenericView {
     mouseUpListener(e) { }
     resizeComponents(e) { }
 }
-export var VerovioViewUpdate;
-(function (VerovioViewUpdate) {
-    VerovioViewUpdate[VerovioViewUpdate["Activate"] = 0] = "Activate";
-    VerovioViewUpdate[VerovioViewUpdate["LoadData"] = 1] = "LoadData";
-    VerovioViewUpdate[VerovioViewUpdate["Resized"] = 2] = "Resized";
-    VerovioViewUpdate[VerovioViewUpdate["Update"] = 3] = "Update";
-    VerovioViewUpdate[VerovioViewUpdate["Zoom"] = 4] = "Zoom";
-})(VerovioViewUpdate || (VerovioViewUpdate = {}));
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+(function (VerovioView) {
+    let Update;
+    (function (Update) {
+        Update[Update["Activate"] = 0] = "Activate";
+        Update[Update["LoadData"] = 1] = "LoadData";
+        Update[Update["Resized"] = 2] = "Resized";
+        Update[Update["Update"] = 3] = "Update";
+        Update[Update["Zoom"] = 4] = "Zoom";
+    })(Update = VerovioView.Update || (VerovioView.Update = {}));
+    ;
+})(VerovioView || (VerovioView = {}));
 ;

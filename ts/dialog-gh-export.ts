@@ -3,8 +3,8 @@
  */
 
 import { App } from './app.js';
+import { Dialog } from './dialog.js';
 import { DialogGhImport } from './dialog-gh-import.js';
-import { DialogOpts } from './dialog.js';
 import { GitHubManager } from './github-manager.js';
 
 import { appendDivTo, appendInputTo, appendTextAreaTo } from './utils/functions.js';
@@ -14,10 +14,10 @@ export class DialogGhExport extends DialogGhImport {
     inputFile: HTMLInputElement;
     inputMessage: HTMLTextAreaElement;
 
-    constructor(div: HTMLDivElement, app: App, title: string, opts: DialogOpts, githubManager: GitHubManager) {
-        opts.okLabel = 'Commit and push';
+    constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, githubManager: GitHubManager) {
+        options.okLabel = 'Commit and push';
 
-        super(div, app, title, opts, githubManager);
+        super(div, app, title, options, githubManager);
 
         this.okBtn.style.display = 'flex';
         this.okBtn.classList.add('disabled');

@@ -9,18 +9,11 @@ import { EventManager } from './event-manager.js';
 
 import { appendDivTo } from './utils/functions.js';
 
-export interface DialogOpts {
-    icon?: string;
-    type?: DialogType;
-    okLabel?: string;
-    cancelLabel?: string;
-}
-
 export class Dialog {
     app: App;
     eventManager: EventManager;
     element: HTMLDivElement;
-    options: DialogOpts;
+    options: Dialog.Options;
     deferred: Deferred;
 
     box: HTMLDivElement;
@@ -34,13 +27,13 @@ export class Dialog {
 
     boundKeyDown: { (event: KeyboardEvent): void };
 
-    constructor(div: HTMLDivElement, app: App, title: string, opts: DialogOpts) {
+    constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options) {
         this.options = Object.assign({
             icon: "info",
-            type: DialogType.OKCancel,
+            type: Dialog.Type.OKCancel,
             okLabel: "OK",
             cancelLabel: "Cancel"
-        }, opts);
+        }, options);
 
         this.element = div;
         // Remove previous content
@@ -78,7 +71,7 @@ export class Dialog {
         this.eventManager.bind(this.okBtn, 'click', this.ok);
         document.addEventListener('keydown', this.boundKeyDown);
 
-        if (this.options.type === DialogType.Msg) {
+        if (this.options.type === Dialog.Type.Msg) {
             this.cancelBtn.style.display = 'none';
         }
     }
@@ -105,7 +98,7 @@ export class Dialog {
     ok(): void {
         this.element.style.display = 'none';
         document.removeEventListener('keydown', this.boundKeyDown);
-        const resolveValue = (this.options.type === DialogType.Msg) ? 0 : 1;
+        const resolveValue = (this.options.type === Dialog.Type.Msg) ? 0 : 1;
         this.deferred.resolve(resolveValue);
     }
 
@@ -121,7 +114,22 @@ export class Dialog {
     ////////////////////////////////////////////////////////////////////////
 }
 
-export enum DialogType {
-    Msg,
-    OKCancel,
-};
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+
+export namespace Dialog
+{
+    export enum Type
+    {
+        Msg,
+        OKCancel,
+    }
+
+    export interface Options {
+        icon?: string;
+        type?: Dialog.Type;
+        okLabel?: string;
+        cancelLabel?: string;
+    }
+}

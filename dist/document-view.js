@@ -13,7 +13,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
+import { VerovioView } from './verovio-view.js';
 import { appendCanvasTo, appendDivTo } from './utils/functions.js';
 class DocumentViewObserver extends IntersectionObserver {
     constructor(callback, view, options) {
@@ -42,16 +42,16 @@ export class DocumentView extends VerovioView {
     updateView(update, lightEndLoading = true) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (update) {
-                case (VerovioViewUpdate.Activate):
+                case (VerovioView.Update.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioViewUpdate.LoadData):
+                case (VerovioView.Update.LoadData):
                     yield this.updateLoadData();
                     break;
-                case (VerovioViewUpdate.Resized):
+                case (VerovioView.Update.Resized):
                     yield this.updateResized();
                     break;
-                case (VerovioViewUpdate.Zoom):
+                case (VerovioView.Update.Zoom):
                     yield this.updateZoom();
                     break;
             }
@@ -63,20 +63,20 @@ export class DocumentView extends VerovioView {
             while (this.docWrapper.firstChild) {
                 this.docWrapper.firstChild.remove();
             }
-            this.app.settings.adjustPageHeight = false;
-            this.app.settings.breaks = 'encoded';
-            this.app.settings.footer = 'auto';
-            this.app.settings.scale = 100;
-            this.app.settings.pageHeight = 2970;
-            this.app.settings.pageWidth = 2100;
-            this.app.settings.justifyVertically = true;
+            this.app.verovioOptions.adjustPageHeight = false;
+            this.app.verovioOptions.breaks = 'encoded';
+            this.app.verovioOptions.footer = 'auto';
+            this.app.verovioOptions.scale = 100;
+            this.app.verovioOptions.pageHeight = 2970;
+            this.app.verovioOptions.pageWidth = 2100;
+            this.app.verovioOptions.justifyVertically = true;
         });
     }
     updateLoadData(redoLayout = true) {
         return __awaiter(this, void 0, void 0, function* () {
             // We do not need to redo the layout when changing zoom with canvas
             if (redoLayout) {
-                yield this.verovio.setOptions(this.app.settings);
+                yield this.verovio.setOptions(this.app.verovioOptions);
                 yield this.verovio.redoLayout();
                 const pageCount = yield this.verovio.getPageCount();
                 this.app.pageCount = pageCount;
@@ -125,12 +125,12 @@ export class DocumentView extends VerovioView {
             this.element.style.width = this.element.parentElement.style.width;
             if (this.ui && this.docWrapper) {
                 this.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
-                this.currentPageWidth = this.app.settings.pageWidth * this.currentScale / 100;
+                this.currentPageWidth = this.app.verovioOptions.pageWidth * this.currentScale / 100;
                 const docWidth = this.currentPageWidth + 2 * this.currentDocMargin + 2 * this.app.options.documentViewPageBorder;
                 const elementWidth = parseInt(this.element.parentElement.style.width, 10);
                 this.currentDocWidth = Math.max(elementWidth, docWidth);
                 this.docWrapper.style.width = `${this.currentDocWidth}px`;
-                this.currentPageHeight = this.app.settings.pageHeight * this.currentScale / 100;
+                this.currentPageHeight = this.app.verovioOptions.pageHeight * this.currentScale / 100;
                 const docHeight = (this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder) * this.app.pageCount + this.currentDocMargin;
                 const elementHeight = parseInt(this.element.parentElement.style.height, 10);
                 this.currentDocHeight = Math.max(elementHeight, docHeight);
@@ -187,8 +187,8 @@ export class DocumentView extends VerovioView {
                 const img = new Image();
                 const svgBlob = new Blob([`${svg}`], { type: "image/svg+xml" });
                 const svgUrl = DOMURL.createObjectURL(svgBlob);
-                const originalHeight = this.app.settings.pageHeight;
-                const originalWidth = this.app.settings.pageWidth;
+                const originalHeight = this.app.verovioOptions.pageHeight;
+                const originalWidth = this.app.verovioOptions.pageWidth;
                 canvas.height = this.currentPageHeight;
                 canvas.width = this.currentPageWidth;
                 img.onload = function () {

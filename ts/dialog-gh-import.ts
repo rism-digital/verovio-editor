@@ -3,7 +3,7 @@
  */
 
 import { App } from './app.js';
-import { Dialog, DialogOpts } from './dialog.js';
+import { Dialog } from './dialog.js';
 import { GitHubManager } from './github-manager.js';
 import { appendDivTo } from './utils/functions.js';
 
@@ -36,8 +36,8 @@ export class DialogGhImport extends Dialog {
     breadCrumbs: HTMLDivElement;
 
 
-    constructor(div: HTMLDivElement, app: App, title: string, opts: DialogOpts, githubManager: GitHubManager) {
-        super(div, app, title, opts);
+    constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, githubManager: GitHubManager) {
+        super(div, app, title, options);
 
         this.iconsBranch = `${app.host}/icons/dialog/branch.png`;
         this.iconsInstitution = `${app.host}/icons/dialog/institution.png`;

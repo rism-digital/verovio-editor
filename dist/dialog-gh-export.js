@@ -13,9 +13,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { DialogGhImport } from './dialog-gh-import.js';
 import { appendDivTo, appendInputTo, appendTextAreaTo } from './utils/functions.js';
 export class DialogGhExport extends DialogGhImport {
-    constructor(div, app, title, opts, githubManager) {
-        opts.okLabel = 'Commit and push';
-        super(div, app, title, opts, githubManager);
+    constructor(div, app, title, options, githubManager) {
+        options.okLabel = 'Commit and push';
+        super(div, app, title, options, githubManager);
         this.okBtn.style.display = 'flex';
         this.okBtn.classList.add('disabled');
         this.fields = appendDivTo(this.content, { class: `vrv-dialog-form`, style: { 'display': `none` } });

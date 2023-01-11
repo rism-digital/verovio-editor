@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { EditorView } from './editor-view.js';
-import { VerovioView, VerovioViewUpdate } from './verovio-view.js';
+import { VerovioView } from './verovio-view.js';
 import { appendDivTo } from './utils/functions.js';
 export class ResponsiveView extends VerovioView {
     constructor(div, app, verovio) {
@@ -26,19 +26,19 @@ export class ResponsiveView extends VerovioView {
     updateView(update, lightEndLoading = true) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (update) {
-                case (VerovioViewUpdate.Activate):
+                case (VerovioView.Update.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioViewUpdate.LoadData):
+                case (VerovioView.Update.LoadData):
                     yield this.updateLoadData();
                     break;
-                case (VerovioViewUpdate.Resized):
+                case (VerovioView.Update.Resized):
                     yield this.updateResized();
                     break;
-                case (VerovioViewUpdate.Update):
+                case (VerovioView.Update.Update):
                     yield this.updateUpdateData();
                     break;
-                case (VerovioViewUpdate.Zoom):
+                case (VerovioView.Update.Zoom):
                     yield this.updateZoom();
                     break;
             }
@@ -47,16 +47,16 @@ export class ResponsiveView extends VerovioView {
     }
     updateActivate() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.app.settings.adjustPageHeight = true;
-            this.app.settings.breaks = 'auto';
-            this.app.settings.footer = 'none';
-            this.app.settings.scale = this.currentScale;
-            this.app.settings.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.settings.scale);
-            this.app.settings.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.settings.scale);
-            this.app.settings.justifyVertically = false;
+            this.app.verovioOptions.adjustPageHeight = true;
+            this.app.verovioOptions.breaks = 'auto';
+            this.app.verovioOptions.footer = 'none';
+            this.app.verovioOptions.scale = this.currentScale;
+            this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
+            this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
+            this.app.verovioOptions.justifyVertically = false;
             this.midiIds = [];
-            if (this.app.settings.pageHeight !== 0) {
-                yield this.verovio.setOptions(this.app.settings);
+            if (this.app.verovioOptions.pageHeight !== 0) {
+                yield this.verovio.setOptions(this.app.verovioOptions);
             }
         });
     }
@@ -69,17 +69,17 @@ export class ResponsiveView extends VerovioView {
             if (this.ui && this.element && this.svgWrapper) {
                 this.updateSVGDimensions();
                 // Reset pageHeight and pageWidth to match the effective scaled viewport width
-                this.app.settings.scale = this.currentScale;
-                this.app.settings.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.settings.scale);
-                this.app.settings.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.settings.scale);
+                this.app.verovioOptions.scale = this.currentScale;
+                this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
+                this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
                 // Not sure why we need to remove the top margin from the calculation... to be investigated
-                this.app.settings.pageHeight -= (this.app.settings.pageMarginTop) * (100 / this.app.settings.scale);
-                if (this.app.settings.pageHeight !== 0) {
-                    yield this.verovio.setOptions(this.app.settings);
+                this.app.verovioOptions.pageHeight -= (this.app.verovioOptions.pageMarginTop) * (100 / this.app.verovioOptions.scale);
+                if (this.app.verovioOptions.pageHeight !== 0) {
+                    yield this.verovio.setOptions(this.app.verovioOptions);
                 }
                 if (this.app.pageCount > 0) {
-                    yield this.verovio.setOptions(this.app.settings);
-                    yield this.verovio.redoLayout(this.app.settings);
+                    yield this.verovio.setOptions(this.app.verovioOptions);
+                    yield this.verovio.redoLayout(this.app.verovioOptions);
                     this.app.pageCount = yield this.verovio.getPageCount();
                     if (this.currentPage > this.app.pageCount) {
                         this.currentPage = this.app.pageCount;

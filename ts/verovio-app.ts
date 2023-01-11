@@ -1,9 +1,9 @@
 
-import { App, AppOptions } from './app.js';
+import { App } from './app.js';
 
 export class VerovioApp extends App {
-    constructor(div: HTMLDivElement, opts: AppOptions) {
-        opts.enableEditor = false;
-        super(div, opts);
+    constructor(div: HTMLDivElement, options: App.Options) {
+        options.enableEditor = false;
+        super(div, options);
     }
 }

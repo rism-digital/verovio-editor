@@ -11,10 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.1.4";
+const version = "1.1.5";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
-import { Dialog, DialogType } from './dialog.js';
+import { Dialog } from './dialog.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DocumentView } from './document-view.js';
@@ -34,7 +34,7 @@ let filter = '/svg/filter.xml';
 const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;
 const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
 export class App {
-    constructor(div, opts) {
+    constructor(div, options) {
         this.clientId = "fd81068a15354a300522";
         this.host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
         this.id = this.clientId;
@@ -61,15 +61,15 @@ export class App {
             schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
             defaultView: 'responsive',
             isSafari: false
-        }, opts);
-        if (opts.appReset)
+        }, options);
+        if (options.appReset)
             window.localStorage.removeItem("options");
         const storedOptions = localStorage.getItem("options");
         if (storedOptions) {
             this.options = Object.assign(this.options, JSON.parse(storedOptions));
         }
         this.fileStack = new FileStack();
-        if (opts.appReset)
+        if (options.appReset)
             this.fileStack.reset();
         // Root element in which verovio-ui is created
         this.element = div;
@@ -128,7 +128,7 @@ export class App {
         const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
         const verovioWorker = new Worker(verovioWorkerURL);
         this.verovio = new VerovioWorkerProxy(verovioWorker);
-        this.settings =
+        this.verovioOptions =
             {
                 pageHeight: 2970,
                 pageWidth: 2100,
@@ -385,7 +385,7 @@ export class App {
                     this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
                 }
                 else {
-                    const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: DialogType.Msg });
+                    const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.Type.Msg });
                     dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.currentSchema}'`);
                     yield dlg.show();
                 }
@@ -406,7 +406,7 @@ export class App {
                 const pdfWorker = new Worker(pdfWorkerURL);
                 this.pdf = new PDFWorkerProxy(pdfWorker);
             }
-            const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.settings.scale);
+            const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.verovioOptions.scale);
             const pdfOutputStr = yield pdfGenerator.generateFile();
             this.endLoading();
             this.output.href = `${pdfOutputStr}`;
@@ -628,7 +628,7 @@ export class App {
     }
     helpAbout(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new Dialog(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: DialogType.Msg });
+            const dlg = new Dialog(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
             dlg.setContent(marked.parse(aboutMsg));
             yield dlg.show();
         });
@@ -686,4 +686,3 @@ export class App {
         });
     }
 }
-export default App;

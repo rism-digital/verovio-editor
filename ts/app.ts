@@ -3,11 +3,11 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.4";
+const version = "1.1.5";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
-import { Dialog, DialogType } from './dialog.js'
+import { Dialog } from './dialog.js'
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DocumentView } from './document-view.js';
@@ -35,51 +35,6 @@ declare global {
 
 const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`
 const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`
-
-export interface AppOptions {
-    appReset?: boolean;
-    isSafari?: boolean;
-    viewerOnly?: boolean;
-    defaultView: string;
-    documentViewPageBorder: number;
-    documentViewSVG: boolean;
-    documentViewMargin: number;
-    documentZoom: number;
-    editorSplitterHorizontal: boolean;
-    editorSplitterShow: boolean;
-    editorZoom: number;
-    enableDocument: boolean;
-    enableEditor: boolean;
-    enableResponsive: boolean;
-    enableStatusbar: boolean;
-    enableValidation: boolean;
-    github: GithubOptions;
-    responsiveZoom: number;
-    schema: string;
-}
-
-export interface GithubOptions {
-    login: string;
-    account: string;
-    repo: string;
-    branch: string;
-    path: Array<string>;
-}
-
-interface VerovioSettings {
-    adjustPageHeight?: boolean;
-    breaks?: string;
-    footer?: string;
-    justifyVertically?: boolean;
-    pageHeight: number;
-    pageWidth: number;
-    pageMarginLeft: number;
-    pageMarginRight: number;
-    pageMarginTop: number;
-    pageMarginBottom: number;
-    scale: number;
-    xmlIdSeed: number;
-}
 
 export class App {
     // private members
@@ -126,14 +81,14 @@ export class App {
     readonly eventManager: EventManager;
     readonly id: string;
     readonly githubManager: GitHubManager;
-    readonly options: AppOptions;
+    readonly options: App.Options;
     readonly fileStack: FileStack;
 
     readonly verovio: VerovioWorkerProxy;
     readonly validator: ValidatorWorkerProxy;
     readonly rngLoader: RNGLoader;
 
-    readonly settings: VerovioSettings;
+    readonly verovioOptions: VerovioView.Options;
 
     // public members
     public view: GenericView;
@@ -144,7 +99,7 @@ export class App {
 
     public mei: string;
 
-    constructor(div: HTMLDivElement, opts?: AppOptions) {
+    constructor(div: HTMLDivElement, options?: App.Options) {
         this.clientId = "fd81068a15354a300522";
         this.host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
         this.id = this.clientId;
@@ -179,9 +134,9 @@ export class App {
             defaultView: 'responsive',
 
             isSafari: false
-        }, opts);
+        }, options);
 
-        if (opts.appReset) window.localStorage.removeItem("options");
+        if (options.appReset) window.localStorage.removeItem("options");
 
         const storedOptions = localStorage.getItem("options");
         if (storedOptions) {
@@ -189,7 +144,7 @@ export class App {
         }
 
         this.fileStack = new FileStack();
-        if (opts.appReset) this.fileStack.reset();
+        if (options.appReset) this.fileStack.reset();
 
         // Root element in which verovio-ui is created
         this.element = div;
@@ -272,7 +227,7 @@ export class App {
         const verovioWorker = new Worker(verovioWorkerURL);
         this.verovio = new VerovioWorkerProxy(verovioWorker);
 
-        this.settings =
+        this.verovioOptions =
         {
             pageHeight: 2970,
             pageWidth: 2100,
@@ -563,7 +518,7 @@ export class App {
                 this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
             }
             else {
-                const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: DialogType.Msg });
+                const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.Type.Msg });
                 dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.currentSchema}'`);
                 await dlg.show();
             }
@@ -583,7 +538,7 @@ export class App {
             this.pdf = new PDFWorkerProxy(pdfWorker);
         }
 
-        const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.settings.scale);
+        const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.verovioOptions.scale);
         const pdfOutputStr = await pdfGenerator.generateFile();
 
         this.endLoading();
@@ -798,7 +753,7 @@ export class App {
     }
 
     async helpAbout(e: Event): Promise<any> {
-        const dlg = new Dialog(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: DialogType.Msg });
+        const dlg = new Dialog(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
         dlg.setContent(marked.parse(aboutMsg));
         await dlg.show();
     }
@@ -859,4 +814,30 @@ export class App {
     }
 }
 
-export default App;
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+
+export namespace App {
+    export interface Options {
+        appReset?: boolean;
+        isSafari?: boolean;
+        viewerOnly?: boolean;
+        defaultView: string;
+        documentViewPageBorder: number;
+        documentViewSVG: boolean;
+        documentViewMargin: number;
+        documentZoom: number;
+        editorSplitterHorizontal: boolean;
+        editorSplitterShow: boolean;
+        editorZoom: number;
+        enableDocument: boolean;
+        enableEditor: boolean;
+        enableResponsive: boolean;
+        enableStatusbar: boolean;
+        enableValidation: boolean;
+        github: GitHubManager.Options;
+        responsiveZoom: number;
+        schema: string;
+    }
+}

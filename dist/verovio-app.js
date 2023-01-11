@@ -1,7 +1,7 @@
 import { App } from './app.js';
 export class VerovioApp extends App {
-    constructor(div, opts) {
-        opts.enableEditor = false;
-        super(div, opts);
+    constructor(div, options) {
+        options.enableEditor = false;
+        super(div, options);
     }
 }

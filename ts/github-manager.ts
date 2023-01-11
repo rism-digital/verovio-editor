@@ -155,3 +155,17 @@ export class GitHubManager {
         }
     }
 }
+
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+
+export namespace GitHubManager {
+    export interface Options {
+        login: string;
+        account: string;
+        repo: string;
+        branch: string;
+        path: Array<string>;
+    }
+}

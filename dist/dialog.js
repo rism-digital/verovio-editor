@@ -15,13 +15,13 @@ import { Deferred } from './deferred.js';
 import { EventManager } from './event-manager.js';
 import { appendDivTo } from './utils/functions.js';
 export class Dialog {
-    constructor(div, app, title, opts) {
+    constructor(div, app, title, options) {
         this.options = Object.assign({
             icon: "info",
-            type: DialogType.OKCancel,
+            type: Dialog.Type.OKCancel,
             okLabel: "OK",
             cancelLabel: "Cancel"
-        }, opts);
+        }, options);
         this.element = div;
         // Remove previous content
         this.element.innerHTML = "";
@@ -47,7 +47,7 @@ export class Dialog {
         this.eventManager.bind(this.cancelBtn, 'click', this.cancel);
         this.eventManager.bind(this.okBtn, 'click', this.ok);
         document.addEventListener('keydown', this.boundKeyDown);
-        if (this.options.type === DialogType.Msg) {
+        if (this.options.type === Dialog.Type.Msg) {
             this.cancelBtn.style.display = 'none';
         }
     }
@@ -71,7 +71,7 @@ export class Dialog {
     ok() {
         this.element.style.display = 'none';
         document.removeEventListener('keydown', this.boundKeyDown);
-        const resolveValue = (this.options.type === DialogType.Msg) ? 0 : 1;
+        const resolveValue = (this.options.type === Dialog.Type.Msg) ? 0 : 1;
         this.deferred.resolve(resolveValue);
     }
     show() {
@@ -83,9 +83,13 @@ export class Dialog {
         });
     }
 }
-export var DialogType;
-(function (DialogType) {
-    DialogType[DialogType["Msg"] = 0] = "Msg";
-    DialogType[DialogType["OKCancel"] = 1] = "OKCancel";
-})(DialogType || (DialogType = {}));
-;
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+(function (Dialog) {
+    let Type;
+    (function (Type) {
+        Type[Type["Msg"] = 0] = "Msg";
+        Type[Type["OKCancel"] = 1] = "OKCancel";
+    })(Type = Dialog.Type || (Dialog.Type = {}));
+})(Dialog || (Dialog = {}));
