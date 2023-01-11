@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.3";
+const version = "1.1.4";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -146,8 +146,7 @@ export class App {
 
     constructor(div: HTMLDivElement, opts?: AppOptions) {
         this.clientId = "fd81068a15354a300522";
-        this.host = "https://editor.verovio.org";
-        //this.host = "http://localhost:8081";
+        this.host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
         this.id = this.clientId;
 
         this.notificationStack = [];
@@ -175,7 +174,7 @@ export class App {
             enableValidation: true,
 
             // The default schema (latest MEI release by default)
-            //schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
+            schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
 
             defaultView: 'responsive',
 
