@@ -79,6 +79,8 @@ export class AppToolbar extends Toolbar {
         this.app.eventManager.bind(fileExportPDF, 'click', this.app.fileExportPDF);
         const fileExportMIDI = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MIDI` });
         this.app.eventManager.bind(fileExportMIDI, 'click', this.app.fileExportMIDI);
+        const fileExportBasic = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MEI-basic` });
+        this.app.eventManager.bind(fileExportBasic, 'click', this.app.fileExportBasic);
         ////////////////////////////////////////////////////////////////////////
         // GitHub
         ////////////////////////////////////////////////////////////////////////

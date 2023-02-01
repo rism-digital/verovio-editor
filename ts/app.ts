@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.7";
+const version = "1.1.8";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -558,6 +558,16 @@ export class App {
         this.output.click();
     }
 
+    async generateMEIBasic(): Promise<any> {
+        const meiOutputStr = await this.verovio.getMEI({ basic: true });
+
+        this.endLoading();
+
+        this.output.href = `data:text/xml;charset=utf-8,${meiOutputStr}`;
+        this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
+        this.output.click();
+    }
+
     async confirmLargeFileLoading(size: number): Promise<any> {
         // Approx. 1 MB limit - fairly arbitrarily
         if (size < 1000000) return true;
@@ -692,6 +702,11 @@ export class App {
         this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(this.mei);
         this.output.download = this.filename;
         this.output.click();
+    }
+
+    async fileExportBasic(e: Event): Promise<any> {
+        this.startLoading("Generating MEI-basic file ...");
+        this.generateMEIBasic();
     }
 
     async fileExportPDF(e: Event): Promise<any> {
