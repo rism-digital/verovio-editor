@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.8";
+const version = "1.1.9";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -559,11 +559,10 @@ export class App {
     }
 
     async generateMEIBasic(): Promise<any> {
-        const meiOutputStr = await this.verovio.getMEI({ basic: true });
-
+        const meiOutputStr = await this.verovio.getMEI({ basic: true, removeIds: true });
         this.endLoading();
 
-        this.output.href = `data:text/xml;charset=utf-8,${meiOutputStr}`;
+        this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
         this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
         this.output.click();
     }

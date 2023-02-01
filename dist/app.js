@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.1.8";
+const version = "1.1.9";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
@@ -425,9 +425,9 @@ export class App {
     }
     generateMEIBasic() {
         return __awaiter(this, void 0, void 0, function* () {
-            const meiOutputStr = yield this.verovio.getMEI({ basic: true });
+            const meiOutputStr = yield this.verovio.getMEI({ basic: true, removeIds: true });
             this.endLoading();
-            this.output.href = `data:text/xml;charset=utf-8,${meiOutputStr}`;
+            this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
             this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
             this.output.click();
         });
