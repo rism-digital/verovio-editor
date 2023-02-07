@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.9";
+const version = "1.1.10";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -768,7 +768,8 @@ export class App {
 
     async helpAbout(e: Event): Promise<any> {
         const dlg = new Dialog(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
-        dlg.setContent(marked.parse(aboutMsg));
+        const vrvVersion = await this.verovio.getVersion();
+        dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
         await dlg.show();
     }
 

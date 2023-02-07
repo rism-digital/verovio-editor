@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.1.9";
+const version = "1.1.10";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
@@ -644,7 +644,8 @@ export class App {
     helpAbout(e) {
         return __awaiter(this, void 0, void 0, function* () {
             const dlg = new Dialog(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
-            dlg.setContent(marked.parse(aboutMsg));
+            const vrvVersion = yield this.verovio.getVersion();
+            dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
             yield dlg.show();
         });
     }
