@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.1.10";
+const version = "1.1.11";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
@@ -626,6 +626,20 @@ export class App {
             if (element.dataset.noIds == 'true')
                 params["removeIds"] = true;
             const mei = yield this.verovio.getMEI(params);
+            this.mei = mei;
+            let event = new CustomEvent('onUpdateData', {
+                detail: {
+                    currentId: this.clientId,
+                    caller: this.view
+                }
+            });
+            this.customEventManager.dispatch(event);
+        });
+    }
+    xmlLoadNoValidation(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mei = this.viewEditor.xmlEditorView.getValue();
+            //const mei = await this.verovio.getMEI(params);
             this.mei = mei;
             let event = new CustomEvent('onUpdateData', {
                 detail: {

@@ -229,6 +229,10 @@ export class XMLEditorView extends GenericView {
         this.CMeditor.setCursor(currentLine);
     }
 
+    getValue(): string {
+        return this.CMeditor.getValue();
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Codemirror event methods
     ////////////////////////////////////////////////////////////////////////

@@ -101,9 +101,12 @@ export class AppToolbar extends Toolbar {
         appendDivTo(xmlMenuContent, { class: `vrv-v-separator` });
         this.xmlOverwriteMEI = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Overwrite XML editor data` });
         this.app.eventManager.bind(this.xmlOverwriteMEI, 'click', this.app.xmlOverwriteMEI);
-        this.xmlOverwriteMEINoIds = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Overwrite XML editor data (without ids)` });
+        this.xmlOverwriteMEINoIds = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Overwrite XML editor data without ids` });
         this.xmlOverwriteMEINoIds.dataset.noIds = "true";
         this.app.eventManager.bind(this.xmlOverwriteMEINoIds, 'click', this.app.xmlOverwriteMEI);
+        appendDivTo(xmlMenuContent, { class: `vrv-v-separator` });
+        this.xmlLoadNoValidation = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Load XML editor data without validation` });
+        this.app.eventManager.bind(this.xmlLoadNoValidation, 'click', this.app.xmlLoadNoValidation);
         ////////////////////////////////////////////////////////////////////////
         // Navigation
         ////////////////////////////////////////////////////////////////////////

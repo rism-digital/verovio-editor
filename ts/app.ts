@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.10";
+const version = "1.1.11";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -752,6 +752,20 @@ export class App {
         let params = {}
         if (element.dataset.noIds == 'true') params["removeIds"] = true
         const mei = await this.verovio.getMEI(params);
+        this.mei = mei;
+        let event = new CustomEvent('onUpdateData', {
+            detail: {
+                currentId: this.clientId,
+                caller: this.view
+            }
+        });
+        this.customEventManager.dispatch(event);
+    }
+
+
+    async xmlLoadNoValidation(e: Event): Promise<any> {
+        const mei = this.viewEditor.xmlEditorView.getValue();
+        //const mei = await this.verovio.getMEI(params);
         this.mei = mei;
         let event = new CustomEvent('onUpdateData', {
             detail: {

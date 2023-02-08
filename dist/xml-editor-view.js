@@ -201,6 +201,9 @@ export class XMLEditorView extends GenericView {
         this.CMeditor.options.lint.getAnnotations = this.validate;
         this.CMeditor.setCursor(currentLine);
     }
+    getValue() {
+        return this.CMeditor.getValue();
+    }
     ////////////////////////////////////////////////////////////////////////
     // Codemirror event methods
     ////////////////////////////////////////////////////////////////////////
