@@ -13,7 +13,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Deferred } from './deferred.js';
 import { EventManager } from './event-manager.js';
-import { appendDivTo } from './utils/functions.js';
+import { appendDivTo, insertDivBefore } from './utils/functions.js';
 export class Dialog {
     constructor(div, app, title, options) {
         this.options = Object.assign({
@@ -50,6 +50,10 @@ export class Dialog {
         if (this.options.type === Dialog.Type.Msg) {
             this.cancelBtn.style.display = 'none';
         }
+    }
+    addButton(label, event) {
+        const btn = insertDivBefore(this.bottom, { class: `vrv-dialog-btn`, 'data-before': label }, this.cancelBtn);
+        this.eventManager.bind(btn, 'click', event);
     }
     setContent(content) {
         this.content.innerHTML = content;

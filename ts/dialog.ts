@@ -6,8 +6,7 @@
 import { App } from './app.js';
 import { Deferred } from './deferred.js';
 import { EventManager } from './event-manager.js';
-
-import { appendDivTo } from './utils/functions.js';
+import { appendDivTo, insertDivBefore } from './utils/functions.js';
 
 export class Dialog {
     app: App;
@@ -74,6 +73,11 @@ export class Dialog {
         if (this.options.type === Dialog.Type.Msg) {
             this.cancelBtn.style.display = 'none';
         }
+    }
+
+    addButton(label: string, event: Function) {
+        const btn = insertDivBefore(this.bottom, { class: `vrv-dialog-btn`, 'data-before': label }, this.cancelBtn);
+        this.eventManager.bind(btn, 'click', event);
     }
 
     setContent(content: string): void {

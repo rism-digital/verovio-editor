@@ -7,6 +7,9 @@ export function appendCanvasTo(parent, options) {
 export function appendDivTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'div');
 }
+export function insertDivBefore(parent, options, before) {
+    return insertHTMLElementBefore(parent, options, 'div', before);
+}
 export function appendInputTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'input');
 }
@@ -23,6 +26,12 @@ function appendHTMLElementTo(parent, options, tag) {
     const element = document.createElement(tag);
     setAttributes(element, options);
     parent.appendChild(element);
+    return element;
+}
+function insertHTMLElementBefore(parent, options, tag, before) {
+    const element = document.createElement(tag);
+    setAttributes(element, options);
+    parent.insertBefore(element, before);
     return element;
 }
 /**

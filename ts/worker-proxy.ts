@@ -87,6 +87,7 @@ export class VerovioWorkerProxy extends WorkerProxy {
     redoPagePitchPosLayout: Function;
     renderToMIDI: Function;
     renderToSVG: Function;
+    select: Function;
     setOptions: Function;
     getVersion: Function;
 

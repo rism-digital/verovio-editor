@@ -81,6 +81,9 @@ export class AppToolbar extends Toolbar {
         this.app.eventManager.bind(fileExportMIDI, 'click', this.app.fileExportMIDI);
         const fileExportBasic = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MEI-basic` });
         this.app.eventManager.bind(fileExportBasic, 'click', this.app.fileExportBasic);
+        appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
+        this.fileSelection = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Apply content selection` });
+        this.app.eventManager.bind(this.fileSelection, 'click', this.app.fileSelection);
         ////////////////////////////////////////////////////////////////////////
         // GitHub
         ////////////////////////////////////////////////////////////////////////
@@ -175,12 +178,14 @@ export class AppToolbar extends Toolbar {
         let isResponsive = ((this.app.view instanceof ResponsiveView) && !(this.app.view instanceof EditorPanel));
         let isEditor = (this.app.view instanceof EditorPanel);
         let isDocument = (this.app.view instanceof DocumentView);
+        const hasSelection = (this.app.options.selection && Object.keys(this.app.options.selection).length !== 0);
         this.updateToolbarGrp(this.pageControls, !isDocument);
         this.updateToolbarGrp(this.midiPlayerSubToolbar, isResponsive);
         this.updateToolbarGrp(this.editorSubToolbar, isEditor);
         this.updateToolbarSubmenuBtn(this.viewDocument, isDocument);
         this.updateToolbarSubmenuBtn(this.viewResponsive, isResponsive);
         this.updateToolbarSubmenuBtn(this.viewEditor, isEditor);
+        this.updateToolbarSubmenuBtn(this.fileSelection, hasSelection);
         this.updateToolbarBtnHide(this.xmlMenu, isEditor);
         if (this.app.githubManager.isLoggedIn()) {
             this.githubMenu.style.display = 'block';

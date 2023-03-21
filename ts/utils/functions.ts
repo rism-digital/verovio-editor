@@ -11,6 +11,10 @@ export function appendDivTo(parent: HTMLElement, options: object): HTMLDivElemen
     return <HTMLDivElement>appendHTMLElementTo(parent, options, 'div');
 }
 
+export function insertDivBefore(parent: HTMLElement, options: object, before: HTMLElement): HTMLDivElement {
+    return <HTMLDivElement>insertHTMLElementBefore(parent, options, 'div', before);
+}
+
 export function appendInputTo(parent: HTMLElement, options: object): HTMLInputElement {
     return <HTMLInputElement>appendHTMLElementTo(parent, options, 'input');
 }
@@ -31,6 +35,13 @@ function appendHTMLElementTo(parent: HTMLElement, options: object, tag: string):
     const element = document.createElement(tag);
     setAttributes(element, options);
     parent.appendChild(element);
+    return element;
+}
+
+function insertHTMLElementBefore(parent: HTMLElement, options: object, tag: string, before: HTMLElement): HTMLElement {
+    const element = document.createElement(tag);
+    setAttributes(element, options);
+    parent.insertBefore(element, before);
     return element;
 }
 

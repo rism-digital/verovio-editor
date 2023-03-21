@@ -489,11 +489,13 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 @extend .vrv-btn-text;
                 @extend .vrv-menu;
                 height: $menu-height;
-                padding: $menu-padding 10px $menu-padding 10px;
+                padding-top: $menu-padding;
+                padding-bottom: $menu-padding;
             }
 
             .vrv-menu-checked::after {
                 content: url(../icons/toolbar/checked.png);
+                padding-top: $menu-padding;
                 margin-left: 8px;
             }
 

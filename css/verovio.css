@@ -245,9 +245,11 @@
       flex-direction: column; }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-menu-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu-text {
         height: 18px;
-        padding: 5px 10px 5px 10px; }
+        padding-top: 5px;
+        padding-bottom: 5px; }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-checked::after, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-menu-checked::after {
         content: url(../icons/toolbar/checked.png);
+        padding-top: 5px;
         margin-left: 8px; }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu {
         float: none; }

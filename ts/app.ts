@@ -10,6 +10,7 @@ import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js'
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
+import { DialogSelect } from './dialog-select.js';
 import { DocumentView } from './document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from './editor-panel.js';
@@ -127,6 +128,9 @@ export class App {
             enableResponsive: true,
             enableStatusbar: true,
             enableValidation: true,
+
+            // Selection is empty by default
+            selection: { },
 
             // The default schema (latest MEI release by default)
             schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
@@ -487,6 +491,9 @@ export class App {
         this.startLoading("Loading the MEI data ...");
 
         await this.verovio.loadData(this.mei);
+
+        await this.applySelection();
+
         this.pageCount = await this.verovio.getPageCount();
 
         if (convert) {
@@ -503,6 +510,12 @@ export class App {
         });
 
         this.view.customEventManager.dispatch(event);
+    }
+
+    async applySelection(): Promise<any> {
+        let selection = this.options.selection;
+        if (!selection || Object.keys(selection).length === 0) selection = {};
+        await this.verovio.select(selection);
     }
 
     async checkSchema(): Promise<any> {
@@ -615,6 +628,8 @@ export class App {
         if (this.view == this.viewDocument) this.options.defaultView = 'document';
         else if (this.view == this.viewResponsive) this.options.defaultView = 'responsive';
         else if (this.view == this.viewEditor) this.options.defaultView = 'editor';
+        // Do not store selection
+        delete this.options['selection'];
         window.localStorage.setItem("options", JSON.stringify(this.options));
 
         this.fileStack.store(this.filename, this.mei);
@@ -730,6 +745,22 @@ export class App {
         //console.log( e.target.dataset.idx );
         let file = this.fileStack.load(Number(element.dataset.idx));
         this.loadData(file.data, file.filename);
+    }
+
+    async fileSelection(e: Event): Promise<any> {
+        const dlg = new DialogSelect(this.dialog, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            this.options.selection = dlg.selection;
+            await this.applySelection();
+            let event = new CustomEvent('onLoadData', {
+                detail: {
+                    currentId: this.clientId,
+                    caller: this.view
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
     }
 
     async githubImport(e: Event): Promise<any> {
@@ -852,6 +883,7 @@ export namespace App {
         appReset?: boolean;
         isSafari?: boolean;
         viewerOnly?: boolean;
+        selection: Object;
         defaultView: string;
         documentViewPageBorder: number;
         documentViewSVG: boolean;
