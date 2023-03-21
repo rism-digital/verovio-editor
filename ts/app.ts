@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.11";
+const version = "1.1.12";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
