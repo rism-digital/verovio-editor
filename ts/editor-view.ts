@@ -251,7 +251,7 @@ export class EditorView extends ResponsiveView {
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onEndLoading(e: CustomEvent): boolean {
+    override onEndLoading(e: CustomEvent): boolean {
         if (!super.onEndLoading(e)) return false;
         //console.debug("AppToolbar::onEndLoading");
 
@@ -270,7 +270,7 @@ export class EditorView extends ResponsiveView {
         return true;
     }
 
-    onSelect(e: CustomEvent): boolean {
+    override onSelect(e: CustomEvent): boolean {
         if (!super.onSelect(e)) return false;
         //console.debug("VerovioView::onSelect");
 

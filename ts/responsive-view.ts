@@ -26,7 +26,7 @@ export class ResponsiveView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateView(update: VerovioView.Update, lightEndLoading = true): Promise<any> {
+    override async updateView(update: VerovioView.Update, lightEndLoading = true): Promise<any> {
         switch (update) {
             case (VerovioView.Update.Activate):
                 await this.updateActivate();
@@ -168,7 +168,7 @@ export class ResponsiveView extends VerovioView {
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    onPage(e: CustomEvent): boolean {
+    override onPage(e: CustomEvent): boolean {
         if (!super.onPage(e)) return false;
         //console.debug("ResponsiveView::onPage");
 
