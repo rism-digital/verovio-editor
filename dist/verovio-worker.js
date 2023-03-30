@@ -59,3 +59,4 @@ addEventListener('message', function (event) {
         result,
     });
 }, false);
+//# sourceMappingURL=verovio-worker.js.map

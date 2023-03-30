@@ -278,3 +278,4 @@ export class CursorPointer {
         this.element.style.display = 'none';
     }
 }
+//# sourceMappingURL=cursor-pointer.js.map

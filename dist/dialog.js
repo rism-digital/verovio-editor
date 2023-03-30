@@ -97,3 +97,4 @@ export class Dialog {
         Type[Type["OKCancel"] = 1] = "OKCancel";
     })(Type = Dialog.Type || (Dialog.Type = {}));
 })(Dialog || (Dialog = {}));
+//# sourceMappingURL=dialog.js.map

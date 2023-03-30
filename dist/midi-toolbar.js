@@ -118,3 +118,4 @@ export class MidiToolbar extends Toolbar {
         return true;
     }
 }
+//# sourceMappingURL=midi-toolbar.js.map

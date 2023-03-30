@@ -415,3 +415,4 @@ if (typeof CodeMirror !== 'undefined') {
         });
     });
 }
+//# sourceMappingURL=xml-editor-view.js.map

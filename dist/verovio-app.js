@@ -5,3 +5,4 @@ export class VerovioApp extends App {
         super(div, options);
     }
 }
+//# sourceMappingURL=verovio-app.js.map

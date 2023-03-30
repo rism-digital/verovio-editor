@@ -102,3 +102,4 @@ export class GenericView {
         return true;
     }
 }
+//# sourceMappingURL=generic-view.js.map

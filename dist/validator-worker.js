@@ -69,3 +69,4 @@ addEventListener('message', function (event) {
         result,
     });
 }, false);
+//# sourceMappingURL=validator-worker.js.map

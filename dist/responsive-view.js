@@ -188,3 +188,4 @@ export class ResponsiveView extends VerovioView {
         this.svgWrapper.scrollLeft = element.scrollLeft;
     }
 }
+//# sourceMappingURL=responsive-view.js.map

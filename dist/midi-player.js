@@ -149,3 +149,4 @@ export class MidiPlayer {
         this.play();
     }
 }
+//# sourceMappingURL=midi-player.js.map

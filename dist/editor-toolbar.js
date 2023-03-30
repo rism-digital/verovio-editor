@@ -143,3 +143,4 @@ export class EditorToolbar extends Toolbar {
         this.updateAll();
     }
 }
+//# sourceMappingURL=editor-toolbar.js.map

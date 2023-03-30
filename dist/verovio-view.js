@@ -123,3 +123,4 @@ export class VerovioView extends GenericView {
     ;
 })(VerovioView || (VerovioView = {}));
 ;
+//# sourceMappingURL=verovio-view.js.map

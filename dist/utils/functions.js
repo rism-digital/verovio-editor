@@ -63,3 +63,4 @@ function setDataset(element, dataset) {
         element.dataset[value] = dataset[value];
     }
 }
+//# sourceMappingURL=functions.js.map

@@ -104,3 +104,4 @@ addEventListener('message', function (event) {
         result,
     });
 }, false);
+//# sourceMappingURL=pdf-worker.js.map

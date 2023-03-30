@@ -59,3 +59,4 @@ export class Toolbar extends GenericView {
             btn.classList.remove("vrv-menu-checked");
     }
 }
+//# sourceMappingURL=toolbar.js.map

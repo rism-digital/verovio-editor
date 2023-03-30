@@ -54,3 +54,4 @@ export class VerovioWorkerProxy extends WorkerProxy {
         super(worker);
     }
 }
+//# sourceMappingURL=worker-proxy.js.map

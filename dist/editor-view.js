@@ -392,3 +392,4 @@ export class EditorView extends ResponsiveView {
         this.svgWrapper.scrollLeft = element.scrollLeft;
     }
 }
+//# sourceMappingURL=editor-view.js.map

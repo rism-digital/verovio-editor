@@ -237,3 +237,4 @@ export class RNGLoader {
         return e.namespaceURI === this.rngns && e.localName === name;
     }
 }
+//# sourceMappingURL=rng-loader.js.map

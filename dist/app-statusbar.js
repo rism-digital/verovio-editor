@@ -32,3 +32,4 @@ export class AppStatusbar extends GenericView {
         return true;
     }
 }
+//# sourceMappingURL=app-statusbar.js.map

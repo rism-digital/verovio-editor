@@ -1,3 +1,5 @@
 .ruby-version
 .sass-cache
 .vscode/launch.json
+dist/*.map
+dist/*/*.map

@@ -48,3 +48,4 @@ export class DialogSelect extends Dialog {
         super.ok();
     }
 }
+//# sourceMappingURL=dialog-select.js.map

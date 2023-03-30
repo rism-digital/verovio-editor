@@ -188,3 +188,4 @@ export class EditorPanel extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
 }
+//# sourceMappingURL=editor-panel.js.map

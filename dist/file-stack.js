@@ -68,3 +68,4 @@ export class FileStack {
         this.stack.items = 0;
     }
 }
+//# sourceMappingURL=file-stack.js.map
