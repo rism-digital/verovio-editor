@@ -8,6 +8,7 @@ import { ResponsiveView } from './responsive-view.js';
 import { CursorPointer } from './cursor-pointer.js';
 import { ActionManager } from './action-manager.js';
 import { VerovioWorkerProxy } from './worker-proxy.js';
+import { VerovioView } from './verovio-view.js';
 
 import { appendDivTo } from './utils/functions.js';
 
@@ -255,6 +256,16 @@ export class EditorView extends ResponsiveView {
         //console.debug("AppToolbar::onEndLoading");
 
         this.initCursor();
+
+        return true;
+    }
+
+    override onUpdateData(e: CustomEvent): boolean {
+        if (!super.onUpdateData(e)) return false;
+        if (this === e.detail.caller) return false;
+        //console.debug("EditorView::onUpdateData");
+
+        this.updateView(VerovioView.Update.Update);
 
         return true;
     }

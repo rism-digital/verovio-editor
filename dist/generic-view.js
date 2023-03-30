@@ -86,8 +86,6 @@ export class GenericView {
     onUpdateData(e) {
         if (!this.active)
             return false;
-        if (this === e.detail.caller)
-            return false;
         //console.debug("GenericView::onUpdateData");
         return true;
     }

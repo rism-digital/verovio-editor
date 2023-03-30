@@ -285,6 +285,8 @@ export class XMLEditorView extends GenericView {
     onUpdateData(e) {
         if (!super.onUpdateData(e))
             return false;
+        if (this === e.detail.caller)
+            return false;
         //console.debug("XMLEditorView::onUpdateData");
         this.timestamp = Date.now();
         this.loaded = true;

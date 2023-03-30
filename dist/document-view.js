@@ -51,6 +51,9 @@ export class DocumentView extends VerovioView {
                 case (VerovioView.Update.Resized):
                     yield this.updateResized();
                     break;
+                case (VerovioView.Update.Update):
+                    yield this.updateLoadData();
+                    break;
                 case (VerovioView.Update.Zoom):
                     yield this.updateZoom();
                     break;

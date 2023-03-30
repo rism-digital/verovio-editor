@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.12";
+const version = "1.1.13";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -753,7 +753,7 @@ export class App {
         if (dlgRes === 1) {
             this.options.selection = dlg.selection;
             await this.applySelection();
-            let event = new CustomEvent('onLoadData', {
+            let event = new CustomEvent('onUpdateData', {
                 detail: {
                     currentId: this.clientId,
                     caller: this.view

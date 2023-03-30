@@ -54,7 +54,8 @@ export class DocumentView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateView(update: VerovioView.Update, lightEndLoading: boolean = true): Promise<any> {
+    override async updateView(update: VerovioView.Update, lightEndLoading: boolean = true): Promise<any> {
+        console.log(update);
         switch (update) {
             case (VerovioView.Update.Activate):
                 await this.updateActivate();
@@ -64,6 +65,9 @@ export class DocumentView extends VerovioView {
                 break;
             case (VerovioView.Update.Resized):
                 await this.updateResized();
+                break;
+            case (VerovioView.Update.Update):
+                await this.updateLoadData();
                 break;
             case (VerovioView.Update.Zoom):
                 await this.updateZoom();

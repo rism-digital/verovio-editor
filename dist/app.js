@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.1.12";
+const version = "1.1.13";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
@@ -623,7 +623,7 @@ export class App {
             if (dlgRes === 1) {
                 this.options.selection = dlg.selection;
                 yield this.applySelection();
-                let event = new CustomEvent('onLoadData', {
+                let event = new CustomEvent('onUpdateData', {
                     detail: {
                         currentId: this.clientId,
                         caller: this.view

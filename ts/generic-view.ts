@@ -104,7 +104,6 @@ export class GenericView {
 
     onUpdateData(e: CustomEvent): boolean {
         if (!this.active) return false;
-        if (this === e.detail.caller) return false;
         //console.debug("GenericView::onUpdateData");
         return true;
     }
