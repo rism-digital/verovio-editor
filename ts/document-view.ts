@@ -55,7 +55,6 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
 
     override async updateView(update: VerovioView.Update, lightEndLoading: boolean = true): Promise<any> {
-        console.log(update);
         switch (update) {
             case (VerovioView.Update.Activate):
                 await this.updateActivate();

@@ -41,7 +41,6 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     updateView(update, lightEndLoading = true) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(update);
             switch (update) {
                 case (VerovioView.Update.Activate):
                     yield this.updateActivate();

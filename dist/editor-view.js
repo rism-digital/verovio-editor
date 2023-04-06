@@ -14,7 +14,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { ResponsiveView } from './responsive-view.js';
 import { CursorPointer } from './cursor-pointer.js';
 import { ActionManager } from './action-manager.js';
-import { VerovioView } from './verovio-view.js';
 import { appendDivTo } from './utils/functions.js';
 import * as soundsImport from '../javascript/utils/sounds.js';
 export class EditorView extends ResponsiveView {
@@ -238,15 +237,6 @@ export class EditorView extends ResponsiveView {
             return false;
         //console.debug("AppToolbar::onEndLoading");
         this.initCursor();
-        return true;
-    }
-    onUpdateData(e) {
-        if (!super.onUpdateData(e))
-            return false;
-        if (this === e.detail.caller)
-            return false;
-        //console.debug("EditorView::onUpdateData");
-        this.updateView(VerovioView.Update.Update);
         return true;
     }
     onSelect(e) {

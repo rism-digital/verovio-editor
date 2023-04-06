@@ -260,16 +260,6 @@ export class EditorView extends ResponsiveView {
         return true;
     }
 
-    override onUpdateData(e: CustomEvent): boolean {
-        if (!super.onUpdateData(e)) return false;
-        if (this === e.detail.caller) return false;
-        //console.debug("EditorView::onUpdateData");
-
-        this.updateView(VerovioView.Update.Update);
-
-        return true;
-    }
-
     override onSelect(e: CustomEvent): boolean {
         if (!super.onSelect(e)) return false;
         //console.debug("VerovioView::onSelect");
