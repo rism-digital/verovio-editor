@@ -84,6 +84,8 @@ export class AppToolbar extends Toolbar {
         appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
         this.fileSelection = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Apply content selection` });
         this.app.eventManager.bind(this.fileSelection, 'click', this.app.fileSelection);
+        this.fileEditorial = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Apply editorial selector` });
+        this.app.eventManager.bind(this.fileEditorial, 'click', this.app.fileEditorial);
         ////////////////////////////////////////////////////////////////////////
         // GitHub
         ////////////////////////////////////////////////////////////////////////

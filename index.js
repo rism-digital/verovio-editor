@@ -12,7 +12,6 @@ const options =
     enableDocument: true,
     enableResponsive: true,
     enableEditor: true,
-    defaultZoom: 5,
     defaultView: 'editor',
     editorSplitterShow: true,
     enableValidation: true

@@ -3,11 +3,12 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.14";
+const version = "1.1.15";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js'
+import { DialogEditorial } from './dialog-editorial.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DialogSelect } from './dialog-select.js';
@@ -130,7 +131,9 @@ export class App {
             enableValidation: true,
 
             // Selection is empty by default
-            selection: { },
+            selection: {},
+            // Editorial is empty by default
+            editorial: {},
 
             // The default schema (latest MEI release by default)
             schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
@@ -628,8 +631,9 @@ export class App {
         if (this.view == this.viewDocument) this.options.defaultView = 'document';
         else if (this.view == this.viewResponsive) this.options.defaultView = 'responsive';
         else if (this.view == this.viewEditor) this.options.defaultView = 'editor';
-        // Do not store selection
+        // Do not store selection and editorial
         delete this.options['selection'];
+        delete this.options['editorial'];
         window.localStorage.setItem("options", JSON.stringify(this.options));
 
         this.fileStack.store(this.filename, this.mei);
@@ -763,6 +767,23 @@ export class App {
         }
     }
 
+    async fileEditorial(e: Event): Promise<any> {
+        const dlg = new DialogEditorial(this.dialog, this, "Apply an editorial selector to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.editorial);
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            this.verovioOptions.appXPathQuery = Array(dlg.editorial["appXPathQuery"]);
+            this.verovioOptions.choiceXPathQuery = Array(dlg.editorial["choiceXPathQuery"]);
+            await this.verovio.setOptions(this.verovioOptions);
+            let event = new CustomEvent('onUpdateData', {
+                detail: {
+                    currentId: this.clientId,
+                    caller: this.view
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
+    }
+
     async githubImport(e: Event): Promise<any> {
         const dlg = new DialogGhImport(this.dialog, this, "Import an MEI file from GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
@@ -884,6 +905,7 @@ export namespace App {
         isSafari?: boolean;
         viewerOnly?: boolean;
         selection: Object;
+        editorial: Object;
         defaultView: string;
         documentViewPageBorder: number;
         documentViewSVG: boolean;

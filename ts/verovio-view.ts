@@ -158,7 +158,9 @@ export namespace VerovioView {
 
     export interface Options {
         adjustPageHeight?: boolean;
+        appXPathQuery?: Array<string>;
         breaks?: string;
+        choiceXPathQuery?: Array<string>;
         footer?: string;
         justifyVertically?: boolean;
         pageHeight: number;

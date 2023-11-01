@@ -11,10 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.1.14";
+const version = "1.1.15";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
+import { DialogEditorial } from './dialog-editorial.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DialogSelect } from './dialog-select.js';
@@ -60,6 +61,8 @@ export class App {
             enableValidation: true,
             // Selection is empty by default
             selection: {},
+            // Editorial is empty by default
+            editorial: {},
             // The default schema (latest MEI release by default)
             schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
             defaultView: 'responsive',
@@ -492,8 +495,9 @@ export class App {
             this.options.defaultView = 'responsive';
         else if (this.view == this.viewEditor)
             this.options.defaultView = 'editor';
-        // Do not store selection
+        // Do not store selection and editorial
         delete this.options['selection'];
+        delete this.options['editorial'];
         window.localStorage.setItem("options", JSON.stringify(this.options));
         this.fileStack.store(this.filename, this.mei);
     }
@@ -623,6 +627,24 @@ export class App {
             if (dlgRes === 1) {
                 this.options.selection = dlg.selection;
                 yield this.applySelection();
+                let event = new CustomEvent('onUpdateData', {
+                    detail: {
+                        currentId: this.clientId,
+                        caller: this.view
+                    }
+                });
+                this.customEventManager.dispatch(event);
+            }
+        });
+    }
+    fileEditorial(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dlg = new DialogEditorial(this.dialog, this, "Apply an editorial selector to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.editorial);
+            const dlgRes = yield dlg.show();
+            if (dlgRes === 1) {
+                this.verovioOptions.appXPathQuery = Array(dlg.editorial["appXPathQuery"]);
+                this.verovioOptions.choiceXPathQuery = Array(dlg.editorial["choiceXPathQuery"]);
+                yield this.verovio.setOptions(this.verovioOptions);
                 let event = new CustomEvent('onUpdateData', {
                     detail: {
                         currentId: this.clientId,
