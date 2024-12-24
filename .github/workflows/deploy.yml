@@ -15,7 +15,7 @@ jobs:
         
       - name: Install packages
         run: |
-          sudo apt install openresolv wireguard
+          sudo apt install wireguard
       
       - name: Set up the configuration
         working-directory: ${{ github.workspace }}
