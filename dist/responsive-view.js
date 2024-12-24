@@ -23,8 +23,8 @@ export class ResponsiveView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
-    updateView(update, lightEndLoading = true) {
-        return __awaiter(this, void 0, void 0, function* () {
+    updateView(update_1) {
+        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true) {
             switch (update) {
                 case (VerovioView.Update.Activate):
                     yield this.updateActivate();
@@ -106,8 +106,8 @@ export class ResponsiveView extends VerovioView {
             yield this.updateLoadData();
         });
     }
-    renderPage(lightEndLoading = false) {
-        return __awaiter(this, void 0, void 0, function* () {
+    renderPage() {
+        return __awaiter(this, arguments, void 0, function* (lightEndLoading = false) {
             const svg = yield this.verovio.renderToSVG(this.currentPage);
             this.svgWrapper.innerHTML = svg;
             if (lightEndLoading)

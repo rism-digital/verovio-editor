@@ -39,8 +39,8 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
-    updateView(update, lightEndLoading = true) {
-        return __awaiter(this, void 0, void 0, function* () {
+    updateView(update_1) {
+        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true) {
             switch (update) {
                 case (VerovioView.Update.Activate):
                     yield this.updateActivate();
@@ -75,8 +75,8 @@ export class DocumentView extends VerovioView {
             this.app.verovioOptions.justifyVertically = true;
         });
     }
-    updateLoadData(redoLayout = true) {
-        return __awaiter(this, void 0, void 0, function* () {
+    updateLoadData() {
+        return __awaiter(this, arguments, void 0, function* (redoLayout = true) {
             // We do not need to redo the layout when changing zoom with canvas
             if (redoLayout) {
                 yield this.verovio.setOptions(this.app.verovioOptions);

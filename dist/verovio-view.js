@@ -51,8 +51,8 @@ export class VerovioView extends GenericView {
         this.boundMouseUp = (e) => this.mouseUpListener(e);
         this.boundResize = (e) => this.resizeComponents(e);
     }
-    updateView(update, lightEndLoading = true) {
-        return __awaiter(this, void 0, void 0, function* () {
+    updateView(update_1) {
+        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true) {
             console.debug("View::updateView should be overwritten");
             console.debug(update);
         });

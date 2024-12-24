@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.15";
+const version = "1.1.16";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -136,7 +136,8 @@ export class App {
             editorial: {},
 
             // The default schema (latest MEI release by default)
-            schema: 'https://music-encoding.org/schema/4.0.1/mei-all.rng',
+            schemaDefault: 'https://music-encoding.org/schema/5.0/mei-all.rng',
+            schema: 'https://music-encoding.org/schema/5.0/mei-all.rng',
 
             defaultView: 'responsive',
 
@@ -534,8 +535,9 @@ export class App {
                 this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
             }
             else {
+                this.currentSchema = this.options.schemaDefault;
                 const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.Type.Msg });
-                dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.currentSchema}'`);
+                dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.options.schemaDefault}'`);
                 await dlg.show();
             }
         }
@@ -921,6 +923,7 @@ export namespace App {
         enableValidation: boolean;
         github: GitHubManager.Options;
         responsiveZoom: number;
+        schemaDefault: string;
         schema: string;
     }
 }

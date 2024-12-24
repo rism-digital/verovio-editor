@@ -59,8 +59,8 @@ export class EditorView extends ResponsiveView {
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    renderPage(lightEndLoading = false, createOverlay = true) {
-        return __awaiter(this, void 0, void 0, function* () {
+    renderPage() {
+        return __awaiter(this, arguments, void 0, function* (lightEndLoading = false, createOverlay = true) {
             const svg = yield this.verovio.renderToSVG(this.currentPage);
             this.svgWrapper.innerHTML = svg;
             this.initCursor();

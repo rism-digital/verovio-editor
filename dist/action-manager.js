@@ -116,10 +116,11 @@ export class ActionManager {
         });
     }
     keyDown(key, shiftKey, ctrlKey) {
-        return __awaiter(this, arguments, void 0, function* () {
+        var arguments_1 = arguments;
+        return __awaiter(this, void 0, void 0, function* () {
             // keyDown events can 
             if (this.inProgress) {
-                this.delayedCalls.push(new Call(this.keyDown, arguments));
+                this.delayedCalls.push(new Call(this.keyDown, arguments_1));
                 return;
             }
             this.inProgress = true;
@@ -239,8 +240,8 @@ export class ActionManager {
         });
     }
     // helper
-    setAttrValue(attribute, value, elementTypes = []) {
-        return __awaiter(this, void 0, void 0, function* () {
+    setAttrValue(attribute_1, value_1) {
+        return __awaiter(this, arguments, void 0, function* (attribute, value, elementTypes = []) {
             let chain = new Array();
             for (const item of this.cursorPointer.selectedItems) {
                 if (elementTypes.length > 0 && !elementTypes.includes(item.elementType))
