@@ -24,6 +24,12 @@ if ( isSafari )
     options.enableValidation = false;
 }
 
+let view = getParameterByName( 'view' );
+if ( view != null )
+{
+    options.defaultView = view;
+}
+
 // Rescue option to reset to default before loading
 if ( getParameterByName( 'reset' ) != null ) options.appReset = true;
 
