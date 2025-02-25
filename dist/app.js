@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.2.0";
+const version = "1.2.1";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
@@ -258,8 +258,6 @@ export class App {
                 this.view = this.viewResponsive;
                 this.toolbarView = this.viewResponsive;
             }
-            // midi player in responsive view only
-            this.midiPlayer.view = this.viewResponsive;
         }
         // Root element in which verovio-ui is created
         if (!this.view) {

@@ -301,7 +301,7 @@ export class AppToolbar extends Toolbar {
 
         this.updateToolbarGrp(this.pageControls, !isDocument);
 
-        this.updateToolbarGrp(this.midiPlayerSubToolbar, isResponsive);
+        this.updateToolbarGrp(this.midiPlayerSubToolbar, isEditor || isResponsive);
         this.updateToolbarGrp(this.editorSubToolbar, isEditor);
 
         this.updateToolbarSubmenuBtn(this.viewDocument, isDocument);

@@ -193,7 +193,7 @@ export class AppToolbar extends Toolbar {
         let isDocument = (this.app.view instanceof DocumentView);
         const hasSelection = (this.app.options.selection && Object.keys(this.app.options.selection).length !== 0);
         this.updateToolbarGrp(this.pageControls, !isDocument);
-        this.updateToolbarGrp(this.midiPlayerSubToolbar, isResponsive);
+        this.updateToolbarGrp(this.midiPlayerSubToolbar, isEditor || isResponsive);
         this.updateToolbarGrp(this.editorSubToolbar, isEditor);
         this.updateToolbarSubmenuBtn(this.viewDocument, isDocument);
         this.updateToolbarSubmenuBtn(this.viewResponsive, isResponsive);

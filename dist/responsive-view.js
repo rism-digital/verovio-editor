@@ -54,6 +54,7 @@ export class ResponsiveView extends VerovioView {
             this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
             this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
             this.app.verovioOptions.justifyVertically = false;
+            this.app.midiPlayer.view = this;
             this.midiIds = [];
             if (this.app.verovioOptions.pageHeight !== 0) {
                 yield this.verovio.setOptions(this.app.verovioOptions);

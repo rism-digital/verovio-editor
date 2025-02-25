@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.2.0";
+const version = "1.2.1";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -60,7 +60,7 @@ export class App {
     private viewResponsive: ResponsiveView;
 
     private pdf: PDFWorkerProxy;
-    private midiPlayer: MidiPlayer;
+    public midiPlayer: MidiPlayer;
     private currentSchema: string;
 
     private input: HTMLInputElement;
@@ -377,8 +377,6 @@ export class App {
                 this.view = this.viewResponsive;
                 this.toolbarView = this.viewResponsive;
             }
-            // midi player in responsive view only
-            this.midiPlayer.view = this.viewResponsive;
         }
 
         // Root element in which verovio-ui is created
