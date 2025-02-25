@@ -20,7 +20,7 @@ $hover-filter: invert(100%);
 $filtered-primary: invert($primary);
 $filtered-background-grey-active: invert($background-active);
 
-@if $dark-theme == true {
+@if $dark-theme ==true {
     $background: rgb(60, 60, 60);
     $background-light: lighten($background, 10%);
     $background-extra-light: lighten($background, 20%);
@@ -688,6 +688,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 a:visited {
                     color: $text-color
                 }
+
+                .vrv-dialog-tab-selected {
+                    @extend .vrv-selectable;
+                    padding: 10px;
+                }
             }
 
             .vrv-dialog-bottom {
@@ -837,16 +842,32 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         grid-template-columns: 1fr 2fr;
 
         .vrv-dialog-label {
-            min-height: 36px;
+            min-height: 24px;
             padding-right: 12px;
-            padding-top: 12px;
+            padding-top: 6px;
             display: flex;
             justify-content: right;
+            text-align: right;
+
+            .tooltip {
+                display: none;
+                background-color: lighten($background, 10%);
+                border: 1px solid $background-border;
+                padding: 4px 8px;
+                white-space: nowrap;
+                position: absolute;
+                transform: translateX(calc(100% + 8px)) translateY(-16px);
+                z-index: 1000;
+            }
+        }
+
+        .vrv-dialog-label:hover .tooltip {
+            display: block;
         }
 
         .vrv-dialog-input {
             background-color: $background;
-            padding: 8px 12px;
+            padding: 4px 8px;
             margin: 4px 0px;
             border: 1px solid $background-border;
             border-radius: 2px;
@@ -857,10 +878,19 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             font-family: $font-family;
         }
 
+        .vrv-dialog-input[type=checkbox] {
+            justify-self: left;
+            padding-top: 6px;
+        }
+
         .vrv-dialog-input:focus {
             border: 1px solid $primary;
         }
 
+        .vrv-dialog-input.non-default {
+            accent-color: $primary;
+            background: $primary;
+        }
     }
 }
 

@@ -16,6 +16,15 @@ export function appendInputTo(parent, options) {
 export function appendLinkTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'link');
 }
+export function appendOptionTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'option');
+}
+export function appendSelectTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'select');
+}
+export function appendSpanTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'span');
+}
 export function appendTextAreaTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'textarea');
 }

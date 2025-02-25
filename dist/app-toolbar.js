@@ -21,6 +21,7 @@ export class AppToolbar extends Toolbar {
         let iconsResponsive = `${app.host}/icons/toolbar/responsive.png`;
         let iconsZoomIn = `${app.host}/icons/toolbar/zoom-in.png`;
         let iconsZoomOut = `${app.host}/icons/toolbar/zoom-out.png`;
+        let iconsSettings = `${app.host}/icons/toolbar/settings.png`;
         ////////////////////////////////////////////////////////////////////////
         // View selection
         ////////////////////////////////////////////////////////////////////////
@@ -84,8 +85,6 @@ export class AppToolbar extends Toolbar {
         appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
         this.fileSelection = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Apply content selection` });
         this.app.eventManager.bind(this.fileSelection, 'click', this.app.fileSelection);
-        this.fileEditorial = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Apply editorial selector` });
-        this.app.eventManager.bind(this.fileEditorial, 'click', this.app.fileEditorial);
         ////////////////////////////////////////////////////////////////////////
         // GitHub
         ////////////////////////////////////////////////////////////////////////
@@ -135,6 +134,18 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         this.midiPlayerSubToolbar = appendDivTo(this.element, {});
         this.editorSubToolbar = appendDivTo(this.element, {});
+        ////////////////////////////////////////////////////////////////////////
+        // Settings
+        ////////////////////////////////////////////////////////////////////////
+        appendDivTo(this.element, { class: `vrv-h-separator` });
+        const settingsMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        appendDivTo(settingsMenu, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsSettings})` }, 'data-before': `Settings` });
+        const settingsMenuContent = appendDivTo(settingsMenu, { class: `vrv-menu-content` });
+        appendDivTo(settingsMenuContent, { class: `vrv-v-separator` });
+        this.settingsEditor = appendDivTo(settingsMenuContent, { class: `vrv-menu-text`, 'data-before': `Editor options` });
+        this.app.eventManager.bind(this.settingsEditor, 'click', this.app.settingsEditor);
+        this.settingsVerovio = appendDivTo(settingsMenuContent, { class: `vrv-menu-text`, 'data-before': `Verovio options` });
+        this.app.eventManager.bind(this.settingsVerovio, 'click', this.app.settingsVerovio);
         ////////////////////////////////////////////////////////////////////////
         // Help
         ////////////////////////////////////////////////////////////////////////

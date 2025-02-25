@@ -2,73 +2,59 @@
  * The Worker for Verovio
  */
 
-importScripts( "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" );
-//importScripts("http://localhost:8082/emscripten/build/verovio-toolkit-wasm.js");
+let verovioToolkit = {};
+
 
 class VerovioDeferred {
-    promise: Promise<unknown>;
-    public reject: ((reason?: any) => void) | undefined;
-    public resolve: ((value: (PromiseLike<unknown> | unknown)) => void) | undefined;
+    promise;
+    reject;
+    resolve;
 
     constructor() {
         this.promise = new Promise((resolve, reject) => {
-            this.reject = reject
-            this.resolve = resolve
+            this.reject = reject;
+            this.resolve = resolve;
         });
     }
 }
 
-// Initializing an empty object to prevent if in onMessage listener the toolkit
-// is being accessed before Module.onRuntimeInitialized
-let verovioToolkit = {};
-
-// Global deferred Promise that can be resolved when Module is initialized
 const isVerovioModuleReady = new VerovioDeferred();
 
-// Create a new toolkit instance when Module is ready
-//@ts-ignore
-verovio.module.onRuntimeInitialized = function () {
-    //@ts-ignore
-    verovioToolkit = new verovio.toolkit();
-    isVerovioModuleReady.resolve(null);
-};
+// Listen for the first message to get the script URL
+addEventListener('message', async function (event) {
+    if (event.data.verovioUrl) {
+        importScripts(event.data.verovioUrl);
 
-// Listen to messages send to this worker
-addEventListener('message', function (event: MessageEvent<any>) {
+        // Initialize the Verovio module once the script is loaded
+        //@ts-ignore
+        verovio.module.onRuntimeInitialized = function () {
+            //@ts-ignore
+            verovioToolkit = new verovio.toolkit();
+            isVerovioModuleReady.resolve(null);
+        };
+        return;
+    }
+
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
 
-    // postMessage on a `onRuntimeInitialized` method as soon as
-    // Module is initialized
+    // Wait until the Verovio module is ready
     if (method === 'onRuntimeInitialized') {
         isVerovioModuleReady.promise.then(() => {
-            postMessage({
-                taskId,
-                method,
-                args,
-                result: null,
-            });
+            postMessage({ taskId, method, args, result: null });
         });
         return;
     }
 
-    // Check if verovio toolkit has passed method
+    // Check if Verovio toolkit has the requested method
     const fn = verovioToolkit[method || null];
     let result;
     if (fn) {
-        // console.debug( "Calling", method );
-        // Call verovio toolkit method and pass arguments
         result = fn.apply(verovioToolkit, args || []);
-    }
-    else {
-        console.warn("Unknown", method);
+    } else {
+        console.warn('Unknown method:', method);
     }
 
     // Always respond to worker calls with postMessage
-    postMessage({
-        taskId,
-        method,
-        args,
-        result,
-    });
+    postMessage({ taskId, method, args, result });
 }, false);

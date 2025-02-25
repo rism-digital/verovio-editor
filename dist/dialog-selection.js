@@ -3,7 +3,7 @@
  */
 import { Dialog } from './dialog.js';
 import { appendDivTo, appendInputTo } from './utils/functions.js';
-export class DialogSelect extends Dialog {
+export class DialogSelection extends Dialog {
     constructor(div, app, title, options, selection) {
         super(div, app, title, options);
         this.addButton("Reset", this.reset);
@@ -48,4 +48,4 @@ export class DialogSelect extends Dialog {
         super.ok();
     }
 }
-//# sourceMappingURL=dialog-select.js.map
+//# sourceMappingURL=dialog-selection.js.map

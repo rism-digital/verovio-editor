@@ -11,14 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.1.16";
+const version = "1.2.0";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
-import { DialogEditorial } from './dialog-editorial.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
-import { DialogSelect } from './dialog-select.js';
+import { DialogSelection } from './dialog-selection.js';
+import { DialogSettingsEditor } from './dialog-settings-editor.js';
+import { DialogSettingsVerovio } from './dialog-settings-verovio.js';
 import { DocumentView } from './document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from './editor-panel.js';
@@ -35,6 +36,7 @@ import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAre
 let filter = '/svg/filter.xml';
 const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;
 const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
+const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`;
 export class App {
     constructor(div, options) {
         this.clientId = "fd81068a15354a300522";
@@ -43,6 +45,7 @@ export class App {
         this.notificationStack = [];
         this.githubManager = new GitHubManager(this);
         this.options = Object.assign({
+            verovioVersion: "latest",
             // The margin around page in documentView
             documentViewMargin: 100,
             // The border for pages in documentView
@@ -134,6 +137,8 @@ export class App {
         this.customEventManager.dispatch(event);
         const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
         const verovioWorker = new Worker(verovioWorkerURL);
+        const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
+        verovioWorker.postMessage({ verovioUrl });
         this.verovio = new VerovioWorkerProxy(verovioWorker);
         this.verovioOptions =
             {
@@ -624,29 +629,11 @@ export class App {
     }
     fileSelection(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogSelect(this.dialog, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
+            const dlg = new DialogSelection(this.dialog, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
             const dlgRes = yield dlg.show();
             if (dlgRes === 1) {
                 this.options.selection = dlg.selection;
                 yield this.applySelection();
-                let event = new CustomEvent('onUpdateData', {
-                    detail: {
-                        currentId: this.clientId,
-                        caller: this.view
-                    }
-                });
-                this.customEventManager.dispatch(event);
-            }
-        });
-    }
-    fileEditorial(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogEditorial(this.dialog, this, "Apply an editorial selector to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.editorial);
-            const dlgRes = yield dlg.show();
-            if (dlgRes === 1) {
-                this.verovioOptions.appXPathQuery = Array(dlg.editorial["appXPathQuery"]);
-                this.verovioOptions.choiceXPathQuery = Array(dlg.editorial["choiceXPathQuery"]);
-                yield this.verovio.setOptions(this.verovioOptions);
                 let event = new CustomEvent('onUpdateData', {
                     detail: {
                         currentId: this.clientId,
@@ -708,6 +695,39 @@ export class App {
     xmlIndent(e) {
         return __awaiter(this, void 0, void 0, function* () {
             // Not sure how to through this event?
+        });
+    }
+    settingsEditor(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dlg = new DialogSettingsEditor(this.dialog, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
+            const dlgRes = yield dlg.show();
+            if (dlgRes === 1) {
+                this.options.verovioVersion = dlg.appOptions.verovioVersion;
+                if (dlg.reload) {
+                    const dlg = new Dialog(this.dialog, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
+                    dlg.setContent(marked.parse(reloadMsg));
+                    if ((yield dlg.show()) === 0)
+                        return;
+                    location.reload();
+                }
+            }
+        });
+    }
+    settingsVerovio(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dlg = new DialogSettingsVerovio(this.dialog, this, "Verovio options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection, this.verovio);
+            yield dlg.loadOptions();
+            const dlgRes = yield dlg.show();
+            if (dlgRes === 1) {
+                yield this.verovio.setOptions(dlg.changedOptions);
+                let event = new CustomEvent('onUpdateData', {
+                    detail: {
+                        currentId: this.clientId,
+                        caller: this.view
+                    }
+                });
+                this.customEventManager.dispatch(event);
+            }
         });
     }
     helpAbout(e) {

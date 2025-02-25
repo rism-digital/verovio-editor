@@ -3,15 +3,16 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.1.16";
+const version = "1.2.0";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js'
-import { DialogEditorial } from './dialog-editorial.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
-import { DialogSelect } from './dialog-select.js';
+import { DialogSelection} from './dialog-selection.js';
+import { DialogSettingsEditor } from './dialog-settings-editor.js';
+import { DialogSettingsVerovio } from './dialog-settings-verovio.js';
 import { DocumentView } from './document-view.js';
 import { CustomEventManager } from './custom-event-manager.js';
 import { EditorPanel } from './editor-panel.js';
@@ -37,6 +38,7 @@ declare global {
 
 const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`
 const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`
+const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`
 
 export class App {
     // private members
@@ -110,6 +112,7 @@ export class App {
         this.githubManager = new GitHubManager(this);
 
         this.options = Object.assign({
+            verovioVersion: "latest",
             // The margin around page in documentView
             documentViewMargin: 100,
             // The border for pages in documentView
@@ -232,7 +235,9 @@ export class App {
         this.customEventManager.dispatch(event);
 
         const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
-        const verovioWorker = new Worker(verovioWorkerURL);
+        const verovioWorker = new Worker(verovioWorkerURL);     
+        const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
+        verovioWorker.postMessage({ verovioUrl });
         this.verovio = new VerovioWorkerProxy(verovioWorker);
 
         this.verovioOptions =
@@ -754,28 +759,11 @@ export class App {
     }
 
     async fileSelection(e: Event): Promise<any> {
-        const dlg = new DialogSelect(this.dialog, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
+        const dlg = new DialogSelection(this.dialog, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
             this.options.selection = dlg.selection;
             await this.applySelection();
-            let event = new CustomEvent('onUpdateData', {
-                detail: {
-                    currentId: this.clientId,
-                    caller: this.view
-                }
-            });
-            this.customEventManager.dispatch(event);
-        }
-    }
-
-    async fileEditorial(e: Event): Promise<any> {
-        const dlg = new DialogEditorial(this.dialog, this, "Apply an editorial selector to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.editorial);
-        const dlgRes = await dlg.show();
-        if (dlgRes === 1) {
-            this.verovioOptions.appXPathQuery = Array(dlg.editorial["appXPathQuery"]);
-            this.verovioOptions.choiceXPathQuery = Array(dlg.editorial["choiceXPathQuery"]);
-            await this.verovio.setOptions(this.verovioOptions);
             let event = new CustomEvent('onUpdateData', {
                 detail: {
                     currentId: this.clientId,
@@ -832,6 +820,36 @@ export class App {
 
     async xmlIndent(e: Event): Promise<any> {
         // Not sure how to through this event?
+    }
+
+    async settingsEditor(e: Event): Promise<any> {
+        const dlg = new DialogSettingsEditor(this.dialog, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            this.options.verovioVersion = dlg.appOptions.verovioVersion;
+            if (dlg.reload) {
+                const dlg = new Dialog(this.dialog, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
+                dlg.setContent(marked.parse(reloadMsg));
+                if (await dlg.show() === 0) return;
+                location.reload();
+            }
+        }
+    }
+
+    async settingsVerovio(e: Event): Promise<any> {
+        const dlg = new DialogSettingsVerovio(this.dialog, this, "Verovio options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection, this.verovio);
+        await dlg.loadOptions();
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            await this.verovio.setOptions(dlg.changedOptions);
+            let event = new CustomEvent('onUpdateData', {
+                detail: {
+                    currentId: this.clientId,
+                    caller: this.view
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
     }
 
     async helpAbout(e: Event): Promise<any> {
@@ -925,5 +943,6 @@ export namespace App {
         responsiveZoom: number;
         schemaDefault: string;
         schema: string;
+        verovioVersion: string;
     }
 }

@@ -1,8 +1,16 @@
 /**
  * The Worker for Verovio
  */
-importScripts("https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js");
-//importScripts("http://localhost:8082/emscripten/build/verovio-toolkit-wasm.js");
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+let verovioToolkit = {};
 class VerovioDeferred {
     constructor() {
         this.promise = new Promise((resolve, reject) => {
@@ -11,52 +19,41 @@ class VerovioDeferred {
         });
     }
 }
-// Initializing an empty object to prevent if in onMessage listener the toolkit
-// is being accessed before Module.onRuntimeInitialized
-let verovioToolkit = {};
-// Global deferred Promise that can be resolved when Module is initialized
 const isVerovioModuleReady = new VerovioDeferred();
-// Create a new toolkit instance when Module is ready
-//@ts-ignore
-verovio.module.onRuntimeInitialized = function () {
-    //@ts-ignore
-    verovioToolkit = new verovio.toolkit();
-    isVerovioModuleReady.resolve(null);
-};
-// Listen to messages send to this worker
+// Listen for the first message to get the script URL
 addEventListener('message', function (event) {
-    // Destruct properties passed to this message event
-    const { taskId, method, args } = event.data;
-    // postMessage on a `onRuntimeInitialized` method as soon as
-    // Module is initialized
-    if (method === 'onRuntimeInitialized') {
-        isVerovioModuleReady.promise.then(() => {
-            postMessage({
-                taskId,
-                method,
-                args,
-                result: null,
+    return __awaiter(this, void 0, void 0, function* () {
+        if (event.data.verovioUrl) {
+            importScripts(event.data.verovioUrl);
+            // Initialize the Verovio module once the script is loaded
+            //@ts-ignore
+            verovio.module.onRuntimeInitialized = function () {
+                //@ts-ignore
+                verovioToolkit = new verovio.toolkit();
+                isVerovioModuleReady.resolve(null);
+            };
+            return;
+        }
+        // Destruct properties passed to this message event
+        const { taskId, method, args } = event.data;
+        // Wait until the Verovio module is ready
+        if (method === 'onRuntimeInitialized') {
+            isVerovioModuleReady.promise.then(() => {
+                postMessage({ taskId, method, args, result: null });
             });
-        });
-        return;
-    }
-    // Check if verovio toolkit has passed method
-    const fn = verovioToolkit[method || null];
-    let result;
-    if (fn) {
-        // console.debug( "Calling", method );
-        // Call verovio toolkit method and pass arguments
-        result = fn.apply(verovioToolkit, args || []);
-    }
-    else {
-        console.warn("Unknown", method);
-    }
-    // Always respond to worker calls with postMessage
-    postMessage({
-        taskId,
-        method,
-        args,
-        result,
+            return;
+        }
+        // Check if Verovio toolkit has the requested method
+        const fn = verovioToolkit[method || null];
+        let result;
+        if (fn) {
+            result = fn.apply(verovioToolkit, args || []);
+        }
+        else {
+            console.warn('Unknown method:', method);
+        }
+        // Always respond to worker calls with postMessage
+        postMessage({ taskId, method, args, result });
     });
 }, false);
 //# sourceMappingURL=verovio-worker.js.map

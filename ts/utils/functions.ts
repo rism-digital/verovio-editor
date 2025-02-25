@@ -23,6 +23,18 @@ export function appendLinkTo(parent: HTMLElement, options: object): HTMLLinkElem
     return <HTMLLinkElement>appendHTMLElementTo(parent, options, 'link');
 }
 
+export function appendOptionTo(parent: HTMLSelectElement, options: object): HTMLOptionElement {
+    return <HTMLOptionElement>appendHTMLElementTo(parent, options, 'option');
+}
+
+export function appendSelectTo(parent: HTMLElement, options: object): HTMLSelectElement {
+    return <HTMLSelectElement>appendHTMLElementTo(parent, options, 'select');
+}
+
+export function appendSpanTo(parent: HTMLElement, options: object): HTMLSpanElement {
+    return <HTMLSpanElement>appendHTMLElementTo(parent, options, 'span');
+}
+
 export function appendTextAreaTo(parent: HTMLElement, options: object): HTMLTextAreaElement {
     return <HTMLTextAreaElement>appendHTMLElementTo(parent, options, 'textarea');
 }

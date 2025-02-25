@@ -25,7 +25,7 @@
 .vrv-inactivable.inactivated, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-icon-large, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .inactivated.vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .inactivated.vrv-menu-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .inactivated.vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .inactivated.vrv-submenu-text, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-icon, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-icon, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-icon-left, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .inactivated.vrv-menu-icon-left, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-menu-icon-left {
   pointer-events: none; }
 
-.vrv-selectable.selected, .vrv-wrapper .vrv-dialog-tabs .selected.vrv-dialog-tab {
+.vrv-selectable.selected, .vrv-wrapper .vrv-dialog-tabs .selected.vrv-dialog-tab, .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content .selected.vrv-dialog-tab-selected {
   background-color: #3c3c3c; }
 
 .vrv-text-no-select, .vrv-wrapper .vrv-dialog-tabs .vrv-dialog-tab, .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper text,
@@ -368,6 +368,8 @@
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content a,
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content a:visited {
           color: white; }
+        .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content .vrv-dialog-tab-selected {
+          padding: 10px; }
       .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-bottom {
         display: flex;
         justify-content: flex-end; }
@@ -455,14 +457,26 @@
     display: grid;
     grid-template-columns: 1fr 2fr; }
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-label {
-      min-height: 36px;
+      min-height: 24px;
       padding-right: 12px;
-      padding-top: 12px;
+      padding-top: 6px;
       display: flex;
-      justify-content: right; }
+      justify-content: right;
+      text-align: right; }
+      .vrv-wrapper .vrv-dialog-form .vrv-dialog-label .tooltip {
+        display: none;
+        background-color: #565656;
+        border: 1px solid #565656;
+        padding: 4px 8px;
+        white-space: nowrap;
+        position: absolute;
+        transform: translateX(calc(100% + 8px)) translateY(-16px);
+        z-index: 1000; }
+    .vrv-wrapper .vrv-dialog-form .vrv-dialog-label:hover .tooltip {
+      display: block; }
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-input {
       background-color: #3c3c3c;
-      padding: 8px 12px;
+      padding: 4px 8px;
       margin: 4px 0px;
       border: 1px solid #565656;
       border-radius: 2px;
@@ -471,8 +485,14 @@
       color: white;
       font-size: 16px;
       font-family: Helvetica Neue, Helvetica, Arial, sans-serif; }
+    .vrv-wrapper .vrv-dialog-form .vrv-dialog-input[type=checkbox] {
+      justify-self: left;
+      padding-top: 6px; }
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-input:focus {
       border: 1px solid #8B0000; }
+    .vrv-wrapper .vrv-dialog-form .vrv-dialog-input.non-default {
+      accent-color: #8B0000;
+      background: #8B0000; }
 
 @media screen and (max-width: 600px) {
   .vrv-wrapper .vrv-toolbar .vrv-btn, .vrv-wrapper .vrv-editor-toolbar .vrv-btn, .vrv-wrapper .vrv-toolbar .vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .vrv-btn-icon, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-large {

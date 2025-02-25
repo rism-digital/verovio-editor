@@ -6,7 +6,7 @@ import { App } from './app.js';
 import { Dialog } from './dialog.js';
 import { appendDivTo, appendInputTo } from './utils/functions.js';
 
-export class DialogSelect extends Dialog {
+export class DialogSelection extends Dialog {
     fields: HTMLDivElement;
     selectMeasureRange: HTMLInputElement;
     selectStart: HTMLInputElement;

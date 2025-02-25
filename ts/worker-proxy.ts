@@ -76,6 +76,8 @@ export class ValidatorWorkerProxy extends WorkerProxy {
 
 export class VerovioWorkerProxy extends WorkerProxy {
     edit: Function;
+    getAvailableOptions: Function;
+    getDefaultOptions: Function;
     getElementAttr: Function;
     getElementsAtTime: Function;
     getOptions: Function;
