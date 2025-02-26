@@ -130,7 +130,6 @@ export class ResponsiveView extends VerovioView {
             let event = new CustomEvent('onPage');
             this.app.customEventManager.dispatch(event);
         }
-        console.log(elementsAtTime.notes);
         if ((elementsAtTime.notes.length > 0) && (this.midiIds != elementsAtTime.notes)) {
             //updatePageOrScrollTo(elementsAtTime.notes[0]);
             for (let i = 0, len = this.midiIds.length; i < len; i++) {

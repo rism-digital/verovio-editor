@@ -525,7 +525,8 @@
         padding-top: 1px;
         color: #3c3c3c; }
       .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-octaves .vrv-keyboard-octave.selected {
-        color: white; }
+        color: white;
+        background-color: #565656; }
     .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys {
       display: flex;
       position: relative;
@@ -547,7 +548,7 @@
         margin-right: -19px;
         width: 35px;
         border-color: #5f5f5f;
-        background-color: #222; }
+        background-color: #333; }
       .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.white.active {
         background-color: #ddd; }
       .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.black.active {

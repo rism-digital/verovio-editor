@@ -4,17 +4,25 @@
 
 import { App } from './app.js';
 import { EventManager } from './event-manager.js';
-import { appendDivTo, insertDivBefore } from './utils/functions.js';
+import { appendDivTo } from './utils/functions.js';
+
+import * as soundsImport from '../javascript/utils/sounds.js';
 
 export class Keyboard {
     app: App;
     eventManager: EventManager;
     element: HTMLDivElement;
     octaves: HTMLDivElement;
+    octaveNumbers: number[];
+    letters: string[];
     keyboardWrapper: HTMLDivElement;
     keys: HTMLDivElement;
     currentOctave: number;
+    sounds: soundsImport;
+    audio: any;
+    note: HTMLAudioElement;
 
+    boundKeyUp: { (event: KeyboardEvent): void };
     boundKeyDown: { (event: KeyboardEvent): void };
 
     constructor(div: HTMLDivElement, app: App) {
@@ -26,6 +34,8 @@ export class Keyboard {
         this.element.innerHTML = "";
 
         this.app = app;
+        this.sounds = soundsImport;
+        this.audio = new Audio();
 
         this.eventManager = new EventManager(this);
         this.bindListeners(); // Document/Window-scoped events
@@ -39,23 +49,29 @@ export class Keyboard {
         this.octaves = appendDivTo(this.keyboardWrapper, { class: `vrv-keyboard-octaves` });
         this.keys = appendDivTo(this.keyboardWrapper, { class: `vrv-keyboard-keys` });
 
-        let octaveNumbers = [1, 2, 3, 4, 5, 6, 7, 8];
-        octaveNumbers.forEach(octave => {
+        this.eventManager.bind(this.keys, 'mousedown', this.mouseDownListener);
+        this.eventManager.bind(this.keys, 'mouseup', this.mouseUpListener);
+
+        this.letters = ['A', 'W', 'S', 'E', 'D', 'F', 'T', 'G', 'Y', 'H', 'U', 'J', 'K', 'O', 'L', 'P', ';'];
+
+        this.octaveNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        this.octaveNumbers.forEach(octave => {
             let oct = appendDivTo(this.octaves, { class: `vrv-keyboard-octave` });
             oct.innerHTML = `C${octave}`;
 
-            let c2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-key': `A` });
-            let c2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-key': `W` });
-            let d2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-key': `S` });
-            let d2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-key': `E` });
-            let e2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-key': `D` });
-            let f2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-key': `F` });
-            let f2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-key': `T` });
-            let g2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-key': `G` });
-            let g2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-key': `Y` });
-            let a2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-key': `H` });
-            let a2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-key': `U` });
-            let b2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-key': `J` });
+            let midi = (octave + 1) * 12;
+            let c2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
+            let c2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
+            let d2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
+            let d2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
+            let e2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
+            let f2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
+            let f2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
+            let g2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
+            let g2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
+            let a2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
+            let a2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
+            let b2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
         })
 
         this.eventManager.bind(this.element, 'mouseleave', this.mouseLeaveListener);
@@ -67,19 +83,64 @@ export class Keyboard {
 
     bindListeners(): void {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
+        this.boundKeyUp = (e: KeyboardEvent) => this.keyUpListener(e);
     }
 
     keyDownListener(e: KeyboardEvent): void {
         if (e.key === 'ArrowLeft') this.activateLower();
         else if (e.key === 'ArrowRight') this.activateHigher();
+        else {
+            let index = this.letters.indexOf(e.key.toUpperCase());
+            if (index !== -1) {
+                let octaveIndex = (this.currentOctave - 1) * 12 + index
+                let key = this.keys.children[octaveIndex];
+                key.classList.add("active");
+                this.playNoteSound((index + 12 * this.currentOctave).toString());
+            }
+        }
+        e.preventDefault();
+        //console.log(e);
+    }
+
+    keyUpListener(e: KeyboardEvent): void {
+        this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove("active"));
+        console.log(e);
+    }
+
+    mouseDownListener(e: MouseEvent): void {
+        let target = <HTMLElement>e.target;
+        target.classList.add("active");
+        if (target.dataset.midi) {
+            this.playNoteSound(target.dataset.midi)
+        }
+        e.preventDefault();
+    }
+
+    mouseUpListener(e: MouseEvent): void {
+        let target = <HTMLElement>e.target;
+        target.classList.remove("active");
     }
 
     mouseEnterListener(e: MouseEvent): void {
         document.addEventListener('keydown', this.boundKeyDown);
+        document.addEventListener('keyup', this.boundKeyUp);
     }
 
     mouseLeaveListener(e: MouseEvent): void {
         document.removeEventListener('keydown', this.boundKeyDown);
+        document.removeEventListener('keyup', this.boundKeyUp);
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
+
+    async playNoteSound(midi: string): Promise<any> {
+        // We do now have sound files above 96
+        if (Number(midi) > 96) return;
+        this.audio.src = eval('this.sounds.c' + midi);
+        this.audio.currentTime = 0;
+        this.audio.play();
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -93,7 +154,7 @@ export class Keyboard {
     }
 
     activateHigher() {
-        if (this.currentOctave >= 7) return;
+        if (this.currentOctave >= this.octaveNumbers.length) return;
         this.currentOctave++;
         this.activate();
     }
@@ -102,9 +163,9 @@ export class Keyboard {
         this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove('selected'));
         this.octaves.querySelectorAll('.vrv-keyboard-octave').forEach(element => element.classList.remove('selected'));
 
-        let letters = ['A', 'W', 'S', 'E', 'D', 'F', 'T', 'G', 'Y', 'H', 'U', 'J', 'K', 'O', 'L', 'P', ';'];
+        
         let key = this.keys.children[(this.currentOctave - 1) * 12];
-        letters.forEach(letter => {
+        this.letters.forEach(letter => {
             if (key) {
                 key.setAttribute('data-key', letter);
                 key.classList.add('selected');
@@ -123,7 +184,7 @@ export class Keyboard {
         let octaveOffset = octave.offsetLeft;
         let shift = octaveOffset - (visibleWidth / 2) + (octaveWidth / 2);
         //this.keyboardWrapper.scrollLeft = shift;
-        this.keyboardWrapper.scrollBy({
+        this.keyboardWrapper.scroll({
             left: shift,
             behavior: "smooth",
         });
