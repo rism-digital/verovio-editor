@@ -7,6 +7,7 @@ import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';
 import { GenericView } from './generic-view.js';
+import { Keyboard } from './keyboard.js';
 import { RNGLoader } from './rng-loader.js';
 import { ValidatorWorkerProxy, VerovioWorkerProxy } from './worker-proxy.js';
 import { XMLEditorView } from './xml-editor-view.js';
@@ -32,6 +33,8 @@ export class EditorPanel extends GenericView {
     toolbar: HTMLDivElement;
     hSplit: HTMLDivElement;
     toolPanel: HTMLDivElement;
+    vSplit: HTMLDivElement;
+    keyboard; HTMLDivElement;
     split: HTMLDivElement;
     editor: HTMLDivElement;
     splitter: HTMLDivElement;
@@ -57,8 +60,11 @@ export class EditorPanel extends GenericView {
 
         this.hSplit = appendDivTo(this.element, { class: `vrv-h-split` });
         this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
+        this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
+        this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
+        this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
+        new Keyboard(this.keyboard, this.app);
 
-        this.split = appendDivTo(this.hSplit, { class: `vrv-split` });
         let orientation = (this.app.options.editorSplitterHorizontal) ? "vertical" : "horizontal";
         this.split.classList.add(orientation);
 
@@ -111,11 +117,12 @@ export class EditorPanel extends GenericView {
 
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
-        let height = this.element.clientHeight - this.toolbar.offsetHeight;
+        let height = this.element.clientHeight - this.toolbar.offsetHeight - this.keyboard.offsetHeight;
         let width = this.element.clientWidth - this.toolPanel.offsetWidth;
 
         this.split.style.height = `${height}px`;
         this.split.style.width = `${width}px`;
+        this.keyboard.style.width = `${width}px`;
 
         this.xmlEditor.style.display = 'block';
         this.splitter.style.display = 'block';

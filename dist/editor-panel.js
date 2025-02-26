@@ -5,6 +5,7 @@ import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';
 import { GenericView } from './generic-view.js';
+import { Keyboard } from './keyboard.js';
 import { XMLEditorView } from './xml-editor-view.js';
 import { appendDivTo } from './utils/functions.js';
 export class EditorPanel extends GenericView {
@@ -19,7 +20,10 @@ export class EditorPanel extends GenericView {
         this.customEventManager.addToPropagationList(this.editorToolbar.customEventManager);
         this.hSplit = appendDivTo(this.element, { class: `vrv-h-split` });
         this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
-        this.split = appendDivTo(this.hSplit, { class: `vrv-split` });
+        this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
+        this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
+        this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
+        new Keyboard(this.keyboard, this.app);
         let orientation = (this.app.options.editorSplitterHorizontal) ? "vertical" : "horizontal";
         this.split.classList.add(orientation);
         this.editor = appendDivTo(this.split, { class: `vrv-view`, style: `` });
@@ -62,10 +66,11 @@ export class EditorPanel extends GenericView {
         this.element.style.width = this.element.parentElement.style.width;
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
-        let height = this.element.clientHeight - this.toolbar.offsetHeight;
+        let height = this.element.clientHeight - this.toolbar.offsetHeight - this.keyboard.offsetHeight;
         let width = this.element.clientWidth - this.toolPanel.offsetWidth;
         this.split.style.height = `${height}px`;
         this.split.style.width = `${width}px`;
+        this.keyboard.style.width = `${width}px`;
         this.xmlEditor.style.display = 'block';
         this.splitter.style.display = 'block';
         if (!this.app.options.editorSplitterShow) {
