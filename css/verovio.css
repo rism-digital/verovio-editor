@@ -523,14 +523,16 @@
         font-size: 14px;
         padding-left: 12px;
         padding-top: 1px;
+        color: #3c3c3c; }
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-octaves .vrv-keyboard-octave.selected {
         color: white; }
-    .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard {
+    .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys {
       display: flex;
       position: relative;
       padding: 0px;
       min-height: 100px;
       user-select: none; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key {
         width: 55px;
         height: 95px;
         border: 2px outset #dddddd;
@@ -538,7 +540,7 @@
         background: white;
         margin-bottom: -4px;
         flex-shrink: 0; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key.black {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.black {
         z-index: 1;
         height: 45px;
         margin-left: -19px;
@@ -546,22 +548,22 @@
         width: 35px;
         border-color: #5f5f5f;
         background-color: #222; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key.white.active {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.white.active {
         background-color: #ddd; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key.black.active {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.black.active {
         background-color: #000; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key.white + .vrv-keyboard-key.white {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.white + .vrv-keyboard-key.white {
         margin-left: 1px; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key::after {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.selected::before {
         content: attr(data-key);
         display: inline-block;
         text-align: center;
         font-size: 14px; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key.white::after {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.white.selected::before {
         color: #3c3c3c;
         width: 55px;
         padding-top: 75px; }
-      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard .vrv-keyboard-key.black::after {
+      .vrv-wrapper .vrv-keyboard-wrapper .vrv-keyboard-keys .vrv-keyboard-key.black.selected::before {
         color: white;
         width: 35px;
         padding-top: 25px; }

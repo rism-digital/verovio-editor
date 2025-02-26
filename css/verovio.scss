@@ -942,11 +942,14 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 font-size: 14px;
                 padding-left: $octave-label-padding;
                 padding-top: 1px;
+                color: $background;
+            }
+            .vrv-keyboard-octave.selected {
                 color: $text-color;
             }
         }
 
-        .vrv-keyboard {
+        .vrv-keyboard-keys {
             display: flex;
             position: relative;
             padding: 0px;
@@ -987,20 +990,20 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
             // labels
 
-            .vrv-keyboard-key::after {
+            .vrv-keyboard-key.selected::before {
                 content: attr(data-key);
                 display: inline-block;
                 text-align: center;
                 font-size: 14px;
             }
 
-            .vrv-keyboard-key.white::after {
+            .vrv-keyboard-key.white.selected::before {
                 color: $background;
                 width: $white-key-width;
                 padding-top: 75px;
             }
 
-            .vrv-keyboard-key.black::after {
+            .vrv-keyboard-key.black.selected::before {
                 color: white;
                 width: $black-key-width;
                 padding-top: 25px;
