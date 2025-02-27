@@ -13,7 +13,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Deferred } from './deferred.js';
 import { EventManager } from './event-manager.js';
-import { appendDivTo, insertDivBefore } from './utils/functions.js';
+import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from './utils/functions.js';
 export class Dialog {
     constructor(div, app, title, options) {
         this.options = Object.assign({
@@ -57,6 +57,13 @@ export class Dialog {
     }
     setContent(content) {
         this.content.innerHTML = content;
+    }
+    addDetails(label, content) {
+        let details = appendDetailsTo(this.content, {});
+        let summary = appendSummaryTo(details, {});
+        let div = appendDivTo(details, {});
+        summary.innerHTML = label;
+        div.innerHTML = content;
     }
     bindListeners() {
         this.boundKeyDown = (e) => this.keyDownListener(e);

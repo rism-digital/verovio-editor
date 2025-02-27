@@ -7,6 +7,10 @@ export function appendCanvasTo(parent: HTMLElement, options: object): HTMLCanvas
     return <HTMLCanvasElement>appendHTMLElementTo(parent, options, 'canvas');
 }
 
+export function appendDetailsTo(parent: HTMLElement, options: object): HTMLDetailsElement {
+    return <HTMLDetailsElement>appendHTMLElementTo(parent, options, 'details');
+}
+
 export function appendDivTo(parent: HTMLElement, options: object): HTMLDivElement {
     return <HTMLDivElement>appendHTMLElementTo(parent, options, 'div');
 }
@@ -33,6 +37,10 @@ export function appendSelectTo(parent: HTMLElement, options: object): HTMLSelect
 
 export function appendSpanTo(parent: HTMLElement, options: object): HTMLSpanElement {
     return <HTMLSpanElement>appendHTMLElementTo(parent, options, 'span');
+}
+
+export function appendSummaryTo(parent: HTMLElement, options: object): HTMLElement {
+    return <HTMLElement>appendHTMLElementTo(parent, options, 'summary');
 }
 
 export function appendTextAreaTo(parent: HTMLElement, options: object): HTMLTextAreaElement {

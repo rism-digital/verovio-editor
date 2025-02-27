@@ -6,7 +6,7 @@
 import { App } from './app.js';
 import { Deferred } from './deferred.js';
 import { EventManager } from './event-manager.js';
-import { appendDivTo, insertDivBefore } from './utils/functions.js';
+import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from './utils/functions.js';
 
 export class Dialog {
     app: App;
@@ -82,6 +82,14 @@ export class Dialog {
 
     setContent(content: string): void {
         this.content.innerHTML = content;
+    }
+
+    addDetails(label: string, content: string) {
+        let details = appendDetailsTo(this.content, {});
+        let summary = appendSummaryTo(details, {});
+        let div = appendDivTo(details, {});
+        summary.innerHTML = label;
+        div.innerHTML = content;
     }
 
     bindListeners(): void {

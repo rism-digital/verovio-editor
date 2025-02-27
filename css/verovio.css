@@ -370,6 +370,10 @@
         padding-top: 10px;
         padding-bottom: 10px;
         line-height: 22px; }
+        .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details > div {
+          background: #232323;
+          padding: 10px;
+          margin-top: 5px; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content br {
           display: block;
           content: '';
