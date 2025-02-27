@@ -4,6 +4,9 @@ export function appendAnchorTo(parent, options) {
 export function appendCanvasTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'canvas');
 }
+export function appendDetailsTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'details');
+}
 export function appendDivTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'div');
 }
@@ -24,6 +27,9 @@ export function appendSelectTo(parent, options) {
 }
 export function appendSpanTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'span');
+}
+export function appendSummaryTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'summary');
 }
 export function appendTextAreaTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'textarea');
