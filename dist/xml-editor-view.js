@@ -287,6 +287,8 @@ export class XMLEditorView extends GenericView {
             return false;
         if (this === e.detail.caller)
             return false;
+        // WIP disabling xml editor update
+        return true;
         //console.debug("XMLEditorView::onUpdateData");
         this.timestamp = Date.now();
         this.loaded = true;

@@ -325,6 +325,9 @@ export class XMLEditorView extends GenericView {
     override onUpdateData(e: CustomEvent): boolean {
         if (!super.onUpdateData(e)) return false;
         if (this === e.detail.caller) return false;
+        
+        // WIP disabling xml editor update
+        return true;
         //console.debug("XMLEditorView::onUpdateData");
 
         this.timestamp = Date.now();

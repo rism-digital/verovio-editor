@@ -61,13 +61,17 @@ export class ActionManager {
         this.inProgress = true;
         const editorAction = { action: 'commit' };
         await this.view.verovio.edit(editorAction);
-        await this.view.verovio.redoLayout();
+
+        // WIP disable redo layout
+        //await this.view.verovio.redoLayout();
         this.view.app.pageCount = await this.view.verovio.getPageCount();
         if (this.view.currentPage > this.view.app.pageCount) {
             this.view.currentPage = this.view.app.pageCount
         }
         await this.view.renderPage(true);
-        this.view.updateMEI();
+
+        // WIP disable udpateMEI
+        //this.view.updateMEI();
         this.inProgress = false;
 
         // Check that nothing was added in-between
@@ -164,8 +168,10 @@ export class ActionManager {
         }
 
         await this.view.verovio.edit(editorAction);
-        await this.view.verovio.redoPagePitchPosLayout();
-        await this.view.renderPage(true, false);
+        
+        // WIP disable redo layout
+        //await this.view.verovio.redoPagePitchPosLayout();
+        //await this.view.renderPage(true, false);
 
         this.inProgress = false;
         await this.callDelayedCalls();
@@ -279,7 +285,9 @@ export class ActionManager {
             param: chain
         }
         await this.view.verovio.edit(editorAction);
-        await this.view.verovio.redoLayout();
+
+        // WIP disable redo layout
+        //await this.view.verovio.redoLayout();
         await this.view.renderPage(true);
         this.view.updateMEI();
     }

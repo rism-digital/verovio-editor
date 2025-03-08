@@ -29,6 +29,9 @@ addEventListener('message', async function (event) {
         //@ts-ignore
         verovio.module.onRuntimeInitialized = function () {
             //@ts-ignore
+            verovio.enableLog(verovio.LOG_DEBUG);
+            console.log("DEBUG");
+            //@ts-ignore
             verovioToolkit = new verovio.toolkit();
             isVerovioModuleReady.resolve(null);
         };

@@ -48,13 +48,15 @@ export class ActionManager {
             this.inProgress = true;
             const editorAction = { action: 'commit' };
             yield this.view.verovio.edit(editorAction);
-            yield this.view.verovio.redoLayout();
+            // WIP disable redo layout
+            //await this.view.verovio.redoLayout();
             this.view.app.pageCount = yield this.view.verovio.getPageCount();
             if (this.view.currentPage > this.view.app.pageCount) {
                 this.view.currentPage = this.view.app.pageCount;
             }
             yield this.view.renderPage(true);
-            this.view.updateMEI();
+            // WIP disable udpateMEI
+            //this.view.updateMEI();
             this.inProgress = false;
             // Check that nothing was added in-between
             if (this.delayedCalls.length > 0) {
@@ -148,8 +150,9 @@ export class ActionManager {
                 param: chain
             };
             yield this.view.verovio.edit(editorAction);
-            yield this.view.verovio.redoPagePitchPosLayout();
-            yield this.view.renderPage(true, false);
+            // WIP disable redo layout
+            //await this.view.verovio.redoPagePitchPosLayout();
+            //await this.view.renderPage(true, false);
             this.inProgress = false;
             yield this.callDelayedCalls();
         });
@@ -264,7 +267,8 @@ export class ActionManager {
                 param: chain
             };
             yield this.view.verovio.edit(editorAction);
-            yield this.view.verovio.redoLayout();
+            // WIP disable redo layout
+            //await this.view.verovio.redoLayout();
             yield this.view.renderPage(true);
             this.view.updateMEI();
         });
