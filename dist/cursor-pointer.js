@@ -160,7 +160,7 @@ export class CursorPointer {
         let children = node.querySelectorAll('g:not(.bounding-box):not(.ledgerLines):not(.articPart):not(.notehead):not(.dots):not(.flag):not(.stem)');
         for (let child of children) {
             const element = child;
-            const childId = element.attributes[id].value;
+            const childId = element.getAttribute(id);
             this.add(childId, element, false);
         }
         //console.debug( this.selectedItems );
