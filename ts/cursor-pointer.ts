@@ -265,7 +265,7 @@ export class CursorPointer {
         let children = node.querySelectorAll('g:not(.bounding-box):not(.ledgerLines):not(.articPart):not(.notehead):not(.dots):not(.flag):not(.stem)');
         for (let child of children) {
             const element = child as SVGElement;
-            const childId: string = element.attributes[id].value;
+            const childId: string = element.getAttribute(id);
             this.add(childId, element, false);
         }
 
