@@ -139,7 +139,8 @@ export class App {
         this.customEventManager.dispatch(event);
         const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
         const verovioWorker = new Worker(verovioWorkerURL);
-        const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
+        //const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
+        const verovioUrl = `http://localhost:8001/build/verovio-toolkit-wasm.js`;
         verovioWorker.postMessage({ verovioUrl });
         this.verovio = new VerovioWorkerProxy(verovioWorker);
         this.verovioOptions =
