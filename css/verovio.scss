@@ -678,10 +678,18 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 padding-bottom: 10px;
                 line-height: 22px;
 
+                details {
+                    margin-bottom: 10px;
+                }
                 details > div {
+                    h1 {
+                        font-size: 110%;
+                    }
                     background: $background-toggled;
                     padding: 10px;
                     margin-top: 5px;
+                    max-height: 300px;
+                    overflow-y: scroll;
                 }
 
                 br {

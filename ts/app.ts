@@ -3,7 +3,7 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-const version = "1.2.1";
+const version = "1.3.0";
 
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
@@ -11,7 +11,7 @@ import { Dialog } from './dialog.js'
 import { DialogAbout } from './dialog-about.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
-import { DialogSelection} from './dialog-selection.js';
+import { DialogSelection } from './dialog-selection.js';
 import { DialogSettingsEditor } from './dialog-settings-editor.js';
 import { DialogSettingsVerovio } from './dialog-settings-verovio.js';
 import { DocumentView } from './document-view.js';
@@ -37,10 +37,18 @@ declare global {
     const marked;
 }
 
-export const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`
-export const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`
-export const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`
-export const licenseUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE`
+export const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;
+export const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
+export const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`;
+export const licenseUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE`;
+export const changelogUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md`;
+export const libraries = `Libraries used in this application:\n\
+* [blob-stream](https://github.com/devongovett/blob-stream)\n\
+* [codemirror](https://codemirror.net/)\n\
+* [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
+* [marked](https://marked.js.org/)\n\
+* [pako](https://github.com/nodeca/pako)\n\
+\n`;
 
 export class App {
     // private members
@@ -237,7 +245,7 @@ export class App {
         this.customEventManager.dispatch(event);
 
         const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
-        const verovioWorker = new Worker(verovioWorkerURL);     
+        const verovioWorker = new Worker(verovioWorkerURL);
         const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
         verovioWorker.postMessage({ verovioUrl });
         this.verovio = new VerovioWorkerProxy(verovioWorker);

@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.2.1";
+const version = "1.3.0";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
@@ -39,6 +39,14 @@ export const aboutMsg = `The Verovio Editor is an experimental online MEI editor
 export const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
 export const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`;
 export const licenseUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE`;
+export const changelogUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md`;
+export const libraries = `Libraries used in this application:\n\
+* [blob-stream](https://github.com/devongovett/blob-stream)\n\
+* [codemirror](https://codemirror.net/)\n\
+* [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
+* [marked](https://marked.js.org/)\n\
+* [pako](https://github.com/nodeca/pako)\n\
+\n`;
 export class App {
     constructor(div, options) {
         this.clientId = "fd81068a15354a300522";

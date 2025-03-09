@@ -361,10 +361,16 @@
         padding-top: 10px;
         padding-bottom: 10px;
         line-height: 22px; }
+        .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details {
+          margin-bottom: 10px; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details > div {
           background: #232323;
           padding: 10px;
-          margin-top: 5px; }
+          margin-top: 5px;
+          max-height: 300px;
+          overflow-y: scroll; }
+          .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details > div h1 {
+            font-size: 110%; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content br {
           display: block;
           content: '';

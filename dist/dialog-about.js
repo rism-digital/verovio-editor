@@ -10,18 +10,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { licenseUrl } from './app.js';
+import { changelogUrl, libraries, licenseUrl } from './app.js';
 import { Dialog } from './dialog.js';
+import { appendDivTo } from './utils/functions.js';
 export class DialogAbout extends Dialog {
     constructor(div, app, title, options) {
         super(div, app, title, options);
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
+            let lib = appendDivTo(this.content, {});
+            lib.innerHTML = marked.parse(libraries);
             try {
                 const response = yield fetch(licenseUrl);
                 const text = yield response.text();
-                this.addDetails("License", marked.parse(text));
+                this.addDetails("License (AGPL-3.0)", marked.parse(text));
+            }
+            catch (err) {
+                console.error(err);
+            }
+            try {
+                const response = yield fetch(changelogUrl);
+                const text = yield response.text();
+                this.addDetails("Change log", marked.parse(text));
             }
             catch (err) {
                 console.error(err);
