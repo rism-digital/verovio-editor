@@ -43,7 +43,7 @@ export function randomHex(digits: number): string {
     return Math.floor((1 + Math.random()) * Math.pow(16, digits)).toString(16).substring(1);
 }
 
-function appendHTMLElementTo(parent: HTMLElement, options: object, tag: string): HTMLElement {
+export function appendHTMLElementTo(parent: HTMLElement, options: object, tag: string): HTMLElement {
     const element = document.createElement(tag);
     setAttributes(element, options);
     parent.appendChild(element);

@@ -31,7 +31,7 @@ export function appendTextAreaTo(parent, options) {
 export function randomHex(digits) {
     return Math.floor((1 + Math.random()) * Math.pow(16, digits)).toString(16).substring(1);
 }
-function appendHTMLElementTo(parent, options, tag) {
+export function appendHTMLElementTo(parent, options, tag) {
     const element = document.createElement(tag);
     setAttributes(element, options);
     parent.appendChild(element);
