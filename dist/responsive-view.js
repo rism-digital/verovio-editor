@@ -118,7 +118,7 @@ export class ResponsiveView extends VerovioView {
     midiUpdate(time) {
         return __awaiter(this, void 0, void 0, function* () {
             //const animateStart = document.getElementById( "highlighting-start" );
-            let vrvTime = Math.max(0, time - 500);
+            let vrvTime = time;
             let elementsAtTime = yield this.app.verovio.getElementsAtTime(vrvTime);
             if (Object.keys(elementsAtTime).length === 0 || elementsAtTime.page === 0) {
                 //console.debug( "Nothing returned by getElementsAtTime" );

@@ -179,7 +179,6 @@ export class App {
             const version = yield this.verovio.getVersion();
             console.log(version);
             this.endLoading();
-            this.midiPlayer = new MidiPlayer();
             if (this.options.enableEditor) {
                 this.startLoading("Loading the XML validator ...");
                 // Listen and wait for Module to emit onRuntimeInitialized
@@ -275,7 +274,8 @@ export class App {
     createToolbar() {
         this.appToolbar = new AppToolbar(this.toolbar, this);
         this.customEventManager.addToPropagationList(this.appToolbar.customEventManager);
-        this.midiToolbar = new MidiToolbar(this.toolbar, this, this.midiPlayer);
+        this.midiToolbar = new MidiToolbar(this.toolbar, this);
+        this.midiPlayer = new MidiPlayer(this.midiToolbar);
         this.customEventManager.addToPropagationList(this.midiToolbar.customEventManager);
     }
     createStatusbar() {
