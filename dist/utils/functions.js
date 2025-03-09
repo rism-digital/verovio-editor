@@ -49,6 +49,12 @@ function insertHTMLElementBefore(parent, options, tag, before) {
     parent.insertBefore(element, before);
     return element;
 }
+export function appendMidiPlayerTo(parent, options) {
+    const midiPlayer = appendHTMLElementTo(parent, options, 'midi-player');
+    midiPlayer.setAttribute('sound-font', '');
+    midiPlayer.style.display = 'none';
+    return midiPlayer;
+}
 /**
  * Set attributes of a DOM element. The `style` property is special-cased to
  * accept an object whose own attributes are assigned to element.style.

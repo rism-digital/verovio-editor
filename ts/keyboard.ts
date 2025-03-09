@@ -4,9 +4,8 @@
 
 import { App } from './app.js';
 import { EventManager } from './event-manager.js';
-import { appendDivTo } from './utils/functions.js';
-
-import * as soundsImport from '../javascript/utils/sounds.js';
+import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from './utils/functions.js';
+import { midiScale } from './utils/midi-scale.js'
 
 export class Keyboard {
     app: App;
@@ -18,9 +17,8 @@ export class Keyboard {
     keyboardWrapper: HTMLDivElement;
     keys: HTMLDivElement;
     currentOctave: number;
-    sounds: soundsImport;
-    audio: any;
     note: HTMLAudioElement;
+    midiPlayerElement: MidiPlayerElement;
 
     boundKeyUp: { (event: KeyboardEvent): void };
     boundKeyDown: { (event: KeyboardEvent): void };
@@ -34,8 +32,8 @@ export class Keyboard {
         this.element.innerHTML = "";
 
         this.app = app;
-        this.sounds = soundsImport;
-        this.audio = new Audio();
+        this.midiPlayerElement = appendMidiPlayerTo(this.element, {});
+        this.midiPlayerElement.setAttribute('src', midiScale);
 
         this.eventManager = new EventManager(this);
         this.bindListeners(); // Document/Window-scoped events
@@ -136,11 +134,20 @@ export class Keyboard {
     ////////////////////////////////////////////////////////////////////////
 
     async playNoteSound(midi: string): Promise<any> {
-        // We do now have sound files above 96
-        if (Number(midi) > 96) return;
-        this.audio.src = eval('this.sounds.c' + midi);
-        this.audio.currentTime = 0;
-        this.audio.play();
+
+        let midiNum: number = Number(midi);
+
+        // Limit the range to playable notes
+        if (Number(midi) > 107) return;
+        if (Number(midi) < 21) return;
+
+        this.midiPlayerElement.stop();
+        this.midiPlayerElement.currentTime = ((Number(midi) - 21) * 0.5);
+        this.midiPlayerElement.start();
+        setTimeout(() => {
+            this.midiPlayerElement.stop();
+        }, 500);
+          
     }
 
     ////////////////////////////////////////////////////////////////////////

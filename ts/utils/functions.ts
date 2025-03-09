@@ -66,6 +66,26 @@ function insertHTMLElementBefore(parent: HTMLElement, options: object, tag: stri
 }
 
 /**
+ * interface for the html-midi-player custom element
+ */
+
+export interface MidiPlayerElement extends HTMLElement {
+    start(): void;
+    pause(): void;
+    stop(): void;
+    currentTime: number;
+    duration: number;
+    playing: boolean;
+}
+
+export function appendMidiPlayerTo(parent: HTMLElement, options: object): MidiPlayerElement {
+    const midiPlayer = <MidiPlayerElement>appendHTMLElementTo(parent, options, 'midi-player');
+    midiPlayer.setAttribute('sound-font', '');
+    midiPlayer.style.display = 'none';
+    return midiPlayer;
+}
+
+/**
  * Set attributes of a DOM element. The `style` property is special-cased to
  * accept an object whose own attributes are assigned to element.style.
  */
