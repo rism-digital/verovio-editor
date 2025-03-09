@@ -283,7 +283,6 @@ export class App {
             console.log(version);
 
             this.endLoading();
-            this.midiPlayer = new MidiPlayer();
 
             if (this.options.enableEditor) {
                 this.startLoading("Loading the XML validator ...");
@@ -397,7 +396,8 @@ export class App {
         this.appToolbar = new AppToolbar(this.toolbar, this);
         this.customEventManager.addToPropagationList(this.appToolbar.customEventManager);
 
-        this.midiToolbar = new MidiToolbar(this.toolbar, this, this.midiPlayer);
+        this.midiToolbar = new MidiToolbar(this.toolbar, this);
+        this.midiPlayer = new MidiPlayer(this.midiToolbar);
         this.customEventManager.addToPropagationList(this.midiToolbar.customEventManager);
     }
 

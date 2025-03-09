@@ -4,14 +4,13 @@
 import { Toolbar } from './toolbar.js';
 import { appendDivTo } from './utils/functions.js';
 export class MidiToolbar extends Toolbar {
-    constructor(div, app, midiPlayer) {
+    constructor(div, app) {
         let iconsPlay = `${app.host}/icons/toolbar/play.png`;
         let iconsPause = `${app.host}/icons/toolbar/pause.png`;
         let iconsStop = `${app.host}/icons/toolbar/stop.png`;
         super(div, app);
+        this.midiPlayer = null;
         this.active = true;
-        this.midiPlayer = midiPlayer;
-        this.midiPlayer.midiToolbar = this;
         this.pausing = false;
         this.playing = false;
         this.pageDragStart = 0;
@@ -37,7 +36,7 @@ export class MidiToolbar extends Toolbar {
         this.eventManager.bind(this.midiBar, 'mousedown', this.onProgressBarDown);
         this.eventManager.bind(this.midiBar, 'mousemove', this.onProgressBarMove);
         this.eventManager.bind(this.midiBar, 'mouseup', this.onProgressBarUp);
-        this.updateAll();
+        //this.updateAll();
     }
     updateAll() {
         this.updateProgressBar();
@@ -50,16 +49,14 @@ export class MidiToolbar extends Toolbar {
     updateProgressBar() {
         this.midiTotalTime.innerHTML = this.midiPlayer.totalTimeStr;
         this.midiCurrentTime.innerHTML = this.midiPlayer.currentTimeStr;
-        let percent = (this.midiPlayer.currentSamples === window.ULONG_MAX) ? 0 : (this.midiPlayer.currentSamples / this.midiPlayer.totalSamples * 100);
+        let percent = (this.midiPlayer.totalTime) ? (this.midiPlayer.currentTime / this.midiPlayer.totalTime * 100) : 0;
         this.midiBarPercent.style.width = `${percent}%`;
     }
     updateDragging(pageX) {
         let posX = this.barDragStart + (pageX - this.pageDragStart);
         if (posX >= 0 && posX <= this.barWidth) {
             let percent = posX / this.barWidth;
-            this.midiPlayer.currentSamples = percent * this.midiPlayer.totalSamples | 0;
-            // Calling low-level callback
-            window.updateProgress(this.midiPlayer.currentSamples, this.midiPlayer.totalSamples);
+            this.midiPlayer.seekToPercent(percent);
         }
     }
     ////////////////////////////////////////////////////////////////////////
@@ -80,7 +77,7 @@ export class MidiToolbar extends Toolbar {
         this.midiPlayer.stop();
     }
     onProgressBarDown(e) {
-        if (this.midiPlayer.totalSamples === 0)
+        if (this.midiPlayer.totalTime === 0)
             return;
         this.pageDragStart = e.pageX;
         this.barDragStart = e.offsetX;
@@ -95,7 +92,7 @@ export class MidiToolbar extends Toolbar {
     onProgressBarUp(e) {
         if (this.pageDragStart === 0)
             return;
-        if (this.midiPlayer.totalSamples === 0)
+        if (this.midiPlayer.totalTime === 0)
             return;
         this.pageDragStart = 0;
         this.midiPlayer.play();
