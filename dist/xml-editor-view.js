@@ -188,8 +188,7 @@ export class XMLEditorView extends GenericView {
         }
         this.updateLinting(this.CMeditor, found);
         if (found.length == 0) {
-            /*
-            if (this.loaded && timestamp === this.timestamp) {
+            if (timestamp === this.timestamp) {
                 this.app.mei = text;
                 this.app.startLoading("Updating data ...", true);
                 let event = new CustomEvent('onUpdateData', {
@@ -197,17 +196,15 @@ export class XMLEditorView extends GenericView {
                         caller: this
                     }
                 });
+                this.setStatus(Status.Valid);
+                this.edited = false;
                 this.app.customEventManager.dispatch(event);
-            }
-            else if (!this.loaded && timestamp === this.timestamp) {
-                this.loaded = true;
             }
             else {
                 console.log("Validated data is obsolete");
+                this.setStatus(Status.Unknown);
+                this.edited = false;
             }
-            */
-            this.setStatus(Status.Valid);
-            this.edited = false;
         }
         else {
             this.setStatus(Status.Invalid);
@@ -261,13 +258,15 @@ export class XMLEditorView extends GenericView {
         }
     }
     keyHandled(cm, string, event) {
-        if (event.ctrlKey && event.shiftKey && event.key === "P") {
-            this.formatXML();
+        if (event.ctrlKey && event.shiftKey) {
+            if (event.key === "P") {
+                this.formatXML();
+            }
+            else if (event.key === "F") {
+                this.triggerValidation();
+            }
         }
-        if (event.ctrlKey && event.shiftKey && event.key === "V") {
-            this.triggerValidation();
-        }
-        if (event.key === "Enter") {
+        else if (event.key === "Enter") {
             let ch = cm.getCursor().ch;
             let line = cm.getCursor().line;
             let nextChar = cm.getLine(line).substr(cm.getCursor().ch, 1);
