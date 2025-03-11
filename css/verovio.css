@@ -173,6 +173,9 @@
       .vrv-wrapper .vrv-views .vrv-view .vrv-xml-valid.error {
         background: url(../icons/xml/stop.png) no-repeat center;
         background-color: #B00; }
+      .vrv-wrapper .vrv-views .vrv-view .vrv-xml-valid.unknown {
+        background: url(../icons/xml/unknown.png) no-repeat center;
+        background-color: goldenrod; }
   .vrv-wrapper svg {
     display: block;
     margin: 0 auto; }

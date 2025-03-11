@@ -35,7 +35,6 @@ export class XMLEditorView extends GenericView {
     autoMode: boolean;
     edited: boolean;  
     enabled: boolean;
-    skipValidation: boolean;
     formatting: boolean;
     CMeditor: any;
     app: App;
@@ -58,9 +57,8 @@ export class XMLEditorView extends GenericView {
         this.currentId = "";
         this.timestamp = Date.now();
         this.edited = false;
-        this.autoMode = true;
+        this.autoMode = false;
         this.enabled = true;
-        this.skipValidation = false;
         this.formatting = false;
 
         const cmThis = this;
@@ -94,20 +92,16 @@ export class XMLEditorView extends GenericView {
             cmThis.onCursorActivity(cm);
         });
 
-        this.CMeditor.on("focus", function (cm) {
-            cmThis.onFocus(cm);
-        });
-
         this.CMeditor.on("keyHandled", function (cm, string, event) {
             cmThis.keyHandled(cm, string, event);
         });
 
         this.CMeditor.on("change", function (cm, changes, event) {
-            if (changes.origin === "setValue" || cmThis.autoMode) {
+            if (changes.origin === "setValue" || (cmThis.autoMode && !cmThis.formatting)) {
                 cmThis.triggerValidation();
             }
             else {
-                cm.setOption("lint", false);
+                cmThis.suspendValidation();
                 cmThis.setStatus(Status.Unknown);
             }
         });
@@ -126,7 +120,6 @@ export class XMLEditorView extends GenericView {
 
         if (!editor.enabled) return;
         if (editor.formatting) return;
-        if (editor.skipValidation) return;
 
         // keep the callback
         editor.setStatus(Status.Validating);
@@ -140,12 +133,8 @@ export class XMLEditorView extends GenericView {
             validation = await editor.validator.check(text);
         }
         editor.app.endLoading(true);
-        editor.highlightValidation(text, validation, this.timestamp);
+        editor.highlightValidation(text, validation, editor.timestamp);
 
-    }
-
-    async suspendedValidate(text: string, updateLinting: Function, options): Promise<any> {
-        // Do nothing...
     }
 
     async replaceSchema(schemaFile: string): Promise<any> {
@@ -253,23 +242,23 @@ export class XMLEditorView extends GenericView {
 
     formatXML(): void {
         console.debug("XMLEditorView::FormatXML");
+        // A flag for suspending validation
         this.formatting = true;
-        this.skipValidation = true;
-        // Suspend lint.getAnnotations to avoid recursive callbacks
-        this.CMeditor.options.lint.getAnnotations = this.suspendedValidate;
         // Store the current line
         let currentLine = this.CMeditor.getCursor();
-        var totalLines = this.CMeditor.lineCount();
+        let totalLines = this.CMeditor.lineCount();
         this.CMeditor.autoFormatRange({ line: 0, ch: 0 }, { line: totalLines });
-        // Reset everything
+        // Re-enable validation
         this.formatting = false;
-        this.skipValidation = false;
-        this.CMeditor.options.lint.getAnnotations = this.validate;
         this.CMeditor.setCursor(currentLine);
     }
 
     triggerValidation(): void {
         this.CMeditor.setOption("lint", this.lintOptions);
+    }
+
+    suspendValidation(): void {
+        this.CMeditor.setOption("lint", false);
     }
 
     getValue(): string {
@@ -297,7 +286,6 @@ export class XMLEditorView extends GenericView {
                     }
                 });
                 //console.debug( "Dispatch-onSelect" );
-                this.skipValidation = false;
                 this.app.customEventManager.dispatch(event);
             }
             this.currentId = id[1];
@@ -323,11 +311,6 @@ export class XMLEditorView extends GenericView {
                 cm.setCursor({ line: line, ch: (ch + tabSize) });
             }
         }
-    }
-
-    onFocus(cm): void {
-        //console.debug( "XMLEditorView::onFocus" );
-        this.skipValidation = false;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -357,7 +340,6 @@ export class XMLEditorView extends GenericView {
     override onSelect(e: CustomEvent): boolean {
         if (!super.onSelect(e)) return false;
         //console.debug("XMLEditorView::onSelect");
-
         this.currentId = e.detail.id;
         this.setCurrent(this.currentId);
 
@@ -367,7 +349,6 @@ export class XMLEditorView extends GenericView {
     override onUpdateData(e: CustomEvent): boolean {
         if (!super.onUpdateData(e)) return false;
         if (this === e.detail.caller) return false;
-        
         //console.debug("XMLEditorView::onUpdateData");
         this.timestamp = Date.now();
         this.CMeditor.setValue(this.app.mei);

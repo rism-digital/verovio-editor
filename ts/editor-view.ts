@@ -12,8 +12,6 @@ import { VerovioWorkerProxy } from './worker-proxy.js';
 import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from './utils/functions.js';
 import { midiScale } from './utils/midi-scale.js'
 
-import * as soundsImport from '../javascript/utils/sounds.js';
-
 export class EditorView extends ResponsiveView {
     midiPlayerElement: MidiPlayerElement;
     svgOverlay: HTMLDivElement;
