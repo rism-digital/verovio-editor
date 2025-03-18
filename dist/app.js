@@ -35,10 +35,13 @@ import { RNGLoader } from './rng-loader.js';
 import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './worker-proxy.js';
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 let filter = '/svg/filter.xml';
+export const autoModeLimit = 1;
 export const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;
 export const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
 export const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`;
 export const licenseUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE`;
+export const autoModeOff = `Live validation and synchronization from the XML editor is disabled for files larger than ${autoModeLimit}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`;
+export const editedXML = `You have un-synchronized modifications in the XML editor which will be lost.\n\nDo you want to continue?`;
 export class App {
     constructor(div, options) {
         this.clientId = "fd81068a15354a300522";
@@ -69,8 +72,8 @@ export class App {
             // Editorial is empty by default
             editorial: {},
             // The default schema (latest MEI release by default)
-            schemaDefault: 'https://music-encoding.org/schema/5.0/mei-all.rng',
-            schema: 'https://music-encoding.org/schema/5.0/mei-all.rng',
+            schemaDefault: 'https://music-encoding.org/schema/5.1/mei-all.rng',
+            schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
             defaultView: 'responsive',
             isSafari: false
         }, options);
@@ -373,6 +376,10 @@ export class App {
             if (convert) {
                 this.mei = yield this.verovio.getMEI({});
             }
+            if (this.viewEditor) {
+                this.viewEditor.xmlEditorView.setEnabled(false);
+                this.viewEditor.xmlEditorView.setMode(this.mei.length);
+            }
             yield this.checkSchema();
             let event = new CustomEvent('onLoadData', {
                 detail: {
@@ -402,7 +409,8 @@ export class App {
             const schema = /<\?xml-model.*href="([^"]*).*/;
             const schemaMatch = schema.exec(this.mei);
             if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
-                if (yield this.viewEditor.xmlEditorView.replaceSchema(schemaMatch[1])) {
+                /*
+                if (await this.viewEditor.xmlEditorView.replaceSchema(schemaMatch[1])) {
                     this.currentSchema = schemaMatch[1];
                     this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
                 }
@@ -410,8 +418,9 @@ export class App {
                     this.currentSchema = this.options.schemaDefault;
                     const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.Type.Msg });
                     dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.options.schemaDefault}'`);
-                    yield dlg.show();
+                    await dlg.show();
                 }
+                */
             }
         });
     }
@@ -577,10 +586,6 @@ export class App {
             const convert = (element.dataset.ext != 'MEI') ? true : false;
             reader.onload = function (e) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (readerThis.view instanceof EditorPanel) {
-                        if ((yield readerThis.confirmLargeFileLoading(file.size)) !== true)
-                            return;
-                    }
                     readerThis.loadData(e.target.result, filename, convert);
                 });
             };
@@ -733,7 +738,7 @@ export class App {
     }
     helpAbout(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogAbout(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
+            const dlg = new DialogAbout(this.dialog, this, "About this application");
             const vrvVersion = yield this.verovio.getVersion();
             dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
             yield dlg.load();

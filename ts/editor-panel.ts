@@ -2,7 +2,8 @@
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
 
-import { App } from './app.js';
+import { App, editedXML } from './app.js';
+import { Dialog } from './dialog.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';
@@ -87,7 +88,6 @@ export class EditorPanel extends GenericView {
         this.xmlEditor = appendDivTo(this.split, { class: `vrv-xml` });
 
         this.xmlEditorView = new XMLEditorView(this.xmlEditor, this.app, this.validator, this.rngLoader);
-        this.xmlEditorView.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
         this.customEventManager.addToPropagationList(this.xmlEditorView.customEventManager);
 
         this.splitterSize = 60;
@@ -127,7 +127,7 @@ export class EditorPanel extends GenericView {
         this.xmlEditor.style.display = 'block';
         this.splitter.style.display = 'block';
 
-        if (!this.app.options.editorSplitterShow) {
+        if (!this.xmlEditorView.isEnabled()) {
             // Ideally we would send a onActive / onDeactivate event
             this.xmlEditor.style.display = 'none';
             this.xmlEditor.style.height = `0px`;
@@ -176,6 +176,13 @@ export class EditorPanel extends GenericView {
         if (!super.onActivate(e)) return false;
         //console.debug("EditorPanel::onActivate");
 
+        this.updateSize();
+    }
+
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
+        //console.debug("EditorPanel::onLoadData");
+        
         this.updateSize();
     }
 
@@ -259,7 +266,20 @@ export class EditorPanel extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
 
-    onToggle(): void {
+    async onToggle(): Promise<any> {
+        if (!this.xmlEditorView.isEnabled()) {
+            this.xmlEditorView.setEnabled(true);
+            await this.editorView.updateMEI();
+        }
+        else {
+            if (this.xmlEditorView.isEdited()) {
+                const dlg = new Dialog(this.app.dialog, this.app, "Un-synchronized changes", { okLabel: "Yes", icon: "question" });
+                dlg.setContent(marked.parse(editedXML));
+                if (await dlg.show() === 0) return;
+                this.xmlEditorView.setEdited(false);
+            }
+            this.xmlEditorView.setEnabled(false);
+        }
         this.app.options.editorSplitterShow = !this.app.options.editorSplitterShow;
         this.app.startLoading("Adjusting size ...", true);
         let event = new CustomEvent('onResized');

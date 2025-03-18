@@ -37,10 +37,13 @@ declare global {
     const marked;
 }
 
+export const autoModeLimit: number = 1;
 export const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`
 export const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`
 export const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`
 export const licenseUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE`
+export const autoModeOff = `Live validation and synchronization from the XML editor is disabled for files larger than ${autoModeLimit}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`
+export const editedXML = `You have un-synchronized modifications in the XML editor which will be lost.\n\nDo you want to continue?`
 
 export class App {
     // private members
@@ -70,7 +73,6 @@ export class App {
     private fileCopy: HTMLTextAreaElement;
     private wrapper: HTMLDivElement;
     private notification: HTMLDivElement;
-    private dialog: HTMLDivElement;
     private toolbar: HTMLDivElement;
     private views: HTMLDivElement;
     private loader: HTMLDivElement;
@@ -81,6 +83,7 @@ export class App {
     private view3: HTMLDivElement;
 
     // readonly members
+    readonly dialog: HTMLDivElement;
     readonly host: string;
     readonly customEventManager: CustomEventManager;
     readonly zoomLevels: Array<number>;
@@ -141,8 +144,8 @@ export class App {
             editorial: {},
 
             // The default schema (latest MEI release by default)
-            schemaDefault: 'https://music-encoding.org/schema/5.0/mei-all.rng',
-            schema: 'https://music-encoding.org/schema/5.0/mei-all.rng',
+            schemaDefault: 'https://music-encoding.org/schema/5.1/mei-all.rng',
+            schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
 
             defaultView: 'responsive',
 
@@ -510,6 +513,11 @@ export class App {
             this.mei = await this.verovio.getMEI({});
         }
 
+        if (this.viewEditor) {
+            this.viewEditor.xmlEditorView.setEnabled(false);
+            this.viewEditor.xmlEditorView.setMode(this.mei.length);
+        }
+
         await this.checkSchema();
 
         let event = new CustomEvent('onLoadData', {
@@ -536,6 +544,7 @@ export class App {
         const schema = /<\?xml-model.*href="([^"]*).*/;
         const schemaMatch = schema.exec(this.mei);
         if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
+            /*
             if (await this.viewEditor.xmlEditorView.replaceSchema(schemaMatch[1])) {
                 this.currentSchema = schemaMatch[1];
                 this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
@@ -546,6 +555,7 @@ export class App {
                 dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.options.schemaDefault}'`);
                 await dlg.show();
             }
+            */
         }
     }
 
@@ -716,9 +726,6 @@ export class App {
         const filename = file.name;
         const convert = (element.dataset.ext != 'MEI') ? true : false;
         reader.onload = async function (e) {
-            if (readerThis.view instanceof EditorPanel) {
-                if (await readerThis.confirmLargeFileLoading(file.size) !== true) return;
-            }
             readerThis.loadData(e.target.result as string, filename, convert);
         };
         reader.readAsText(file);
@@ -854,7 +861,7 @@ export class App {
     }
 
     async helpAbout(e: Event): Promise<any> {
-        const dlg = new DialogAbout(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
+        const dlg = new DialogAbout(this.dialog, this, "About this application");
         const vrvVersion = await this.verovio.getVersion();
         dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
         await dlg.load();

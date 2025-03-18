@@ -7,8 +7,8 @@ import { Dialog } from './dialog.js';
 
 export class DialogAbout extends Dialog {
 
-    constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options) {
-        super(div, app, title, options);
+    constructor(div: HTMLDivElement, app: App, title: string) {
+        super(div, app, title, { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
     }
 
     async load() {
