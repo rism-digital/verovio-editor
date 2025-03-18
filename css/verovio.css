@@ -110,7 +110,7 @@
           background: white;
           box-shadow: 2px 2px 4px #343434; }
       .vrv-wrapper .vrv-views .vrv-view .vrv-editor-tool-panel {
-        min-width: 0px;
+        min-width: 300px;
         background-color: #3c3c3c;
         border-top: 1px solid #565656;
         border-bottom: 1px solid #565656; }

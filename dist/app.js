@@ -60,7 +60,6 @@ export class App {
             documentZoom: 3,
             responsiveZoom: 4,
             editorSplitterHorizontal: true,
-            editorSplitterShow: true,
             editorZoom: 4,
             enableDocument: true,
             enableEditor: true,

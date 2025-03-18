@@ -56,8 +56,8 @@ export class EditorToolbar extends Toolbar {
         this.layoutControls = appendDivTo(this.element, { class: `vrv-btn-group` });
         appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
 
-        this.panelOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
         this.panelShow = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+        this.panelOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
 
         appendDivTo(this.element, { class: `vrv-h-separator` });
         this.notes = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Notes` });
@@ -66,8 +66,8 @@ export class EditorToolbar extends Toolbar {
         this.controlEvents = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Control events` });
 
         // binding
-        this.panel.eventManager.bind(this.panelOrientation, 'click', this.panel.onToggleOrientation);
         this.panel.eventManager.bind(this.panelShow, 'click', this.panel.onToggle);
+        this.panel.eventManager.bind(this.panelOrientation, 'click', this.panel.onToggleOrientation);
         this.eventManager.bind(this.notes, 'click', this.onNotes);
         this.eventManager.bind(this.controlEvents, 'click', this.onControlEvents);
 
@@ -98,21 +98,25 @@ export class EditorToolbar extends Toolbar {
 
     updateAll(): void {
         let iconsLayoutH = `${this.app.host}/icons/toolbar/layout-h.png`;
-        let iconsLayoutToggle = `${this.app.host}/icons/toolbar/layout-toggle.png`;
-        let iconsLayoutToggleV = `${this.app.host}/icons/toolbar/layout-toggle-v.png`;
-        let iconsLayoutUnToggle = `${this.app.host}/icons/toolbar/layout-un-toggle.png`;
-        let iconsLayoutUnToggleV = `${this.app.host}/icons/toolbar/layout-un-toggle-v.png`;
+        let iconsEditorXML = `${this.app.host}/icons/toolbar/editor-xml.png`;
         let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
 
+        this.panelShow.style.backgroundImage = `url(${iconsEditorXML})`;
         let toggleOrientation = (this.app.options.editorSplitterHorizontal) ? true : false;
-        let toggle = (this.app.options.editorSplitterShow) ? true : false;
+        let toggle = this.panel.xmlEditorView.isEnabled() ? true : false;
         if (toggleOrientation) {
             this.panelOrientation.style.backgroundImage = `url(${iconsLayoutV})`
-            this.panelShow.style.backgroundImage = toggle ? `url(${iconsLayoutUnToggle})` : `url(${iconsLayoutToggle})`;
         }
         else {
             this.panelOrientation.style.backgroundImage = `url(${iconsLayoutH})`
-            this.panelShow.style.backgroundImage = toggle ? `url(${iconsLayoutUnToggleV})` : `url(${iconsLayoutToggleV})`;
+        }
+        if (toggle) {
+            this.panelShow.classList.add('toggled');
+            this.panelOrientation.style.display = 'block';
+        }
+        else {
+            this.panelShow.classList.remove('toggled');
+            this.panelOrientation.style.display = 'none';
         }
         this.updateToolbarBtn(this.panelOrientation, toggle);
         this.updateToolbarBtn(this.panelShow, true);

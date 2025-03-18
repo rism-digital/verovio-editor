@@ -129,7 +129,6 @@ export class App {
             responsiveZoom: 4,
 
             editorSplitterHorizontal: true,
-            editorSplitterShow: true,
             editorZoom: 4,
 
             enableDocument: true,
@@ -941,7 +940,6 @@ export namespace App {
         documentViewMargin: number;
         documentZoom: number;
         editorSplitterHorizontal: boolean;
-        editorSplitterShow: boolean;
         editorZoom: number;
         enableDocument: boolean;
         enableEditor: boolean;

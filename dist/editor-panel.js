@@ -74,6 +74,10 @@ export class EditorPanel extends GenericView {
     updateSize() {
         this.element.style.height = this.element.parentElement.style.height;
         this.element.style.width = this.element.parentElement.style.width;
+        //this.toolPanel.style.display = 'none';
+        //this.keyboard.style.display = 'none';
+        this.toolPanel.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'block';
+        this.keyboard.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'flex';
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
         let height = this.element.clientHeight - this.toolbar.offsetHeight - this.keyboard.offsetHeight;
@@ -218,7 +222,6 @@ export class EditorPanel extends GenericView {
                 }
                 this.xmlEditorView.setEnabled(false);
             }
-            this.app.options.editorSplitterShow = !this.app.options.editorSplitterShow;
             this.app.startLoading("Adjusting size ...", true);
             let event = new CustomEvent('onResized');
             this.app.customEventManager.dispatch(event);
