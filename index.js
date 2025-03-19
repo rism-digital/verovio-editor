@@ -13,7 +13,6 @@ const options =
     enableResponsive: true,
     enableEditor: true,
     defaultView: 'editor',
-    editorSplitterShow: true,
     enableValidation: true
 }
 

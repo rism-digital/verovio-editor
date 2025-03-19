@@ -7,6 +7,8 @@ import { Toolbar } from './toolbar.js';
 import { appendDivTo } from './utils/functions.js';
 export class EditorToolbar extends Toolbar {
     constructor(div, app, panel) {
+        let editorXml = `${app.host}/icons/toolbar/editor-xml.png`;
+        let editorXmlValidate = `${app.host}/icons/toolbar/validate.png`;
         let editorStemDirUp = `${app.host}/icons/editor/stem-dir-up.png`;
         let editorStemDirDown = `${app.host}/icons/editor/stem-dir-down.png`;
         let editorStemDirAuto = `${app.host}/icons/editor/stem-dir-auto.png`;
@@ -22,15 +24,17 @@ export class EditorToolbar extends Toolbar {
         // sub-toolbar in application 
         this.layoutControls = appendDivTo(this.element, { class: `vrv-btn-group` });
         appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
-        this.panelShow = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
-        this.panelOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+        this.xmlEditorEnable = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXml})` } });
+        this.xmlEditorOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+        this.xmlEditorValidate = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlValidate})` } });
         appendDivTo(this.element, { class: `vrv-h-separator` });
         this.notes = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Notes` });
         appendDivTo(this.element, { class: `vrv-h-separator` });
         this.controlEvents = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Control events` });
         // binding
-        this.panel.eventManager.bind(this.panelShow, 'click', this.panel.onToggle);
-        this.panel.eventManager.bind(this.panelOrientation, 'click', this.panel.onToggleOrientation);
+        this.panel.eventManager.bind(this.xmlEditorEnable, 'click', this.panel.onToggle);
+        this.panel.eventManager.bind(this.xmlEditorOrientation, 'click', this.panel.onToggleOrientation);
+        this.eventManager.bind(this.xmlEditorValidate, 'click', this.onTriggerValidation);
         this.eventManager.bind(this.notes, 'click', this.onNotes);
         this.eventManager.bind(this.controlEvents, 'click', this.onControlEvents);
         // controlEventControls
@@ -56,34 +60,44 @@ export class EditorToolbar extends Toolbar {
     ////////////////////////////////////////////////////////////////////////
     updateAll() {
         let iconsLayoutH = `${this.app.host}/icons/toolbar/layout-h.png`;
-        let iconsEditorXML = `${this.app.host}/icons/toolbar/editor-xml.png`;
         let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
-        this.panelShow.style.backgroundImage = `url(${iconsEditorXML})`;
         let toggleOrientation = (this.app.options.editorSplitterHorizontal) ? true : false;
         let toggle = this.panel.xmlEditorView.isEnabled() ? true : false;
+        let autoMode = this.panel.xmlEditorView.isAutoMode() ? true : false;
         if (toggleOrientation) {
-            this.panelOrientation.style.backgroundImage = `url(${iconsLayoutV})`;
+            this.xmlEditorOrientation.style.backgroundImage = `url(${iconsLayoutV})`;
         }
         else {
-            this.panelOrientation.style.backgroundImage = `url(${iconsLayoutH})`;
+            this.xmlEditorOrientation.style.backgroundImage = `url(${iconsLayoutH})`;
         }
         if (toggle) {
-            this.panelShow.classList.add('toggled');
-            this.panelOrientation.style.display = 'block';
+            this.xmlEditorEnable.classList.add('toggled');
+            this.xmlEditorValidate.style.display = (autoMode) ? 'none' : 'block';
+            this.xmlEditorOrientation.style.display = 'block';
         }
         else {
-            this.panelShow.classList.remove('toggled');
-            this.panelOrientation.style.display = 'none';
+            this.xmlEditorEnable.classList.remove('toggled');
+            this.xmlEditorValidate.style.display = 'none';
+            this.xmlEditorOrientation.style.display = 'none';
         }
-        this.updateToolbarBtn(this.panelOrientation, toggle);
-        this.updateToolbarBtn(this.panelShow, true);
+        this.updateToolbarBtn(this.xmlEditorOrientation, toggle);
+        this.updateToolbarBtn(this.xmlEditorEnable, true);
+        /*
         this.updateToolbarToggleBtn(this.notes, (this.selectedElementType === "NOTES"));
         this.updateToolbarToggleBtn(this.controlEvents, (this.selectedElementType === "CONTROLEVENTS"));
+
         // Disable hairpin for now
         this.updateToolbarGrp(this.hairpinFormControls, false);
-        //this.updateToolbarGrp( this.ui.hairpinFormControls, ["CONTROLEVENTS", "hairpin"].includes( this.selectedElementType ) );
+        //this.updateToolbarGrp( this.hairpinFormControls, ["CONTROLEVENTS", "hairpin"].includes( this.selectedElementType ) );
         this.updateToolbarGrp(this.controlEventControls, ["CONTROLEVENTS", "dir", "dynam", "hairpin", "tempo", "pedal"].includes(this.selectedElementType));
         this.updateToolbarGrp(this.stemControls, ["NOTES", "note", "chord"].includes(this.selectedElementType));
+        */
+        // Hide everything for now
+        this.notes.style.display = 'none';
+        this.controlEvents.style.display = 'none';
+        this.controlEventControls.style.display = 'none';
+        this.stemControls.style.display = 'none';
+        this.hairpinFormControls.style.display = 'none';
     }
     bindEvents(actionManager) {
         actionManager.eventManager.bind(this.formCres, 'click', actionManager.formCres);
@@ -124,8 +138,8 @@ export class EditorToolbar extends Toolbar {
         if (!super.onStartLoading(e))
             return false;
         //console.debug("EditorToolbar:onStartLoading");
-        this.updateToolbarBtn(this.panelOrientation, false);
-        this.updateToolbarBtn(this.panelShow, false);
+        this.updateToolbarBtn(this.xmlEditorOrientation, false);
+        this.updateToolbarBtn(this.xmlEditorEnable, false);
         return true;
     }
     onUpdateView(e) {
@@ -145,6 +159,11 @@ export class EditorToolbar extends Toolbar {
     onControlEvents(e) {
         this.selectedElementType = "CONTROLEVENTS";
         this.updateAll();
+    }
+    onTriggerValidation(e) {
+        if (this.panel.xmlEditorView && this.panel.xmlEditorView.isEdited()) {
+            this.panel.xmlEditorView.triggerValidation();
+        }
     }
 }
 //# sourceMappingURL=editor-toolbar.js.map

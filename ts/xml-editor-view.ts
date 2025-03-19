@@ -125,6 +125,7 @@ export class XMLEditorView extends GenericView {
 
     isEnabled(): boolean { return this.enabled; }
 
+    isAutoMode(): boolean { return this.autoMode; }
     setMode(fileSize: number): void {
         this.autoMode = (fileSize < (autoModeLimit * 1024 * 1024));
         this.autoModeNotification = !this.autoMode;
