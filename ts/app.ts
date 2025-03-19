@@ -543,6 +543,10 @@ export class App {
         const schema = /<\?xml-model.*href="([^"]*).*/;
         const schemaMatch = schema.exec(this.mei);
         if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
+            this.currentSchema = this.options.schemaDefault;
+            const dlg = new Dialog(this.dialog, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
+            dlg.setContent(`The Schema '${schemaMatch[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`);
+            await dlg.show();
             /*
             if (await this.viewEditor.xmlEditorView.replaceSchema(schemaMatch[1])) {
                 this.currentSchema = schemaMatch[1];
