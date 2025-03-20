@@ -4,7 +4,7 @@
  * Events are attached to the App.eventManager
  */
 import { Toolbar } from './toolbar.js';
-import { appendDivTo } from './utils/functions.js';
+import { appendDivTo, appendSpanTo } from './utils/functions.js';
 export class EditorToolbar extends Toolbar {
     constructor(div, app, panel) {
         let editorXml = `${app.host}/icons/toolbar/editor-xml.png`;
@@ -25,8 +25,11 @@ export class EditorToolbar extends Toolbar {
         this.layoutControls = appendDivTo(this.element, { class: `vrv-btn-group` });
         appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
         this.xmlEditorEnable = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXml})` } });
+        appendSpanTo(this.xmlEditorEnable, { class: `vrv-tooltip` }, "Open or close the XML editor");
         this.xmlEditorOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+        appendSpanTo(this.xmlEditorOrientation, { class: `vrv-tooltip` }, "Change the divider orientation");
         this.xmlEditorValidate = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlValidate})` } });
+        appendSpanTo(this.xmlEditorValidate, { class: `vrv-tooltip` }, "Validate and refresh rendering ('Shift-Ctrl-V')");
         appendDivTo(this.element, { class: `vrv-h-separator` });
         this.notes = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Notes` });
         appendDivTo(this.element, { class: `vrv-h-separator` });

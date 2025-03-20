@@ -35,8 +35,10 @@ export function appendSelectTo(parent: HTMLElement, options: object): HTMLSelect
     return <HTMLSelectElement>appendHTMLElementTo(parent, options, 'select');
 }
 
-export function appendSpanTo(parent: HTMLElement, options: object): HTMLSpanElement {
-    return <HTMLSpanElement>appendHTMLElementTo(parent, options, 'span');
+export function appendSpanTo(parent: HTMLElement, options: object, text: string = "") : HTMLSpanElement {
+    let span = appendHTMLElementTo(parent, options, 'span');
+    span.innerHTML = text;
+    return <HTMLSpanElement>span;
 }
 
 export function appendSummaryTo(parent: HTMLElement, options: object): HTMLElement {

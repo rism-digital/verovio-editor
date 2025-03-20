@@ -272,7 +272,8 @@
         width: calc(100% - 30px); }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu-content, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu-content, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu-content .vrv-submenu-content, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu-content .vrv-submenu-content {
         margin-top: 0px;
-        left: calc(100% + 1px);
+        left: calc(100% - 0px);
+        border-left: 2px solid rgba(255, 255, 255, 0.1);
         white-space: nowrap;
         display: none !important; }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu:hover .vrv-submenu-content, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu:hover .vrv-submenu-content {
@@ -283,6 +284,18 @@
       display: flex; }
   .vrv-wrapper .vrv-editor-toolbar {
     border-top: 1px solid #565656; }
+  .vrv-wrapper span.vrv-tooltip, .vrv-wrapper .vrv-dialog-form .vrv-dialog-label span.vrv-tooltip-label {
+    display: none;
+    background-color: #565656;
+    border: 1px solid #565656;
+    padding: 4px 8px;
+    white-space: nowrap;
+    position: absolute;
+    text-align: left;
+    transform: translateX(38px) translateY(1px);
+    z-index: 9; }
+  .vrv-wrapper div:hover > span.vrv-tooltip, .vrv-wrapper .vrv-dialog-form .vrv-dialog-label div:hover > span.vrv-tooltip-label {
+    display: block; }
   .vrv-wrapper .vrv-statusbar {
     width: 100%;
     overflow: hidden;
@@ -479,16 +492,9 @@
       display: flex;
       justify-content: right;
       text-align: right; }
-      .vrv-wrapper .vrv-dialog-form .vrv-dialog-label .tooltip {
-        display: none;
-        background-color: #565656;
-        border: 1px solid #565656;
-        padding: 4px 8px;
-        white-space: nowrap;
-        position: absolute;
-        transform: translateX(calc(100% + 8px)) translateY(-16px);
-        z-index: 1000; }
-    .vrv-wrapper .vrv-dialog-form .vrv-dialog-label:hover .tooltip {
+      .vrv-wrapper .vrv-dialog-form .vrv-dialog-label .vrv-tooltip-label {
+        transform: translateX(calc(100% + 8px)) translateY(-16px) !important; }
+    .vrv-wrapper .vrv-dialog-form .vrv-dialog-label:hover .vrv-tooltip-label {
       display: block; }
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-input {
       background-color: #3c3c3c;

@@ -9,7 +9,7 @@ import { App } from './app.js';
 import { EditorPanel } from './editor-panel.js';
 import { Toolbar } from './toolbar.js';
 
-import { appendDivTo } from './utils/functions.js';
+import { appendDivTo, appendSpanTo } from './utils/functions.js';
 
 export class EditorToolbar extends Toolbar {
     app: App;
@@ -61,8 +61,11 @@ export class EditorToolbar extends Toolbar {
         appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
 
         this.xmlEditorEnable = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXml})` } });
+        appendSpanTo(this.xmlEditorEnable, { class: `vrv-tooltip` }, "Open or close the XML editor");
         this.xmlEditorOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+        appendSpanTo(this.xmlEditorOrientation, { class: `vrv-tooltip` }, "Change the divider orientation");
         this.xmlEditorValidate = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlValidate})` } });
+        appendSpanTo(this.xmlEditorValidate, { class: `vrv-tooltip` }, "Validate and refresh rendering ('Shift-Ctrl-V')");
 
 
         appendDivTo(this.element, { class: `vrv-h-separator` });

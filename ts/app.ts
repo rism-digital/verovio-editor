@@ -3,8 +3,6 @@
  * It requires a HTMLDivElement to be put on.
  */
 
-export const version = "1.4.0";
-
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js'
@@ -30,7 +28,7 @@ import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './work
 import { VerovioView } from './verovio-view.js';
 
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
-import { aboutMsg, reloadMsg, resetMsg } from './utils/messages.js';
+import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
 
 let filter = '/svg/filter.xml';
 
