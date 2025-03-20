@@ -11,9 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { autoModeLimit, autoModeOff } from './app.js';
 import { Dialog } from './dialog.js';
 import { GenericView } from './generic-view.js';
+import { autoModeLimit, autoModeOff } from './utils/messages.js';
 import { appendDivTo, appendTextAreaTo } from './utils/functions.js';
 const theme = "vrv"; // default for light theme
 var Status;

@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { editedXML } from './app.js';
 import { Dialog } from './dialog.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
@@ -18,6 +17,7 @@ import { EventManager } from './event-manager.js';
 import { GenericView } from './generic-view.js';
 import { Keyboard } from './keyboard.js';
 import { XMLEditorView } from './xml-editor-view.js';
+import { editedXML } from './utils/messages.js';
 import { appendDivTo } from './utils/functions.js';
 export class EditorPanel extends GenericView {
     constructor(div, app, verovio, validator, rngLoader) {

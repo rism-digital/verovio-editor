@@ -2,7 +2,7 @@
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
 
-import { App, editedXML } from './app.js';
+import { App } from './app.js';
 import { Dialog } from './dialog.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
@@ -13,6 +13,7 @@ import { RNGLoader } from './rng-loader.js';
 import { ValidatorWorkerProxy, VerovioWorkerProxy } from './worker-proxy.js';
 import { XMLEditorView } from './xml-editor-view.js';
 
+import { editedXML} from './utils/messages.js';
 import { appendDivTo } from './utils/functions.js';
 
 export class EditorPanel extends GenericView {

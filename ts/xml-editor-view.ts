@@ -3,12 +3,13 @@
  * It uses the CodeMirror editor package and a ValidatorMessenger
  */
 
-import { App, autoModeLimit, autoModeOff } from './app.js';
+import { App } from './app.js';
 import { Dialog } from './dialog.js'
 import { GenericView } from './generic-view.js';
 import { ValidatorWorkerProxy } from './worker-proxy.js';
-
 import { RNGLoader } from './rng-loader.js';
+
+import { autoModeLimit, autoModeOff } from './utils/messages.js';
 import { appendDivTo, appendTextAreaTo } from './utils/functions.js';
 
 const theme = "vrv"; // default for light theme

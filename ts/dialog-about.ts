@@ -2,8 +2,10 @@
  * The DialogAbout class.
  */
 
-import { App, licenseUrl } from './app.js';
+import { App } from './app.js';
 import { Dialog } from './dialog.js';
+
+import { licenseUrl } from './utils/messages.js';
 
 export class DialogAbout extends Dialog {
 

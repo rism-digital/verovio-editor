@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.2.1";
+export const version = "1.4.0";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
@@ -34,14 +34,8 @@ import { ResponsiveView } from './responsive-view.js';
 import { RNGLoader } from './rng-loader.js';
 import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './worker-proxy.js';
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
+import { aboutMsg, reloadMsg, resetMsg } from './utils/messages.js';
 let filter = '/svg/filter.xml';
-export const autoModeLimit = 0.5;
-export const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;
-export const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
-export const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`;
-export const licenseUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE`;
-export const autoModeOff = `Live validation and synchronization from the XML editor is disabled for files larger than ${autoModeLimit}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`;
-export const editedXML = `You have un-synchronized modifications in the XML editor which will be lost.\n\nDo you want to continue?`;
 export class App {
     constructor(div, options) {
         this.clientId = "fd81068a15354a300522";
@@ -50,6 +44,7 @@ export class App {
         this.notificationStack = [];
         this.githubManager = new GitHubManager(this);
         this.options = Object.assign({
+            version: version,
             verovioVersion: "latest",
             // The margin around page in documentView
             documentViewMargin: 100,
@@ -80,7 +75,20 @@ export class App {
             window.localStorage.removeItem("options");
         const storedOptions = localStorage.getItem("options");
         if (storedOptions) {
-            this.options = Object.assign(this.options, JSON.parse(storedOptions));
+            let jsonStoredOptions = JSON.parse(storedOptions);
+            // Options.version introduce after 1.3.0
+            let version = (jsonStoredOptions['version'] !== undefined) ? jsonStoredOptions['version'] : "1.3.0";
+            // ignore revisions here
+            const [major1, minor1] = version.split('.').map(Number);
+            const [major2, minor2] = this.options.version.split('.').map(Number);
+            // Do not reload options if we have a new minor release
+            if (major1 < major2 || minor1 < minor2) {
+                // We cannot show a notification at this stage
+                console.warn(`Version ${options.version} is new, options not reloaded`);
+            }
+            else {
+                this.options = Object.assign(this.options, jsonStoredOptions);
+            }
         }
         this.fileStack = new FileStack();
         if (options.appReset)
@@ -412,18 +420,6 @@ export class App {
                 const dlg = new Dialog(this.dialog, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
                 dlg.setContent(`The Schema '${schemaMatch[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`);
                 yield dlg.show();
-                /*
-                if (await this.viewEditor.xmlEditorView.replaceSchema(schemaMatch[1])) {
-                    this.currentSchema = schemaMatch[1];
-                    this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
-                }
-                else {
-                    this.currentSchema = this.options.schemaDefault;
-                    const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.Type.Msg });
-                    dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.options.schemaDefault}'`);
-                    await dlg.show();
-                }
-                */
             }
         });
     }
