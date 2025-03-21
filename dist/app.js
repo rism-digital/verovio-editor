@@ -15,6 +15,7 @@ import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
 import { DialogAbout } from './dialog-about.js';
+import { DialogExport } from './dialog-export.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DialogSelection } from './dialog-selection.js';
@@ -453,24 +454,13 @@ export class App {
             this.output.click();
         });
     }
-    generateMEIBasic() {
+    generateMEI(options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const meiOutputStr = yield this.verovio.getMEI({ basic: true, removeIds: true });
+            const meiOutputStr = yield this.verovio.getMEI(options);
             this.endLoading();
             this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
             this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
             this.output.click();
-        });
-    }
-    confirmLargeFileLoading(size) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Approx. 1 MB limit - fairly arbitrarily
-            if (size < 1000000)
-                return true;
-            const dlg = new Dialog(this.dialog, this, "Large file warning", { okLabel: "Continue", icon: "warning" });
-            dlg.setContent("You are trying to load a large file into the Editor. This can yield poor performance.<br>Do you want to proceed?");
-            const dlgRes = yield dlg.show();
-            return (dlgRes !== 0);
         });
     }
     ////////////////////////////////////////////////////////////////////////
@@ -592,15 +582,12 @@ export class App {
     }
     fileExport(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(this.mei);
-            this.output.download = this.filename;
-            this.output.click();
-        });
-    }
-    fileExportBasic(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.startLoading("Generating MEI-basic file ...");
-            this.generateMEIBasic();
+            const dlg = new DialogExport(this.dialog, this, "Select MEI export parameters");
+            const dlgRes = yield dlg.show();
+            if (dlgRes === 0)
+                return;
+            this.startLoading("Generating MEI file ...");
+            this.generateMEI(dlg.exportOptions);
         });
     }
     fileExportPDF(e) {
@@ -682,25 +669,6 @@ export class App {
             this.customEventManager.dispatch(event);
         });
     }
-    xmlLoadNoValidation(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const mei = this.viewEditor.xmlEditorView.getValue();
-            //const mei = await this.verovio.getMEI(params);
-            this.mei = mei;
-            let event = new CustomEvent('onUpdateData', {
-                detail: {
-                    currentId: this.clientId,
-                    caller: this.view
-                }
-            });
-            this.customEventManager.dispatch(event);
-        });
-    }
-    xmlIndent(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Not sure how to through this event?
-        });
-    }
     settingsEditor(e) {
         return __awaiter(this, void 0, void 0, function* () {
             const dlg = new DialogSettingsEditor(this.dialog, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
@@ -766,10 +734,6 @@ export class App {
             const element = e.target;
             if (this.midiToolbar && this.midiToolbar.playing) {
                 this.midiPlayer.stop();
-            }
-            if (element.dataset.view === 'editor') {
-                if ((yield this.confirmLargeFileLoading(this.mei.length)) !== true)
-                    return;
             }
             let event = new CustomEvent('onDeactivate');
             this.view.customEventManager.dispatch(event);

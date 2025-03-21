@@ -291,4 +291,16 @@ export class EditorPanel extends GenericView {
         let event = new CustomEvent('onResized');
         this.app.customEventManager.dispatch(event);
     }
+
+    onForceReload(e: Event): void {
+        if (this.xmlEditorView && this.xmlEditorView.isEdited()) {
+            this.app.mei = this.xmlEditorView.getValue();
+            let event = new CustomEvent('onUpdateData', {
+                detail: {
+                    caller: this.xmlEditorView
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
+    }
 }

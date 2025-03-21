@@ -80,8 +80,6 @@ export class AppToolbar extends Toolbar {
         this.app.eventManager.bind(fileExportPDF, 'click', this.app.fileExportPDF);
         const fileExportMIDI = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MIDI` });
         this.app.eventManager.bind(fileExportMIDI, 'click', this.app.fileExportMIDI);
-        const fileExportBasic = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MEI-basic` });
-        this.app.eventManager.bind(fileExportBasic, 'click', this.app.fileExportBasic);
         appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
         this.fileSelection = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Apply content selection` });
         this.app.eventManager.bind(this.fileSelection, 'click', this.app.fileSelection);
@@ -96,21 +94,6 @@ export class AppToolbar extends Toolbar {
         this.app.eventManager.bind(this.githubImport, 'click', this.app.githubImport);
         this.githubExport = appendDivTo(githubMenuContent, { class: `vrv-menu-text`, 'data-before': `Export (commit/push) to GitHub` });
         this.app.eventManager.bind(this.githubExport, 'click', this.app.githubExport);
-        ////////////////////////////////////////////////////////////////////////
-        // XML Editor
-        ////////////////////////////////////////////////////////////////////////
-        this.xmlMenu = appendDivTo(this.element, { class: `vrv-menu`, style: { display: `none` } });
-        appendDivTo(this.xmlMenu, { class: `vrv-btn-text`, 'data-before': `XML editor` });
-        const xmlMenuContent = appendDivTo(this.xmlMenu, { class: `vrv-menu-content` });
-        appendDivTo(xmlMenuContent, { class: `vrv-v-separator` });
-        this.xmlOverwriteMEI = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Overwrite XML editor data` });
-        this.app.eventManager.bind(this.xmlOverwriteMEI, 'click', this.app.xmlOverwriteMEI);
-        this.xmlOverwriteMEINoIds = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Overwrite XML editor data without ids` });
-        this.xmlOverwriteMEINoIds.dataset.noIds = "true";
-        this.app.eventManager.bind(this.xmlOverwriteMEINoIds, 'click', this.app.xmlOverwriteMEI);
-        appendDivTo(xmlMenuContent, { class: `vrv-v-separator` });
-        this.xmlLoadNoValidation = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Load XML editor data without validation` });
-        this.app.eventManager.bind(this.xmlLoadNoValidation, 'click', this.app.xmlLoadNoValidation);
         ////////////////////////////////////////////////////////////////////////
         // Navigation
         ////////////////////////////////////////////////////////////////////////
@@ -199,7 +182,6 @@ export class AppToolbar extends Toolbar {
         this.updateToolbarSubmenuBtn(this.viewResponsive, isResponsive);
         this.updateToolbarSubmenuBtn(this.viewEditor, isEditor);
         this.updateToolbarSubmenuBtn(this.fileSelection, hasSelection);
-        this.updateToolbarBtnHide(this.xmlMenu, isEditor);
         if (this.app.githubManager.isLoggedIn()) {
             this.githubMenu.style.display = 'block';
             this.updateToolbarBtnHide(this.logout, true);

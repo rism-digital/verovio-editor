@@ -227,5 +227,16 @@ export class EditorPanel extends GenericView {
             this.app.customEventManager.dispatch(event);
         });
     }
+    onForceReload(e) {
+        if (this.xmlEditorView && this.xmlEditorView.isEdited()) {
+            this.app.mei = this.xmlEditorView.getValue();
+            let event = new CustomEvent('onUpdateData', {
+                detail: {
+                    caller: this.xmlEditorView
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
+    }
 }
 //# sourceMappingURL=editor-panel.js.map

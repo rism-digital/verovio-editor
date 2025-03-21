@@ -7,6 +7,7 @@ import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js'
 import { DialogAbout } from './dialog-about.js';
+import { DialogExport } from './dialog-export.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DialogSelection} from './dialog-selection.js';
@@ -588,23 +589,12 @@ export class App {
         this.output.click();
     }
 
-    async generateMEIBasic(): Promise<any> {
-        const meiOutputStr = await this.verovio.getMEI({ basic: true, removeIds: true });
+    async generateMEI(options: App.MEIExportOptions): Promise<any> {
+        const meiOutputStr = await this.verovio.getMEI(options);
         this.endLoading();
-
         this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
         this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
         this.output.click();
-    }
-
-    async confirmLargeFileLoading(size: number): Promise<any> {
-        // Approx. 1 MB limit - fairly arbitrarily
-        if (size < 1000000) return true;
-
-        const dlg = new Dialog(this.dialog, this, "Large file warning", { okLabel: "Continue", icon: "warning" });
-        dlg.setContent("You are trying to load a large file into the Editor. This can yield poor performance.<br>Do you want to proceed?")
-        const dlgRes = await dlg.show();
-        return (dlgRes !== 0);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -728,14 +718,11 @@ export class App {
     }
 
     async fileExport(e: Event): Promise<any> {
-        this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(this.mei);
-        this.output.download = this.filename;
-        this.output.click();
-    }
-
-    async fileExportBasic(e: Event): Promise<any> {
-        this.startLoading("Generating MEI-basic file ...");
-        this.generateMEIBasic();
+        const dlg = new DialogExport(this.dialog, this, "Select MEI export parameters");
+        const dlgRes = await dlg.show();
+        if (dlgRes === 0) return;
+        this.startLoading("Generating MEI file ...");
+        this.generateMEI(dlg.exportOptions);
     }
 
     async fileExportPDF(e: Event): Promise<any> {
@@ -808,24 +795,6 @@ export class App {
         this.customEventManager.dispatch(event);
     }
 
-
-    async xmlLoadNoValidation(e: Event): Promise<any> {
-        const mei = this.viewEditor.xmlEditorView.getValue();
-        //const mei = await this.verovio.getMEI(params);
-        this.mei = mei;
-        let event = new CustomEvent('onUpdateData', {
-            detail: {
-                currentId: this.clientId,
-                caller: this.view
-            }
-        });
-        this.customEventManager.dispatch(event);
-    }
-
-    async xmlIndent(e: Event): Promise<any> {
-        // Not sure how to through this event?
-    }
-
     async settingsEditor(e: Event): Promise<any> {
         const dlg = new DialogSettingsEditor(this.dialog, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
         const dlgRes = await dlg.show();
@@ -889,10 +858,6 @@ export class App {
             this.midiPlayer.stop();
         }
 
-        if (element.dataset.view === 'editor') {
-            if (await this.confirmLargeFileLoading(this.mei.length) !== true) return;
-        }
-
         let event = new CustomEvent('onDeactivate');
         this.view.customEventManager.dispatch(event);
 
@@ -949,5 +914,14 @@ export namespace App {
         schemaDefault: string;
         schema: string;
         verovioVersion: string;
+    }
+
+    export interface MEIExportOptions {
+        scoreBased: boolean;
+        basic: boolean;
+        removeIds: boolean;
+        ignoreHeader: boolean;
+        firstPage: number;
+        lastPage: number;
     }
 }
