@@ -1,3 +1,7 @@
+# 1.4.0
+* Toggle XML editor
+* Disable live validation and refreshing for files larger than 0.5 MB
+
 # 1.3.0
 * Change MIDI player to [html-midi-player](https://cifkao.github.io/html-midi-player/)
 * Changelog
