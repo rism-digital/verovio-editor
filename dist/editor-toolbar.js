@@ -78,22 +78,17 @@ export class EditorToolbar extends Toolbar {
         else {
             this.xmlEditorOrientation.style.backgroundImage = `url(${iconsLayoutH})`;
         }
-        if (isToggled) {
-            this.xmlEditorEnable.classList.add('toggled');
-            this.xmlEditorValidate.style.display = (isAutoMode) ? 'none' : 'block';
-            this.xmlEditorForce.style.display = 'block';
-            this.xmlEditorOrientation.style.display = 'block';
-        }
-        else {
-            this.xmlEditorEnable.classList.remove('toggled');
-            this.xmlEditorValidate.style.display = 'none';
-            this.xmlEditorForce.style.display = 'none';
-            this.xmlEditorOrientation.style.display = 'none';
-        }
-        this.updateToolbarBtn(this.xmlEditorOrientation, isToggled);
-        this.updateToolbarBtn(this.xmlEditorEnable, true);
-        this.updateToolbarBtn(this.xmlEditorValidate, isToggled);
-        this.updateToolbarBtn(this.xmlEditorForce, isEdited);
+        // update toggled status
+        this.updateToolbarBtnToggled(this.xmlEditorEnable, isToggled);
+        // update display
+        this.updateToolbarBtnDisplay(this.xmlEditorOrientation, isToggled);
+        this.updateToolbarBtnDisplay(this.xmlEditorValidate, (isToggled && !isAutoMode));
+        this.updateToolbarBtnDisplay(this.xmlEditorForce, isToggled);
+        // update enabled status
+        this.updateToolbarBtnEnabled(this.xmlEditorEnable, true);
+        this.updateToolbarBtnEnabled(this.xmlEditorOrientation, isToggled);
+        this.updateToolbarBtnEnabled(this.xmlEditorValidate, isToggled);
+        this.updateToolbarBtnEnabled(this.xmlEditorForce, isEdited);
         /*
         this.updateToolbarToggleBtn(this.notes, (this.selectedElementType === "NOTES"));
         this.updateToolbarToggleBtn(this.controlEvents, (this.selectedElementType === "CONTROLEVENTS"));
@@ -150,10 +145,10 @@ export class EditorToolbar extends Toolbar {
         if (!super.onStartLoading(e))
             return false;
         //console.debug("EditorToolbar:onStartLoading");
-        this.updateToolbarBtn(this.xmlEditorOrientation, false);
-        this.updateToolbarBtn(this.xmlEditorEnable, false);
-        this.updateToolbarBtn(this.xmlEditorValidate, false);
-        this.updateToolbarBtn(this.xmlEditorForce, false);
+        this.updateToolbarBtnEnabled(this.xmlEditorOrientation, false);
+        this.updateToolbarBtnEnabled(this.xmlEditorEnable, false);
+        this.updateToolbarBtnEnabled(this.xmlEditorValidate, false);
+        this.updateToolbarBtnEnabled(this.xmlEditorForce, false);
         return true;
     }
     onUpdateView(e) {

@@ -45,8 +45,8 @@ $filtered-background-grey-active: invert($background-active);
 $toolbar-height: 36px;
 $menu-height: 18px;
 $statusbar-height: 20px;
-$editor-tool-panel-width: 300px;
-$editor-keyboard-height: 110px;
+$editor-tool-panel-width: 0px;
+$editor-keyboard-height: 0px; //110px;
 $btn-height: 40px;
 $dialog-gh-list-height: 350px;
 
@@ -250,7 +250,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
 
             .vrv-keyboard-panel {
-                display: flex;
+                display: none; //flex;
                 min-height: $editor-keyboard-height;
                 background-color: $background;
                 border-top: 1px solid $background-border;

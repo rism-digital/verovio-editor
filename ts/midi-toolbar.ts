@@ -71,16 +71,19 @@ export class MidiToolbar extends Toolbar {
         this.eventManager.bind(this.midiBar, 'mousemove', this.onProgressBarMove);
         this.eventManager.bind(this.midiBar, 'mouseup', this.onProgressBarUp);
 
-        //this.updateAll();
+        // hide the pause, stop and progress bar
+        this.updateToolbarBtnDisplay(this.pause, false);
+        this.updateToolbarBtnDisplay(this.stop, false);
+        this.updateToolbarGrp(this.progressControl, false);
     }
 
     updateAll(): void {
         this.updateProgressBar();
 
         this.updateToolbarGrp(this.midiControls, (this.app.pageCount > 0));
-        this.updateToolbarBtnHide(this.play, !this.playing || this.pausing);
-        this.updateToolbarBtnHide(this.pause, !this.pausing && this.playing);
-        this.updateToolbarBtnHide(this.stop, this.playing || this.pausing);
+        this.updateToolbarBtnDisplay(this.play, !this.playing || this.pausing);
+        this.updateToolbarBtnDisplay(this.pause, !this.pausing && this.playing);
+        this.updateToolbarBtnDisplay(this.stop, this.playing || this.pausing);
         this.updateToolbarGrp(this.progressControl, this.playing || this.pausing);
     }
 

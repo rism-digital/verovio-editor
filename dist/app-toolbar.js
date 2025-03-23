@@ -167,10 +167,10 @@ export class AppToolbar extends Toolbar {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     updateAll() {
-        this.updateToolbarBtn(this.prevPage, (this.app.toolbarView.currentPage > 1));
-        this.updateToolbarBtn(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
-        this.updateToolbarBtn(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex > 0)));
-        this.updateToolbarBtn(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex < this.app.zoomLevels.length - 1)));
+        this.updateToolbarBtnEnabled(this.prevPage, (this.app.toolbarView.currentPage > 1));
+        this.updateToolbarBtnEnabled(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
+        this.updateToolbarBtnEnabled(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex > 0)));
+        this.updateToolbarBtnEnabled(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex < this.app.zoomLevels.length - 1)));
         let isResponsive = ((this.app.view instanceof ResponsiveView) && !(this.app.view instanceof EditorPanel));
         let isEditor = (this.app.view instanceof EditorPanel);
         let isDocument = (this.app.view instanceof DocumentView);
@@ -184,7 +184,7 @@ export class AppToolbar extends Toolbar {
         this.updateToolbarSubmenuBtn(this.fileSelection, hasSelection);
         if (this.app.githubManager.isLoggedIn()) {
             this.githubMenu.style.display = 'block';
-            this.updateToolbarBtnHide(this.logout, true);
+            this.updateToolbarBtnDisplay(this.logout, true);
             this.login.setAttribute("data-before", this.app.githubManager.name);
             this.login.classList.add("inactivated");
         }
@@ -236,10 +236,10 @@ export class AppToolbar extends Toolbar {
         if (!super.onStartLoading(e))
             return false;
         //console.debug("AppToolbar:onStartLoading");
-        this.updateToolbarBtn(this.prevPage, false);
-        this.updateToolbarBtn(this.nextPage, false);
-        this.updateToolbarBtn(this.zoomOut, false);
-        this.updateToolbarBtn(this.zoomIn, false);
+        this.updateToolbarBtnEnabled(this.prevPage, false);
+        this.updateToolbarBtnEnabled(this.nextPage, false);
+        this.updateToolbarBtnEnabled(this.zoomOut, false);
+        this.updateToolbarBtnEnabled(this.zoomIn, false);
         return true;
     }
     onUpdateView(e) {
