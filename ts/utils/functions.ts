@@ -35,8 +35,10 @@ export function appendSelectTo(parent: HTMLElement, options: object): HTMLSelect
     return <HTMLSelectElement>appendHTMLElementTo(parent, options, 'select');
 }
 
-export function appendSpanTo(parent: HTMLElement, options: object): HTMLSpanElement {
-    return <HTMLSpanElement>appendHTMLElementTo(parent, options, 'span');
+export function appendSpanTo(parent: HTMLElement, options: object, text: string = "") : HTMLSpanElement {
+    let span = appendHTMLElementTo(parent, options, 'span');
+    span.innerHTML = text;
+    return <HTMLSpanElement>span;
 }
 
 export function appendSummaryTo(parent: HTMLElement, options: object): HTMLElement {
@@ -63,6 +65,26 @@ function insertHTMLElementBefore(parent: HTMLElement, options: object, tag: stri
     setAttributes(element, options);
     parent.insertBefore(element, before);
     return element;
+}
+
+/**
+ * interface for the html-midi-player custom element
+ */
+
+export interface MidiPlayerElement extends HTMLElement {
+    start(): void;
+    pause(): void;
+    stop(): void;
+    currentTime: number;
+    duration: number;
+    playing: boolean;
+}
+
+export function appendMidiPlayerTo(parent: HTMLElement, options: object): MidiPlayerElement {
+    const midiPlayer = <MidiPlayerElement>appendHTMLElementTo(parent, options, 'midi-player');
+    midiPlayer.setAttribute('sound-font', '');
+    midiPlayer.style.display = 'none';
+    return midiPlayer;
 }
 
 /**

@@ -3,14 +3,17 @@
  */
 
 import { App } from './app.js';
+import { Dialog } from './dialog.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';
 import { GenericView } from './generic-view.js';
+import { Keyboard } from './keyboard.js';
 import { RNGLoader } from './rng-loader.js';
 import { ValidatorWorkerProxy, VerovioWorkerProxy } from './worker-proxy.js';
 import { XMLEditorView } from './xml-editor-view.js';
 
+import { editedXML} from './utils/messages.js';
 import { appendDivTo } from './utils/functions.js';
 
 export class EditorPanel extends GenericView {
@@ -32,6 +35,8 @@ export class EditorPanel extends GenericView {
     toolbar: HTMLDivElement;
     hSplit: HTMLDivElement;
     toolPanel: HTMLDivElement;
+    vSplit: HTMLDivElement;
+    keyboard; HTMLDivElement;
     split: HTMLDivElement;
     editor: HTMLDivElement;
     splitter: HTMLDivElement;
@@ -57,8 +62,11 @@ export class EditorPanel extends GenericView {
 
         this.hSplit = appendDivTo(this.element, { class: `vrv-h-split` });
         this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
+        this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
+        this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
+        this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
+        new Keyboard(this.keyboard, this.app);
 
-        this.split = appendDivTo(this.hSplit, { class: `vrv-split` });
         let orientation = (this.app.options.editorSplitterHorizontal) ? "vertical" : "horizontal";
         this.split.classList.add(orientation);
 
@@ -81,7 +89,6 @@ export class EditorPanel extends GenericView {
         this.xmlEditor = appendDivTo(this.split, { class: `vrv-xml` });
 
         this.xmlEditorView = new XMLEditorView(this.xmlEditor, this.app, this.validator, this.rngLoader);
-        this.xmlEditorView.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
         this.customEventManager.addToPropagationList(this.xmlEditorView.customEventManager);
 
         this.splitterSize = 60;
@@ -109,18 +116,25 @@ export class EditorPanel extends GenericView {
         this.element.style.height = this.element.parentElement.style.height;
         this.element.style.width = this.element.parentElement.style.width;
 
+        this.toolPanel.style.display = 'none';
+        this.keyboard.style.display = 'none';
+        //this.toolPanel.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'block';
+        //this.keyboard.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'flex';
+
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
-        let height = this.element.clientHeight - this.toolbar.offsetHeight;
+
+        let height = this.element.clientHeight - this.toolbar.offsetHeight - this.keyboard.offsetHeight;
         let width = this.element.clientWidth - this.toolPanel.offsetWidth;
 
         this.split.style.height = `${height}px`;
         this.split.style.width = `${width}px`;
+        this.keyboard.style.width = `${width}px`;
 
         this.xmlEditor.style.display = 'block';
         this.splitter.style.display = 'block';
 
-        if (!this.app.options.editorSplitterShow) {
+        if (!this.xmlEditorView.isEnabled()) {
             // Ideally we would send a onActive / onDeactivate event
             this.xmlEditor.style.display = 'none';
             this.xmlEditor.style.height = `0px`;
@@ -169,6 +183,13 @@ export class EditorPanel extends GenericView {
         if (!super.onActivate(e)) return false;
         //console.debug("EditorPanel::onActivate");
 
+        this.updateSize();
+    }
+
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
+        //console.debug("EditorPanel::onLoadData");
+        
         this.updateSize();
     }
 
@@ -252,10 +273,34 @@ export class EditorPanel extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
 
-    onToggle(): void {
-        this.app.options.editorSplitterShow = !this.app.options.editorSplitterShow;
+    async onToggle(): Promise<any> {
+        if (!this.xmlEditorView.isEnabled()) {
+            this.xmlEditorView.setEnabled(true);
+            await this.editorView.updateMEI();
+        }
+        else {
+            if (this.xmlEditorView.isEdited()) {
+                const dlg = new Dialog(this.app.dialog, this.app, "Un-synchronized changes", { okLabel: "Yes", icon: "question" });
+                dlg.setContent(marked.parse(editedXML));
+                if (await dlg.show() === 0) return;
+                this.xmlEditorView.setEdited(false);
+            }
+            this.xmlEditorView.setEnabled(false);
+        }
         this.app.startLoading("Adjusting size ...", true);
         let event = new CustomEvent('onResized');
         this.app.customEventManager.dispatch(event);
+    }
+
+    onForceReload(e: Event): void {
+        if (this.xmlEditorView && this.xmlEditorView.isEdited()) {
+            this.app.mei = this.xmlEditorView.getValue();
+            let event = new CustomEvent('onUpdateData', {
+                detail: {
+                    caller: this.xmlEditorView
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
     }
 }

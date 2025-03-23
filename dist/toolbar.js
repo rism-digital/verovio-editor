@@ -22,7 +22,7 @@ export class Toolbar extends GenericView {
         else
             grp.style.display = 'none';
     }
-    updateToolbarBtn(btn, condition) {
+    updateToolbarBtnEnabled(btn, condition) {
         if (btn === undefined) {
             return;
         }
@@ -31,7 +31,7 @@ export class Toolbar extends GenericView {
         else
             btn.classList.add("disabled");
     }
-    updateToolbarBtnHide(btn, condition) {
+    updateToolbarBtnDisplay(btn, condition) {
         if (btn === undefined) {
             return;
         }
@@ -40,7 +40,7 @@ export class Toolbar extends GenericView {
         else
             btn.style.display = 'none';
     }
-    updateToolbarToggleBtn(btn, condition) {
+    updateToolbarBtnToggled(btn, condition) {
         if (btn === undefined) {
             return;
         }

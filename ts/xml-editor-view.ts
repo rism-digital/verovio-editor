@@ -4,10 +4,12 @@
  */
 
 import { App } from './app.js';
+import { Dialog } from './dialog.js'
 import { GenericView } from './generic-view.js';
 import { ValidatorWorkerProxy } from './worker-proxy.js';
-
 import { RNGLoader } from './rng-loader.js';
+
+import { autoModeLimit, autoModeOff } from './utils/messages.js';
 import { appendDivTo, appendTextAreaTo } from './utils/functions.js';
 
 const theme = "vrv"; // default for light theme
@@ -16,20 +18,28 @@ declare global {
     const CodeMirror;
 }
 
+enum Status {
+    Validating,
+    Valid,
+    Invalid,
+    Unknown,
+};
+
 export class XMLEditorView extends GenericView {
-    validator: ValidatorWorkerProxy;
-    rngLoader: RNGLoader;
-    currentId: string;
-    element: HTMLDivElement;
-    xmlValid: HTMLDivElement;
-    xmlEditorView: HTMLTextAreaElement;
-    updateLinting: Function;
-    loaded: boolean;
-    timestamp: number;
-    skipValidation: boolean;
-    formatting: boolean;
-    CMeditor: any;
-    app: App;
+    private validator: ValidatorWorkerProxy;
+    private rngLoader: RNGLoader;
+    private currentId: string;
+    private xmlValid: HTMLDivElement;
+    private xmlEditorView: HTMLTextAreaElement;
+    private updateLinting: Function;
+    private timestamp: number; // For checking if the data validated is still the data loaded 
+    private autoMode: boolean; // For indicating if live validation and sync is on
+    private autoModeNotification: boolean; // For indicating if the notification should be displayed
+    private edited: boolean; // For indicating if the XML content is edited but not synchronized
+    private enabled: boolean; // For indicating the XML editor is open
+    private formatting: boolean; // For indicating that XML formatting is under progress
+    private CMeditor: any;
+    private lintOptions: Object;
 
     constructor(div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader) {
         super(div, app);
@@ -46,12 +56,20 @@ export class XMLEditorView extends GenericView {
 
         this.updateLinting = null;
         this.currentId = "";
-        this.loaded = false;
         this.timestamp = Date.now();
-        this.skipValidation = false;
+        this.edited = false;
+        this.autoMode = false;
+        this.autoModeNotification = false;
+        this.enabled = false;
         this.formatting = false;
 
         const cmThis = this;
+
+        this.lintOptions = {
+            "caller": cmThis,
+            "getAnnotations": cmThis.validate,
+            "async": true
+        }
 
         this.CMeditor = CodeMirror.fromTextArea(this.xmlEditorView, {
             lineNumbers: true,
@@ -67,64 +85,92 @@ export class XMLEditorView extends GenericView {
                 "'<'": completeAfter,
                 "'/'": completeIfAfterLt,
                 "' '": completeIfInTag,
-                "'='": completeIfInTag
+                "'='": completeIfInTag,
             },
             gutters: ["CodeMirror-lint-markers", "CodeMirror-foldgutter"],
-            lint: {
-                "caller": cmThis,
-                "getAnnotations": this.validate,
-                "async": true
-            }
-        });
-        this.CMeditor.on("cursorActivity", function (cm) {
-            cmThis.onCursorActivity(cm);
         });
 
-        this.CMeditor.on("focus", function (cm) {
-            cmThis.onFocus(cm);
+        const map = {
+            "Shift-Ctrl-V": function (cm) { cmThis.triggerValidation(); },
+            "Shift-Ctrl-F": function (cm) { cmThis.formatXML(); },
+        }
+        this.CMeditor.addKeyMap(map);
+
+        this.CMeditor.on("cursorActivity", function (cm) {
+            cmThis.onCursorActivity(cm);
         });
 
         this.CMeditor.on("keyHandled", function (cm, string, event) {
             cmThis.keyHandled(cm, string, event);
         });
 
+        this.CMeditor.on("change", function (cm, changes, event) {
+            if (changes.origin === "setValue" || (cmThis.autoMode && !cmThis.formatting)) {
+                cmThis.triggerValidation();
+            }
+            else {
+                cmThis.suspendValidation();
+                cmThis.setStatus(Status.Unknown);
+            }
+        });
+
+        this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Async worker methods
+    // Getters and Setter
     ////////////////////////////////////////////////////////////////////////
 
-    async validate(text: string, updateLinting: Function, options): Promise<any> {
-        //console.debug( "XMLEditorView::validate");
-        if (options && options.caller && text) {
-            const editor: XMLEditorView = options.caller;
-            //console.debug( "XMLEditorView::validate", editor );
+    isEdited(): boolean { return this.edited; }
+    setEdited(edited: boolean): void { this.edited = edited; }
 
-            if (editor.formatting) return;
-            if (editor.skipValidation) return;
+    isEnabled(): boolean { return this.enabled; }
 
-            // keep the callback
-            if (editor.xmlValid) {
-                editor.xmlValid.classList.remove("ok");
-                editor.xmlValid.classList.remove("error");
-                editor.xmlValid.classList.add("wait");
-            }
-            editor.updateLinting = updateLinting;
-            editor.app.startLoading("Validating ...", true);
-            let validation = "[]";
-            if (editor.app.options.enableValidation) {
-                validation = await editor.validator.validateNG(text);
-            }
-            else {
-                validation = await editor.validator.check(text);
-            }
-            editor.app.endLoading(true);
-            editor.highlightValidation(text, validation, editor.timestamp);
+    isAutoMode(): boolean { return this.autoMode; }
+    setMode(fileSize: number): void {
+        this.autoMode = (fileSize < (autoModeLimit * 1024 * 1024));
+        this.autoModeNotification = !this.autoMode;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Async methods
+    ////////////////////////////////////////////////////////////////////////
+
+    async setEnabled(enabled: boolean): Promise<any> {
+        this.enabled = enabled;
+        if (this.enabled && this.autoModeNotification && !this.autoMode) {
+            const dlg = new Dialog(this.app.dialog, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
+            dlg.setContent(marked.parse(autoModeOff));
+            await dlg.show();
+            // Do not show it again for that file.
+            this.autoModeNotification = false;
         }
     }
 
-    async suspendedValidate(text: string, updateLinting: Function, options): Promise<any> {
-        // Do nothing...
+    async validate(text: string, updateLinting: Function, options: any): Promise<any> {
+        //console.debug( "XMLEditorView::validate");
+        if (!updateLinting || !options.caller || !text) return;
+
+        const editor: XMLEditorView = options.caller;
+        //console.debug( "XMLEditorView::validate", editor );
+
+        if (!editor.enabled) return;
+        if (editor.formatting) return;
+
+        // keep the callback
+        editor.setStatus(Status.Validating);
+        editor.updateLinting = updateLinting;
+        editor.app.startLoading("Validating ...", true);
+        let validation = "[]";
+        if (editor.app.options.enableValidation) {
+            validation = await editor.validator.validateNG(text);
+        }
+        else {
+            validation = await editor.validator.check(text);
+        }
+        editor.app.endLoading(true);
+        editor.highlightValidation(text, validation, editor.timestamp);
+
     }
 
     async replaceSchema(schemaFile: string): Promise<any> {
@@ -148,6 +194,24 @@ export class XMLEditorView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+
+    setStatus(status: Status): void {
+        if (!this.xmlValid) return;
+
+        this.xmlValid.classList.remove("wait");
+        this.xmlValid.classList.remove("ok");
+        this.xmlValid.classList.remove("error");
+        this.xmlValid.classList.remove("unknown");
+
+        let statusClass: string;
+        switch (status) {
+            case (Status.Validating): statusClass = "wait"; break;
+            case (Status.Valid): statusClass = "ok"; break;
+            case (Status.Invalid): statusClass = "error"; break;
+            case (Status.Unknown): statusClass = "unknown"; break;
+        }
+        this.xmlValid.classList.add(statusClass);
+    }
 
     setCurrent(id: string): void {
         //console.debug( "XMLEditorView::setCurrent" );
@@ -185,7 +249,10 @@ export class XMLEditorView extends GenericView {
         }
         this.updateLinting(this.CMeditor, found);
         if (found.length == 0) {
-            if (this.loaded && timestamp === this.timestamp) {
+            if (timestamp === this.timestamp) {
+                this.setStatus(Status.Valid);
+                this.edited = false;
+                if (this.app.mei == text) return;
                 this.app.mei = text;
                 this.app.startLoading("Updating data ...", true);
                 let event = new CustomEvent('onUpdateData', {
@@ -193,40 +260,40 @@ export class XMLEditorView extends GenericView {
                         caller: this
                     }
                 });
+
                 this.app.customEventManager.dispatch(event);
-            }
-            else if (!this.loaded && timestamp === this.timestamp) {
-                this.loaded = true;
             }
             else {
                 console.log("Validated data is obsolete");
+                this.setStatus(Status.Unknown);
+                this.edited = false;
             }
-            this.xmlValid.classList.remove("wait");
-            this.xmlValid.classList.remove("error");
-            this.xmlValid.classList.add("ok");
         }
         else {
-            this.xmlValid.classList.remove("wait");
-            this.xmlValid.classList.remove("ok");
-            this.xmlValid.classList.add("error");
+            this.setStatus(Status.Invalid);
+            this.edited = true;
         }
     }
 
     formatXML(): void {
         console.debug("XMLEditorView::FormatXML");
+        // A flag for suspending validation
         this.formatting = true;
-        this.skipValidation = true;
-        // Suspend lint.getAnnotations to avoid recursive callbacks
-        this.CMeditor.options.lint.getAnnotations = this.suspendedValidate;
         // Store the current line
         let currentLine = this.CMeditor.getCursor();
-        var totalLines = this.CMeditor.lineCount();
+        let totalLines = this.CMeditor.lineCount();
         this.CMeditor.autoFormatRange({ line: 0, ch: 0 }, { line: totalLines });
-        // Reset everything
+        // Re-enable validation
         this.formatting = false;
-        this.skipValidation = false;
-        this.CMeditor.options.lint.getAnnotations = this.validate;
         this.CMeditor.setCursor(currentLine);
+    }
+
+    triggerValidation(): void {
+        this.CMeditor.setOption("lint", this.lintOptions);
+    }
+
+    suspendValidation(): void {
+        this.CMeditor.setOption("lint", false);
     }
 
     getValue(): string {
@@ -254,7 +321,6 @@ export class XMLEditorView extends GenericView {
                     }
                 });
                 //console.debug( "Dispatch-onSelect" );
-                this.skipValidation = false;
                 this.app.customEventManager.dispatch(event);
             }
             this.currentId = id[1];
@@ -262,9 +328,7 @@ export class XMLEditorView extends GenericView {
     }
 
     keyHandled(cm, string, event): void {
-        if (event.ctrlKey && event.shiftKey && event.key === "P") {
-            this.formatXML();
-        }
+        this.setEdited(true);
         if (event.key === "Enter") {
             let ch = cm.getCursor().ch;
             let line = cm.getCursor().line;
@@ -279,11 +343,6 @@ export class XMLEditorView extends GenericView {
         }
     }
 
-    onFocus(cm): void {
-        //console.debug( "XMLEditorView::onFocus" );
-        this.skipValidation = false;
-    }
-
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
@@ -295,17 +354,13 @@ export class XMLEditorView extends GenericView {
         this.CMeditor.refresh();
         this.CMeditor.setSize(this.element.style.width, this.element.style.height);
 
-        this.skipValidation = !this.app.options.editorSplitterShow;
-
         return true;
     }
 
     override onLoadData(e: CustomEvent): boolean {
         if (!super.onLoadData(e)) return false;
         //console.debug("XMLEditorView::onLoadData");
-
         this.timestamp = Date.now();
-        this.loaded = false;
         this.CMeditor.setValue(e.detail.mei);
         this.setCurrent(this.currentId);
 
@@ -315,7 +370,6 @@ export class XMLEditorView extends GenericView {
     override onSelect(e: CustomEvent): boolean {
         if (!super.onSelect(e)) return false;
         //console.debug("XMLEditorView::onSelect");
-
         this.currentId = e.detail.id;
         this.setCurrent(this.currentId);
 
@@ -326,10 +380,7 @@ export class XMLEditorView extends GenericView {
         if (!super.onUpdateData(e)) return false;
         if (this === e.detail.caller) return false;
         //console.debug("XMLEditorView::onUpdateData");
-
         this.timestamp = Date.now();
-        this.loaded = true;
-        this.skipValidation = true;
         this.CMeditor.setValue(this.app.mei);
         this.setCurrent(this.currentId);
 
@@ -465,4 +516,3 @@ if (typeof CodeMirror !== 'undefined') {
         });
     });
 }
-

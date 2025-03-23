@@ -1,11 +1,23 @@
 /**
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { Dialog } from './dialog.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';
 import { GenericView } from './generic-view.js';
+import { Keyboard } from './keyboard.js';
 import { XMLEditorView } from './xml-editor-view.js';
+import { editedXML } from './utils/messages.js';
 import { appendDivTo } from './utils/functions.js';
 export class EditorPanel extends GenericView {
     constructor(div, app, verovio, validator, rngLoader) {
@@ -19,7 +31,10 @@ export class EditorPanel extends GenericView {
         this.customEventManager.addToPropagationList(this.editorToolbar.customEventManager);
         this.hSplit = appendDivTo(this.element, { class: `vrv-h-split` });
         this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
-        this.split = appendDivTo(this.hSplit, { class: `vrv-split` });
+        this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
+        this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
+        this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
+        new Keyboard(this.keyboard, this.app);
         let orientation = (this.app.options.editorSplitterHorizontal) ? "vertical" : "horizontal";
         this.split.classList.add(orientation);
         this.editor = appendDivTo(this.split, { class: `vrv-view`, style: `` });
@@ -37,7 +52,6 @@ export class EditorPanel extends GenericView {
         this.splitterY = 0;
         this.xmlEditor = appendDivTo(this.split, { class: `vrv-xml` });
         this.xmlEditorView = new XMLEditorView(this.xmlEditor, this.app, this.validator, this.rngLoader);
-        this.xmlEditorView.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
         this.customEventManager.addToPropagationList(this.xmlEditorView.customEventManager);
         this.splitterSize = 60;
         this.resizeTimer;
@@ -60,15 +74,20 @@ export class EditorPanel extends GenericView {
     updateSize() {
         this.element.style.height = this.element.parentElement.style.height;
         this.element.style.width = this.element.parentElement.style.width;
+        this.toolPanel.style.display = 'none';
+        this.keyboard.style.display = 'none';
+        //this.toolPanel.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'block';
+        //this.keyboard.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'flex';
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
-        let height = this.element.clientHeight - this.toolbar.offsetHeight;
+        let height = this.element.clientHeight - this.toolbar.offsetHeight - this.keyboard.offsetHeight;
         let width = this.element.clientWidth - this.toolPanel.offsetWidth;
         this.split.style.height = `${height}px`;
         this.split.style.width = `${width}px`;
+        this.keyboard.style.width = `${width}px`;
         this.xmlEditor.style.display = 'block';
         this.splitter.style.display = 'block';
-        if (!this.app.options.editorSplitterShow) {
+        if (!this.xmlEditorView.isEnabled()) {
             // Ideally we would send a onActive / onDeactivate event
             this.xmlEditor.style.display = 'none';
             this.xmlEditor.style.height = `0px`;
@@ -108,6 +127,12 @@ export class EditorPanel extends GenericView {
         if (!super.onActivate(e))
             return false;
         //console.debug("EditorPanel::onActivate");
+        this.updateSize();
+    }
+    onLoadData(e) {
+        if (!super.onLoadData(e))
+            return false;
+        //console.debug("EditorPanel::onLoadData");
         this.updateSize();
     }
     onResized(e) {
@@ -182,10 +207,36 @@ export class EditorPanel extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
     onToggle() {
-        this.app.options.editorSplitterShow = !this.app.options.editorSplitterShow;
-        this.app.startLoading("Adjusting size ...", true);
-        let event = new CustomEvent('onResized');
-        this.app.customEventManager.dispatch(event);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.xmlEditorView.isEnabled()) {
+                this.xmlEditorView.setEnabled(true);
+                yield this.editorView.updateMEI();
+            }
+            else {
+                if (this.xmlEditorView.isEdited()) {
+                    const dlg = new Dialog(this.app.dialog, this.app, "Un-synchronized changes", { okLabel: "Yes", icon: "question" });
+                    dlg.setContent(marked.parse(editedXML));
+                    if ((yield dlg.show()) === 0)
+                        return;
+                    this.xmlEditorView.setEdited(false);
+                }
+                this.xmlEditorView.setEnabled(false);
+            }
+            this.app.startLoading("Adjusting size ...", true);
+            let event = new CustomEvent('onResized');
+            this.app.customEventManager.dispatch(event);
+        });
+    }
+    onForceReload(e) {
+        if (this.xmlEditorView && this.xmlEditorView.isEdited()) {
+            this.app.mei = this.xmlEditorView.getValue();
+            let event = new CustomEvent('onUpdateData', {
+                detail: {
+                    caller: this.xmlEditorView
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
     }
 }
 //# sourceMappingURL=editor-panel.js.map

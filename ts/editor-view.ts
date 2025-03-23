@@ -8,28 +8,26 @@ import { ResponsiveView } from './responsive-view.js';
 import { CursorPointer } from './cursor-pointer.js';
 import { ActionManager } from './action-manager.js';
 import { VerovioWorkerProxy } from './worker-proxy.js';
-import { VerovioView } from './verovio-view.js';
 
-import { appendDivTo } from './utils/functions.js';
-
-import * as soundsImport from '../javascript/utils/sounds.js';
+import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from './utils/functions.js';
+import { midiScale } from './utils/midi-scale.js'
 
 export class EditorView extends ResponsiveView {
-    sounds: soundsImport;
+    midiPlayerElement: MidiPlayerElement;
     svgOverlay: HTMLDivElement;
     cursor: HTMLDivElement;
     cursorPointer: CursorPointer;
     mouseMoveTimer: boolean;
     draggingActive: boolean;
     highlightedCache: Array<string>;
-    audio: any;
     actionManager: ActionManager;
     lastNote: { midiPitch: number, oct: string, pname: string };
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app, verovio);
 
-        this.sounds = soundsImport;
+        this.midiPlayerElement = appendMidiPlayerTo(this.element, {});
+        this.midiPlayerElement.setAttribute('src', midiScale);
 
         // add the svgOverlay for dragging
         this.svgOverlay = appendDivTo(this.element, { class: `vrv-svg-overlay`, style: { position: `absolute` } });
@@ -49,7 +47,6 @@ export class EditorView extends ResponsiveView {
 
         // For note playback
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
-        this.audio = new Audio();
 
         // EditorAction
         this.actionManager = new ActionManager(this);
@@ -147,8 +144,17 @@ export class EditorView extends ResponsiveView {
         if (this.lastNote.midiPitch === midiPitch) return;
 
         this.lastNote.midiPitch = midiPitch;
-        this.audio.src = eval('this.sounds.c' + midiPitch);
-        this.audio.play();
+
+        // Limit the range to playable notes
+        if (midiPitch > 107) return;
+        if (midiPitch < 21) return;
+
+        this.midiPlayerElement.stop();
+        this.midiPlayerElement.currentTime = ((midiPitch - 21) * 0.5);
+        this.midiPlayerElement.start();
+        setTimeout(() => {
+            this.midiPlayerElement.stop();
+        }, 500);
     }
 
     ////////////////////////////////////////////////////////////////////////

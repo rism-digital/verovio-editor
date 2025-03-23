@@ -37,11 +37,6 @@ export class AppToolbar extends Toolbar {
     zoomIn: HTMLDivElement;
     zoomOut: HTMLDivElement;
 
-    xmlMenu: HTMLDivElement;
-    xmlOverwriteMEINoIds: HTMLDivElement;
-    xmlOverwriteMEI: HTMLDivElement;
-    xmlLoadNoValidation: HTMLDivElement;
-
     settingsEditor: HTMLDivElement;
     settingsVerovio: HTMLDivElement;
 
@@ -145,9 +140,6 @@ export class AppToolbar extends Toolbar {
         const fileExportMIDI = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MIDI` });
         this.app.eventManager.bind(fileExportMIDI, 'click', this.app.fileExportMIDI);
 
-        const fileExportBasic = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Export as MEI-basic` });
-        this.app.eventManager.bind(fileExportBasic, 'click', this.app.fileExportBasic);
-
         appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
 
         this.fileSelection = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Apply content selection` });
@@ -167,27 +159,6 @@ export class AppToolbar extends Toolbar {
 
         this.githubExport = appendDivTo(githubMenuContent, { class: `vrv-menu-text`, 'data-before': `Export (commit/push) to GitHub` });
         this.app.eventManager.bind(this.githubExport, 'click', this.app.githubExport);
-
-        ////////////////////////////////////////////////////////////////////////
-        // XML Editor
-        ////////////////////////////////////////////////////////////////////////
-
-        this.xmlMenu = appendDivTo(this.element, { class: `vrv-menu`, style: { display: `none` } });
-        appendDivTo(this.xmlMenu, { class: `vrv-btn-text`, 'data-before': `XML editor` });
-        const xmlMenuContent = appendDivTo(this.xmlMenu, { class: `vrv-menu-content` });
-        appendDivTo(xmlMenuContent, { class: `vrv-v-separator` });
-
-        this.xmlOverwriteMEI = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Overwrite XML editor data` });
-        this.app.eventManager.bind(this.xmlOverwriteMEI, 'click', this.app.xmlOverwriteMEI);
-
-        this.xmlOverwriteMEINoIds = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Overwrite XML editor data without ids` });
-        this.xmlOverwriteMEINoIds.dataset.noIds = "true";
-        this.app.eventManager.bind(this.xmlOverwriteMEINoIds, 'click', this.app.xmlOverwriteMEI);
-
-        appendDivTo(xmlMenuContent, { class: `vrv-v-separator` });
-
-        this.xmlLoadNoValidation = appendDivTo(xmlMenuContent, { class: `vrv-menu-text`, 'data-before': `Load XML editor data without validation` });
-        this.app.eventManager.bind(this.xmlLoadNoValidation, 'click', this.app.xmlLoadNoValidation);
 
         ////////////////////////////////////////////////////////////////////////
         // Navigation
@@ -288,10 +259,10 @@ export class AppToolbar extends Toolbar {
     ////////////////////////////////////////////////////////////////////////
 
     updateAll(): void {
-        this.updateToolbarBtn(this.prevPage, (this.app.toolbarView.currentPage > 1));
-        this.updateToolbarBtn(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
-        this.updateToolbarBtn(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex > 0)));
-        this.updateToolbarBtn(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex < this.app.zoomLevels.length - 1)));
+        this.updateToolbarBtnEnabled(this.prevPage, (this.app.toolbarView.currentPage > 1));
+        this.updateToolbarBtnEnabled(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
+        this.updateToolbarBtnEnabled(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex > 0)));
+        this.updateToolbarBtnEnabled(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex < this.app.zoomLevels.length - 1)));
 
         let isResponsive = ((this.app.view instanceof ResponsiveView) && !(this.app.view instanceof EditorPanel));
         let isEditor = (this.app.view instanceof EditorPanel);
@@ -310,11 +281,9 @@ export class AppToolbar extends Toolbar {
 
         this.updateToolbarSubmenuBtn(this.fileSelection, hasSelection);
 
-        this.updateToolbarBtnHide(this.xmlMenu, isEditor);
-
         if (this.app.githubManager.isLoggedIn()) {
             this.githubMenu.style.display = 'block';
-            this.updateToolbarBtnHide(this.logout, true);
+            this.updateToolbarBtnDisplay(this.logout, true);
             this.login.setAttribute("data-before", this.app.githubManager.name);
             this.login.classList.add("inactivated");
         }
@@ -378,10 +347,10 @@ export class AppToolbar extends Toolbar {
         if (!super.onStartLoading(e)) return false;
         //console.debug("AppToolbar:onStartLoading");
 
-        this.updateToolbarBtn(this.prevPage, false);
-        this.updateToolbarBtn(this.nextPage, false);
-        this.updateToolbarBtn(this.zoomOut, false);
-        this.updateToolbarBtn(this.zoomIn, false);
+        this.updateToolbarBtnEnabled(this.prevPage, false);
+        this.updateToolbarBtnEnabled(this.nextPage, false);
+        this.updateToolbarBtnEnabled(this.zoomOut, false);
+        this.updateToolbarBtnEnabled(this.zoomIn, false);
 
         return true;
     }

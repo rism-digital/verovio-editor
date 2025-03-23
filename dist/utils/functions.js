@@ -25,8 +25,10 @@ export function appendOptionTo(parent, options) {
 export function appendSelectTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'select');
 }
-export function appendSpanTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'span');
+export function appendSpanTo(parent, options, text = "") {
+    let span = appendHTMLElementTo(parent, options, 'span');
+    span.innerHTML = text;
+    return span;
 }
 export function appendSummaryTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'summary');
@@ -48,6 +50,12 @@ function insertHTMLElementBefore(parent, options, tag, before) {
     setAttributes(element, options);
     parent.insertBefore(element, before);
     return element;
+}
+export function appendMidiPlayerTo(parent, options) {
+    const midiPlayer = appendHTMLElementTo(parent, options, 'midi-player');
+    midiPlayer.setAttribute('sound-font', '');
+    midiPlayer.style.display = 'none';
+    return midiPlayer;
 }
 /**
  * Set attributes of a DOM element. The `style` property is special-cased to

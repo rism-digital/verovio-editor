@@ -46,6 +46,7 @@ $toolbar-height: 36px;
 $menu-height: 18px;
 $statusbar-height: 20px;
 $editor-tool-panel-width: 0px;
+$editor-keyboard-height: 0px; //110px;
 $btn-height: 40px;
 $dialog-gh-list-height: 350px;
 
@@ -53,6 +54,7 @@ $z-index-valid: 5;
 $z-index-menu: 6;
 $z-index-dialog: 7;
 $z-index-notification: 8;
+$z-index-tooltip: 9;
 
 $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
@@ -247,8 +249,21 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 border-bottom: 1px solid $background-border;
             }
 
+            .vrv-keyboard-panel {
+                display: none; //flex;
+                min-height: $editor-keyboard-height;
+                background-color: $background;
+                border-top: 1px solid $background-border;
+                border-bottom: 1px solid $background-border;
+            }
+
             .vrv-h-split {
                 display: flex;
+            }
+
+            .vrv-v-split {
+                display: flex;
+                flex-direction: column;
             }
 
             .vrv-split {
@@ -335,6 +350,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             .vrv-xml-valid.error {
                 background: url(../icons/xml/stop.png) no-repeat center;
                 background-color: #B00;
+            }
+
+            .vrv-xml-valid.unknown {
+                background: url(../icons/xml/unknown.png) no-repeat center;
+                background-color: goldenrod;
             }
         }
     }
@@ -514,7 +534,8 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             .vrv-submenu-content {
                 @extend .vrv-menu-content;
                 margin-top: 0px;
-                left: calc(100% + 1px);
+                left: calc(100% - 0px);
+                border-left: 2px solid rgba(255, 255, 255, .1);
                 white-space: nowrap;
                 display: none !important; // Because we inherit from submenu-content
             }
@@ -539,6 +560,26 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     .vrv-editor-toolbar {
         @extend .vrv-toolbar;
         border-top: 1px solid $background-border;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Tooltip
+    ////////////////////////////////////////////////////////////////////////
+
+    span.vrv-tooltip {
+        display: none;
+        background-color: lighten($background, 10%);
+        border: 1px solid $background-border;
+        padding: 4px 8px;
+        white-space: nowrap;
+        position: absolute;
+        text-align: left;
+        transform: translateX(38px) translateY(1px);
+        z-index: $z-index-tooltip;
+    }
+
+    div:hover > span.vrv-tooltip {
+        display: block;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -863,19 +904,13 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             justify-content: right;
             text-align: right;
 
-            .tooltip {
-                display: none;
-                background-color: lighten($background, 10%);
-                border: 1px solid $background-border;
-                padding: 4px 8px;
-                white-space: nowrap;
-                position: absolute;
-                transform: translateX(calc(100% + 8px)) translateY(-16px);
-                z-index: 1000;
+            .vrv-tooltip-label {
+                @extend .vrv-tooltip;
+                transform: translateX(calc(100% + 8px)) translateY(-16px) !important;
             }
         }
 
-        .vrv-dialog-label:hover .tooltip {
+        .vrv-dialog-label:hover .vrv-tooltip-label {
             display: block;
         }
 
@@ -904,6 +939,111 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         .vrv-dialog-input.non-default {
             accent-color: $primary;
             background: $primary;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Dialog form
+    ////////////////////////////////////////////////////////////////////////
+
+    .vrv-keyboard-navigator {
+        padding: 2px;
+        width: $btn-large;
+        background-repeat: no-repeat;
+        background-position: center center;
+        flex-shrink: 0;
+    }
+
+    .vrv-keyboard-wrapper {
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+
+        $white-key-width: 55px;
+        $black-key-width: 35px;
+        $key-border: 2px;
+        $key-margin: 1px;
+        $octave-label-padding: 12px;
+
+        .vrv-keyboard-octaves {
+            display: flex;
+            min-height: 20px;
+            background: $background;
+
+            .vrv-keyboard-octave {
+                min-width: calc((#{$white-key-width} + #{$key-border} * 2) * 7 + (#{$key-margin} * 6) - #{$octave-label-padding} - 1px);
+                border-left: 1px solid $background-border;
+                border-right: 1px solid $background-border;
+                font-size: 14px;
+                padding-left: $octave-label-padding;
+                padding-top: 1px;
+                color: $background;
+            }
+            .vrv-keyboard-octave.selected {
+                color: $text-color;
+                background-color: $background-light;
+            }
+        }
+
+        .vrv-keyboard-keys {
+            display: flex;
+            position: relative;
+            padding: 0px;
+            min-height: 100px;
+            user-select: none;
+
+            .vrv-keyboard-key {
+                width: $white-key-width;
+                height: 95px;
+                border: $key-border outset #dddddd;
+                border-radius: 0 0 6px 6px;
+                background: white;
+                margin-bottom: -4px;
+                flex-shrink: 0;
+            }
+
+            .vrv-keyboard-key.black {
+                z-index: 1;
+                height: 45px;
+                margin-left: -19px;
+                margin-right: -19px;
+                width: $black-key-width;
+                border-color: #5f5f5f;
+                background-color: #333;
+            }
+
+            .vrv-keyboard-key.white.active {
+                background-color: #ddd
+            }
+
+            .vrv-keyboard-key.black.active {
+                background-color: #000
+            }
+
+            .vrv-keyboard-key.white+.vrv-keyboard-key.white {
+                margin-left: $key-margin;
+            }
+
+            // labels
+
+            .vrv-keyboard-key.selected::before {
+                content: attr(data-key);
+                display: inline-block;
+                text-align: center;
+                font-size: 14px;
+            }
+
+            .vrv-keyboard-key.white.selected::before {
+                color: $background;
+                width: $white-key-width;
+                padding-top: 75px;
+            }
+
+            .vrv-keyboard-key.black.selected::before {
+                color: white;
+                width: $black-key-width;
+                padding-top: 25px;
+            }
         }
     }
 }

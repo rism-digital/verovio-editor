@@ -10,12 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { changelogUrl, libraries, licenseUrl } from './app.js';
 import { Dialog } from './dialog.js';
 import { appendDivTo } from './utils/functions.js';
+import { changelogUrl, libraries, licenseUrl } from './utils/messages.js';
 export class DialogAbout extends Dialog {
-    constructor(div, app, title, options) {
-        super(div, app, title, options);
+    constructor(div, app, title) {
+        super(div, app, title, { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {

@@ -96,8 +96,7 @@ export class DialogSettingsVerovio extends Dialog {
                     const currentValue = this.currentOptions[optionKey];
                     const label = appendDivTo(fields, { class: `vrv-dialog-label` });
                     label.innerHTML = option.title;
-                    const tooltip = appendSpanTo(label, { class: `tooltip` });
-                    tooltip.innerHTML = option.description;
+                    appendSpanTo(label, { class: `vrv-tooltip-label` }, option.description);
                     let input;
                     if (option.type === 'bool') {
                         input = appendInputTo(fields, { class: `vrv-dialog-input`, type: `checkbox` });

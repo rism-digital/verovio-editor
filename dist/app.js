@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const version = "1.3.0";
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './app-toolbar.js';
 import { Dialog } from './dialog.js';
 import { DialogAbout } from './dialog-about.js';
+import { DialogExport } from './dialog-export.js';
 import { DialogGhExport } from './dialog-gh-export.js';
 import { DialogGhImport } from './dialog-gh-import.js';
 import { DialogSelection } from './dialog-selection.js';
@@ -34,19 +34,8 @@ import { ResponsiveView } from './responsive-view.js';
 import { RNGLoader } from './rng-loader.js';
 import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './worker-proxy.js';
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
+import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
 let filter = '/svg/filter.xml';
-export const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;
-export const resetMsg = `This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?`;
-export const reloadMsg = `Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?`;
-export const licenseUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE`;
-export const changelogUrl = `https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md`;
-export const libraries = `Libraries used in this application:\n\
-* [blob-stream](https://github.com/devongovett/blob-stream)\n\
-* [codemirror](https://codemirror.net/)\n\
-* [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
-* [marked](https://marked.js.org/)\n\
-* [pako](https://github.com/nodeca/pako)\n\
-\n`;
 export class App {
     constructor(div, options) {
         this.clientId = "fd81068a15354a300522";
@@ -55,6 +44,7 @@ export class App {
         this.notificationStack = [];
         this.githubManager = new GitHubManager(this);
         this.options = Object.assign({
+            version: version,
             verovioVersion: "latest",
             // The margin around page in documentView
             documentViewMargin: 100,
@@ -65,7 +55,6 @@ export class App {
             documentZoom: 3,
             responsiveZoom: 4,
             editorSplitterHorizontal: true,
-            editorSplitterShow: true,
             editorZoom: 4,
             enableDocument: true,
             enableEditor: true,
@@ -77,8 +66,8 @@ export class App {
             // Editorial is empty by default
             editorial: {},
             // The default schema (latest MEI release by default)
-            schemaDefault: 'https://music-encoding.org/schema/5.0/mei-all.rng',
-            schema: 'https://music-encoding.org/schema/5.0/mei-all.rng',
+            schemaDefault: 'https://music-encoding.org/schema/5.1/mei-all.rng',
+            schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
             defaultView: 'responsive',
             isSafari: false
         }, options);
@@ -86,7 +75,20 @@ export class App {
             window.localStorage.removeItem("options");
         const storedOptions = localStorage.getItem("options");
         if (storedOptions) {
-            this.options = Object.assign(this.options, JSON.parse(storedOptions));
+            let jsonStoredOptions = JSON.parse(storedOptions);
+            // Options.version introduce after 1.3.0
+            let version = (jsonStoredOptions['version'] !== undefined) ? jsonStoredOptions['version'] : "1.3.0";
+            // ignore revisions here
+            const [major1, minor1] = version.split('.').map(Number);
+            const [major2, minor2] = this.options.version.split('.').map(Number);
+            // Do not reload options if we have a new minor release
+            if (major1 < major2 || minor1 < minor2) {
+                // We cannot show a notification at this stage
+                console.warn(`Version ${options.version} is new, options not reloaded`);
+            }
+            else {
+                this.options = Object.assign(this.options, jsonStoredOptions);
+            }
         }
         this.fileStack = new FileStack();
         if (options.appReset)
@@ -148,6 +150,7 @@ export class App {
         const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
         const verovioWorker = new Worker(verovioWorkerURL);
         const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
+        //const verovioUrl = `http://localhost:8001/build/verovio-toolkit-wasm.js`
         verovioWorker.postMessage({ verovioUrl });
         this.verovio = new VerovioWorkerProxy(verovioWorker);
         this.verovioOptions =
@@ -380,6 +383,10 @@ export class App {
             if (convert) {
                 this.mei = yield this.verovio.getMEI({});
             }
+            if (this.viewEditor) {
+                this.viewEditor.xmlEditorView.setEnabled(false);
+                this.viewEditor.xmlEditorView.setMode(this.mei.length);
+            }
             yield this.checkSchema();
             let event = new CustomEvent('onLoadData', {
                 detail: {
@@ -409,16 +416,10 @@ export class App {
             const schema = /<\?xml-model.*href="([^"]*).*/;
             const schemaMatch = schema.exec(this.mei);
             if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
-                if (yield this.viewEditor.xmlEditorView.replaceSchema(schemaMatch[1])) {
-                    this.currentSchema = schemaMatch[1];
-                    this.showNotification(`Current MEI Schema changed to '${this.currentSchema}'`);
-                }
-                else {
-                    this.currentSchema = this.options.schemaDefault;
-                    const dlg = new Dialog(this.dialog, this, "Error when loading the MEI Schema", { icon: "error", type: Dialog.Type.Msg });
-                    dlg.setContent(`The Schema '${schemaMatch[1]}' could not be loaded<br>The validation will be performed using '${this.options.schemaDefault}'`);
-                    yield dlg.show();
-                }
+                this.currentSchema = this.options.schemaDefault;
+                const dlg = new Dialog(this.dialog, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
+                dlg.setContent(`The Schema '${schemaMatch[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`);
+                yield dlg.show();
             }
         });
     }
@@ -453,24 +454,13 @@ export class App {
             this.output.click();
         });
     }
-    generateMEIBasic() {
+    generateMEI(options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const meiOutputStr = yield this.verovio.getMEI({ basic: true, removeIds: true });
+            const meiOutputStr = yield this.verovio.getMEI(options);
             this.endLoading();
             this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
             this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
             this.output.click();
-        });
-    }
-    confirmLargeFileLoading(size) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Approx. 1 MB limit - fairly arbitrarily
-            if (size < 1000000)
-                return true;
-            const dlg = new Dialog(this.dialog, this, "Large file warning", { okLabel: "Continue", icon: "warning" });
-            dlg.setContent("You are trying to load a large file into the Editor. This can yield poor performance.<br>Do you want to proceed?");
-            const dlgRes = yield dlg.show();
-            return (dlgRes !== 0);
         });
     }
     ////////////////////////////////////////////////////////////////////////
@@ -584,10 +574,6 @@ export class App {
             const convert = (element.dataset.ext != 'MEI') ? true : false;
             reader.onload = function (e) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (readerThis.view instanceof EditorPanel) {
-                        if ((yield readerThis.confirmLargeFileLoading(file.size)) !== true)
-                            return;
-                    }
                     readerThis.loadData(e.target.result, filename, convert);
                 });
             };
@@ -596,15 +582,12 @@ export class App {
     }
     fileExport(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(this.mei);
-            this.output.download = this.filename;
-            this.output.click();
-        });
-    }
-    fileExportBasic(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.startLoading("Generating MEI-basic file ...");
-            this.generateMEIBasic();
+            const dlg = new DialogExport(this.dialog, this, "Select MEI export parameters");
+            const dlgRes = yield dlg.show();
+            if (dlgRes === 0)
+                return;
+            this.startLoading("Generating MEI file ...");
+            this.generateMEI(dlg.exportOptions);
         });
     }
     fileExportPDF(e) {
@@ -686,25 +669,6 @@ export class App {
             this.customEventManager.dispatch(event);
         });
     }
-    xmlLoadNoValidation(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const mei = this.viewEditor.xmlEditorView.getValue();
-            //const mei = await this.verovio.getMEI(params);
-            this.mei = mei;
-            let event = new CustomEvent('onUpdateData', {
-                detail: {
-                    currentId: this.clientId,
-                    caller: this.view
-                }
-            });
-            this.customEventManager.dispatch(event);
-        });
-    }
-    xmlIndent(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Not sure how to through this event?
-        });
-    }
     settingsEditor(e) {
         return __awaiter(this, void 0, void 0, function* () {
             const dlg = new DialogSettingsEditor(this.dialog, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
@@ -740,7 +704,7 @@ export class App {
     }
     helpAbout(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogAbout(this.dialog, this, "About this application", { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
+            const dlg = new DialogAbout(this.dialog, this, "About this application");
             const vrvVersion = yield this.verovio.getVersion();
             dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
             yield dlg.load();
@@ -770,10 +734,6 @@ export class App {
             const element = e.target;
             if (this.midiToolbar && this.midiToolbar.playing) {
                 this.midiPlayer.stop();
-            }
-            if (element.dataset.view === 'editor') {
-                if ((yield this.confirmLargeFileLoading(this.mei.length)) !== true)
-                    return;
             }
             let event = new CustomEvent('onDeactivate');
             this.view.customEventManager.dispatch(event);
