@@ -51,7 +51,7 @@ export class FileStack {
 
         this.stack.filenames[this.stack.idx] = filename;
         //let compressedData = zlib.deflateSync( data ).toString( 'base64' );
-        let compressedData = btoa(pako.deflate(data, { to: 'string' }));
+        let compressedData = pako ? btoa(pako.deflate(data, { to: 'string' })) : "";
         window.localStorage.setItem("file-" + this.stack.idx, compressedData);
 
         // Increase the stack items if not full
@@ -63,7 +63,7 @@ export class FileStack {
     load(idx: number): File {
         let data = window.localStorage.getItem("file-" + idx);
         //let decompressedData = zlib.inflateSync( new Buffer( data, 'base64' ) ).toString();
-        let decompressedData = pako.inflate(atob(data), { to: 'string' });
+        let decompressedData = pako ? pako.inflate(atob(data), { to: 'string' }) : "";
         return { filename: this.stack.filenames[idx], data: decompressedData };
     }
 

@@ -1,3 +1,6 @@
+# 1.4.1
+* Fix MIDI player not loaded in the Verovio App
+
 # 1.4.0
 * Toggle XML editor
 * Disable live validation and refreshing for files larger than 0.5 MB
