@@ -122,6 +122,8 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         appendDivTo(this.element, { class: `vrv-h-separator` });
         const settingsMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        if (!app.options.enableEditor)
+            settingsMenu.style.display = 'none';
         appendDivTo(settingsMenu, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsSettings})` }, 'data-before': `Settings` });
         const settingsMenuContent = appendDivTo(settingsMenu, { class: `vrv-menu-content` });
         appendDivTo(settingsMenuContent, { class: `vrv-v-separator` });

@@ -1,3 +1,6 @@
+# 1.4.2
+* Hide the settings menu in the Verovio App
+
 # 1.4.1
 * Fix MIDI player not loaded in the Verovio App
 
