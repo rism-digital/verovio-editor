@@ -1,7 +1,7 @@
 /**
  * Messages and values
  */
-export const version = "1.4.2";
+export const version = "1.4.3";
 export const autoModeLimit = 0.5;
 export const autoModeOff = `Live validation and synchronization from the XML editor is disabled for files larger than ${autoModeLimit}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`;
 export const aboutMsg = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${version}`;

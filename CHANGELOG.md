@@ -1,3 +1,6 @@
+# 1.4.3
+* Use local version for some external packages
+
 # 1.4.2
 * Hide the settings menu in the Verovio App
 
