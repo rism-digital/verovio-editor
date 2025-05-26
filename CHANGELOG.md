@@ -1,3 +1,6 @@
+# 1.4.4
+* Add CMME input menu
+
 # 1.4.3
 * Use local version for some external packages
 
