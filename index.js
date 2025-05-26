@@ -46,7 +46,7 @@ if ( urlFile != null )
 }
 if ( getParameterByName( 'musicxml' ) != null ) convert = false;
 
-// Load a file (MEI or MusicXML)
+// Load a file (MEI, MusicXML, or CMME)
 fetch( file )
     .then( function ( response )
     {

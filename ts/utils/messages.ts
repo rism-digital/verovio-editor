@@ -2,7 +2,7 @@
  * Messages and values
  */
 
-export const version = "1.4.3";
+export const version = "1.4.4";
 
 export const autoModeLimit: number = 0.5;
 export const autoModeOff = `Live validation and synchronization from the XML editor is disabled for files larger than ${autoModeLimit}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`

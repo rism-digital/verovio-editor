@@ -557,6 +557,8 @@ export class App {
                 this.input.accept = ".xml, .mei";
             else if (element.dataset.ext === 'MusicXML')
                 this.input.accept = ".xml, .musicxml";
+            else if (element.dataset.ext === 'CMME')
+                this.input.accept = ".xml, .cmme.xml";
             //console.log( element.dataset.ext );
             this.input.dataset.ext = element.dataset.ext;
             this.input.click();

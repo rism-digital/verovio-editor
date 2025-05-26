@@ -66,6 +66,9 @@ export class AppToolbar extends Toolbar {
         this.fileImportMusicXML = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Import MusicXML file` });
         fileMenuContent.appendChild(this.fileImportMusicXML);
         this.app.eventManager.bind(this.fileImportMusicXML, 'click', this.app.fileImport);
+        this.fileImportCMME = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Import CMME file` });
+        fileMenuContent.appendChild(this.fileImportCMME);
+        this.app.eventManager.bind(this.fileImportCMME, 'click', this.app.fileImport);
         const fileRecentSubMenu = appendDivTo(fileMenuContent, { class: `vrv-submenu` });
         this.fileRecent = appendDivTo(fileRecentSubMenu, { class: `vrv-submenu-text`, 'data-before': `Recent files` });
         this.subSubMenu = appendDivTo(fileRecentSubMenu, { class: `vrv-submenu-content` });
