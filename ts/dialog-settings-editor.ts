@@ -25,11 +25,11 @@ export class DialogSettingsEditor extends Dialog {
         const labelVerovioVersion = appendDivTo(this.fields, { class: `vrv-dialog-label` });
         labelVerovioVersion.innerHTML = "Verovio version";
         this.verovioVersion = appendSelectTo(this.fields, { class: `vrv-dialog-input` });
-        ["latest", "develop"].forEach(version => {
+        [[ "latest", "Latest release"], ["develop", "Development version"]].forEach(version => {
             let option = appendOptionTo(this.verovioVersion, {});
-            option.value = version;
-            option.innerHTML = version;
-            if (appOptions.verovioVersion === version) option.selected = true;
+            option.value = version[0];
+            option.innerHTML = version[1];
+            if (appOptions.verovioVersion === version[0]) option.selected = true;
         })
     }
 

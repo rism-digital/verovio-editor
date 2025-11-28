@@ -171,7 +171,7 @@ export class EditorView extends ResponsiveView {
         }
 
         // Make all /g, /path and /text transparent
-        for (const node of this.svgOverlay.querySelectorAll('g, path, text, polyline')) {
+        for (const node of this.svgOverlay.querySelectorAll('g, path, text, ellipse, polyline')) {
             (<SVGElement>node).style.stroke = 'transparent';
             (<SVGElement>node).style.fill = 'transparent';
         }

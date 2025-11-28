@@ -1,3 +1,6 @@
+# 1.4.5
+* Fix editor overlay
+
 # 1.4.4
 * Add CMME input menu
 
