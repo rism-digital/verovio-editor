@@ -4,3 +4,5 @@
 dist/*.map
 dist/*/*.map
 local/*
+.idea
+.DS_Store
